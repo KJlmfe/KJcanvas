@@ -7,16 +7,23 @@
 		<canvas id="canvas" width="960" height="600" style="border:1px solid #000000;"></canvas>
 		
 	<script type="text/javascript">
-		var canvas= document.getElementById("canvas");
-		var ctx = canvas.getContext("2d");
-	
-		var abc = new Rectangle(ctx,50,90,300,200,"00f");
+		var Mycanvas= document.getElementById("canvas");
+		var ctx = Mycanvas.getContext("2d");
+
+		var canvas = new canvas(Mycanvas.width,Mycanvas.height);
+		
+		var abc = new Rectangle(50,90,300,300,"00f");
 		abc.draw();
-		canvasSave(abc);	
-		var sfsa = new Rectangle(ctx,15,15,200,200,"f00");
+		
+		var sfsa = new Rectangle(45,45,200,200,"f00");
 		sfsa.draw();
-		canvasSave(sfsa);
-		sfsa.move(900,600);
+	
+		abc.move(100,300,25);
+		sfsa.move(300,300,1);
+		
+		var tmp = new Rectangle(45,45,0,550,"0f0");
+		tmp.draw();
+
 
 	</script>
 
