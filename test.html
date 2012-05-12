@@ -1,0 +1,24 @@
+<html>
+	<head>
+		<script src="Animation/rectangle.js"></script>
+	</head>
+
+	<body>
+		<canvas id="canvas" width="960" height="600" style="border:1px solid #000000;"></canvas>
+		
+	<script type="text/javascript">
+		var canvas= document.getElementById("canvas");
+		var ctx = canvas.getContext("2d");
+	
+		var abc = new Rectangle(ctx,50,90,300,200,"00f");
+		abc.draw();
+		canvasSave(abc);	
+		var sfsa = new Rectangle(ctx,15,15,200,200,"f00");
+		sfsa.draw();
+		canvasSave(sfsa);
+		sfsa.move(900,600);
+
+	</script>
+
+	</body>
+</html>
