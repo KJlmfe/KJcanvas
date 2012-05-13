@@ -35,10 +35,12 @@ canvas.prototype.clear = function() //清空画板
 	ctx.clearRect(0,0,this.w,this.h);
 }
 
-Rectangle = function(width,height,x,y,color) //矩形长、宽，位置，颜色
+Rectangle = function(width,height,x,y) //矩形长、宽，位置
 {
-	this.id = this;
-	this.color = color;
+	this.text = "ABC";      //矩形填充的文本内容
+	this.backColor = "abc";  //背景色
+	this.edgeColor = "000";  //边框颜色
+	this.textColor = "f00";  //文本颜色
 	this.w = width;
 	this.h = height;
 	this.x = x;
@@ -53,10 +55,18 @@ Rectangle.prototype.draw = function(x,y) //矩形左上角所在位置
 		this.x = x;
 		this.y = y;
 	}
-	ctx.fillStyle = this.color;
+	ctx.fillStyle = this.backColor;
 	ctx.fillRect(this.x,this.y,this.w,this.h);  //画一个实体矩形
-//	this.ctx.strokeRect(this.x,this.y,this.w,this.h); //勾画出矩形边框
-//	this.ctx.clearRect(this.x,this.y,this.w,this.h);  //清空内部，只留边框	
+
+	ctx.fillStyle = this.edgeColor;
+	ctx.strokeRect(this.x,this.y,this.w,this.h); //勾画出矩形边框
+
+	ctx.fillStyle = this.textColor;      //在矩形中间绘制文本内容
+	ctx.textAlign = 'center';
+	ctx.font         = '10px sans-serif';
+	ctx.textBaseline   = 'middle'; 
+	ctx.lineWidth = 1;
+	ctx.fillText(this.text,this.x+this.w/2,this.y+this.h/2);  
 }
 Rectangle.prototype.clear = function() //橡皮擦擦掉矩形
 {
@@ -71,7 +81,7 @@ Rectangle.prototype.move = function(x,y,speed,action) //移动一个巨型
 	}
 	else
 		return;
-	if(speed)  //设置移动速度
+	if(speed)  //设置移动速度  每次移动1px的毫秒
 		this.speed = speed;
 	else
 		this.speed = 24;
