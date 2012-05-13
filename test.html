@@ -20,15 +20,15 @@
 		
 		var abc = new Rectangle(50,90,300,300,"00f");
 		abc.draw();
-		
+	
 		var sfsa = new Rectangle(45,45,200,200,"f00");
 		sfsa.draw();
-	
-		abc.move(100,300,25);
-		sfsa.move(300,300,1000);
-		
 		var tmp = new Rectangle(45,45,0,550,"0f0");
 		tmp.draw();
+		canvas.cmd("setup");	
+		canvas.cmd("abc.move(0,0,5000)");
+		canvas.cmd("sfsa.move(300,300,7000)");
+		canvas.cmd("tmp.move(500,500,3000)");
 
 	</script>
 

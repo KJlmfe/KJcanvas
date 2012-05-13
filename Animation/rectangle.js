@@ -1,8 +1,22 @@
+
 canvas = function(width,height)
 {
 	this.w = width;
 	this.h = height;
 	this.Shape = new Array(); //用于保存画板上存在的图形对象
+	this.llink = new Array(); //用于保存动画命令
+	this.time = 0;
+}
+canvas.prototype.cmd = function(string)
+{
+	if(string == "setup")
+	{
+		this.time = 0;
+		return;
+	}
+
+	setTimeout(string,this.time);
+	this.time += parseInt( string.substring( string.lastIndexOf(',')+1 , string.lastIndexOf(')') ) );
 }
 canvas.prototype.exist = function(obj)  //判断obj图形对象是否在画板上存在
 {
@@ -34,7 +48,6 @@ canvas.prototype.clear = function() //清空画板
 {
 	ctx.clearRect(0,0,this.w,this.h);
 }
-
 Rectangle = function(width,height,x,y) //矩形长、宽，位置
 {
 	this.text = "ABC";      //矩形填充的文本内容
@@ -72,19 +85,16 @@ Rectangle.prototype.clear = function() //橡皮擦擦掉矩形
 {
 	this.ctx.clearRect(this.x,this.y,this.w,this.h);
 }
-Rectangle.prototype.move = function(x,y,speed,action) //移动一个巨型
+Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 {
-	if(x && y)  //设置目标位置
-	{
-		this.aimX = x;
-		this.aimY = y;
-	}
+	//设置目标位置
+	this.aimX = x;
+	this.aimY = y;
+	
+	if(time)  //设置移动时间
+		this.time = time;
 	else
-		return;
-	if(speed)  //设置移动速度  每次移动1px的毫秒
-		this.speed = speed;
-	else
-		this.speed = 24;
+		this.time = 3000;
 	if(action)  //设置移动路线
 		this.action = action;
 	else
@@ -106,6 +116,7 @@ Rectangle.prototype.move = function(x,y,speed,action) //移动一个巨型
 	}
 	if(this.aimX > this.x)   // 原图形右侧运动
 	{
+		this.speed = this.time / (this.aimX - this.x);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -124,6 +135,7 @@ Rectangle.prototype.move = function(x,y,speed,action) //移动一个巨型
 	}
 	else if(this.aimX < this.x)   // 原图形左侧运动
 	{
+		this.speed = this.time / (this.x - this.aimX);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -142,6 +154,7 @@ Rectangle.prototype.move = function(x,y,speed,action) //移动一个巨型
 	}
 	else if(this.aimY < this.y)   // 原图形正上方运动
 	{
+		this.speed = this.time / (this.y - this.aimY);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -159,6 +172,7 @@ Rectangle.prototype.move = function(x,y,speed,action) //移动一个巨型
 	}
 	else if(this.aimY > this.y)   // 原图形正下方运动
 	{
+		this.speed = this.time / (this.aimY - this.y);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
