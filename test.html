@@ -6,9 +6,11 @@
 
 	<body>
 		<div id="controlBar">
-			<input type="text" name="text"/>
-			<input type="button" value="PUSH" name="push"/>
-			<input type="button" value="POP" name="pop">
+			<input type="text" id="text"/>
+
+			<input type="button" value="Create a Stack" onclick="create();" />
+			<input type="button" value="PUSH" id="push"/>
+			<input type="button" value="POP" id="pop"/>
 		</div>
 		<canvas id="canvas" width="960" height="600" style="border:1px solid #000000;"></canvas>
 		
@@ -17,18 +19,54 @@
 		var ctx = Mycanvas.getContext("2d");
 		
 		var canvas = new canvas(Mycanvas.width,Mycanvas.height);
-		
-		var abc = new Rectangle(50,90,300,300,"00f");
-		abc.draw();
-	
-		var sfsa = new Rectangle(45,45,200,200,"f00");
-		sfsa.draw();
-		var tmp = new Rectangle(45,45,0,550,"0f0");
-		tmp.draw();
-		canvas.cmd("setup");	
-		canvas.cmd("abc.move(0,0,5000)");
-		canvas.cmd("sfsa.move(300,300,7000)");
-		canvas.cmd("tmp.move(500,500,3000)");
+		var ArrayStack;
+		function create()
+		{
+			value = $("#text").val();
+			 ArrayStack = new Stack(value);
+			$("#push").click(function(){
+				value = $("#text").val();
+				ArrayStack.push(value);
+			});
+			$("#pop").click(function(){
+				value = $("#text").val();
+				ArrayStack.pop();
+			});
+		}
+		Stack = function(size)
+		{
+			this.stack = new Array();
+			this.top = 0;
+			if(size)
+				this.size = size;
+		}
+	Stack.WIDTH = 30;
+	Stack.HEIGHT = 30;
+	Stack.X = 30;
+	Stack.Y = 30;
+	Stack.time = 1000;
+	Stack.ENDX = 300;
+	Stack.ENDY = 500;
+		Stack.prototype.push = function( value )
+		{
+			
+		 this.stack[this.top] = new Rectangle(Stack.WIDTH,Stack.HEIGHT,Stack.X,Stack.Y,value);
+		 canvas.cmd("setup");
+		 canvas.cmd("ArrayStack.stack[ArrayStack.top].draw()",100);
+		 if(this.top == 0)
+		 	waitTime = canvas.cmd("ArrayStack.stack[ArrayStack.top].move(Stack.ENDX,Stack.ENDY,Stack.time)",Stack.time);
+		 else
+		 	waitTime = canvas.cmd("ArrayStack.stack[ArrayStack.top].move(ArrayStack.stack[ArrayStack.top-1].x,ArrayStack.stack[ArrayStack.top-1].y-Stack.WIDTH,Stack.time)",Stack.time);
+		 setTimeout("ArrayStack.top++",waitTime);	
+		}
+		Stack.prototype.pop = function()
+		{
+		 	this.top--;
+			canvas.cmd("setup");
+		    canvas.cmd("ArrayStack.stack[ArrayStack.top].move(Stack.X,Stack.Y,Stack.time)",Stack.time);
+			canvas.cmd("delay",700);
+			canvas.cmd("ArrayStack.stack[ArrayStack.top].del()",0);
+		}
 
 	</script>
 

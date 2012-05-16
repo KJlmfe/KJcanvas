@@ -7,16 +7,22 @@ canvas = function(width,height)
 	this.llink = new Array(); //用于保存动画命令
 	this.time = 0;
 }
-canvas.prototype.cmd = function(string)
+canvas.prototype.cmd = function(string,time)  //动画命令控制器  string是要执行的动画命令  time是该动画命令所占用的时间
 {
-	if(string == "setup")
+	if(string == "setup")       
 	{
 		this.time = 0;
-		return;
+		return 0;
 	}
-
+    if(string == "delay")
+	{
+		this.time += time;
+		return this.time;
+	}
 	setTimeout(string,this.time);
-	this.time += parseInt( string.substring( string.lastIndexOf(',')+1 , string.lastIndexOf(')') ) );
+	this.time += time;
+	//	this.time += parseInt( string.substring( string.lastIndexOf(',')+1 , string.lastIndexOf(')') ) );
+	return this.time;
 }
 canvas.prototype.exist = function(obj)  //判断obj图形对象是否在画板上存在
 {
@@ -31,6 +37,7 @@ canvas.prototype.save = function(obj) //保存obj图形对象到Shape数组
 }
 canvas.prototype.restore = function() //将Shape里的所有图形对象重绘
 {
+	this.clear();
 	for(i=0;i<this.Shape.length;i++)
 		if(this.Shape[i])
 			this.Shape[i].draw();
@@ -48,9 +55,9 @@ canvas.prototype.clear = function() //清空画板
 {
 	ctx.clearRect(0,0,this.w,this.h);
 }
-Rectangle = function(width,height,x,y) //矩形长、宽，位置
+Rectangle = function(width,height,x,y,text) //矩形长、宽，位置
 {
-	this.text = "ABC";      //矩形填充的文本内容
+	this.text = text;      //矩形填充的文本内容
 	this.backColor = "abc";  //背景色
 	this.edgeColor = "000";  //边框颜色
 	this.textColor = "f00";  //文本颜色
@@ -81,16 +88,20 @@ Rectangle.prototype.draw = function(x,y) //矩形左上角所在位置
 	ctx.lineWidth = 1;
 	ctx.fillText(this.text,this.x+this.w/2,this.y+this.h/2);  
 }
-Rectangle.prototype.clear = function() //橡皮擦擦掉矩形
+Rectangle.prototype.clear = function() //橡皮擦擦掉矩形内部
 {
-	this.ctx.clearRect(this.x,this.y,this.w,this.h);
+	ctx.clearRect(this.x,this.y,this.w,this.h);
+}
+Rectangle.prototype.del = function()
+{
+	canvas.del(this);
+	canvas.restore();
 }
 Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 {
 	//设置目标位置
 	this.aimX = x;
 	this.aimY = y;
-	
 	if(time)  //设置移动时间
 		this.time = time;
 	else
@@ -116,7 +127,7 @@ Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 	}
 	if(this.aimX > this.x)   // 原图形右侧运动
 	{
-		this.speed = this.time / (this.aimX - this.x);
+		this.speed = (this.aimX - this.x)/(this,time/24);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -125,17 +136,22 @@ Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 			//重画画布上的图形
 			canvas.restore();
 			//绘制移动图形
-			me.x++;
+			me.x += me.speed;
 			me.y = me.k*me.x + me.b;
+			if(me.x >= me.aimX)
+			{
+				me.x = me.aimX;
+				me.y = me.aimY;
+			}
 			me.draw(me.x,me.y);
 			//判断是否到达目标位置
 			if(me.aimX == me.x)
 				clearInterval(me.timer);
-		},me.speed);
+		},24);
 	}
 	else if(this.aimX < this.x)   // 原图形左侧运动
 	{
-		this.speed = this.time / (this.x - this.aimX);
+		this.speed = (this.x - this.aimX)/(this,time/24);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -144,17 +160,22 @@ Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 			//重画画布上的图形
 			canvas.restore();
 			//绘制移动图形
-			me.x--;
+			me.x -= me.speed;
 			me.y = me.k*me.x + me.b;
+			if(me.x <= me.aimX)
+			{
+				me.x = me.aimX;
+				me.y = me.aimY;
+			}
 			me.draw(me.x,me.y);
 			//判断是否到达目标位置
 			if(me.aimX == me.x)
 				clearInterval(me.timer);
-		},me.speed);
+		},24);
 	}
 	else if(this.aimY < this.y)   // 原图形正上方运动
 	{
-		this.speed = this.time / (this.y - this.aimY);
+		this.speed = (this.y - this.aimY)/(this,time/24);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -163,16 +184,18 @@ Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 			//重画画布上的图形
 			canvas.restore();
 			//绘制移动图形
-			me.y--;
+			me.y -= me.speed;
+			if(me.y < me.aimY)
+				me.y = me.aimY;
 			me.draw(me.x,me.y);
 			//判断是否到达目标位置
 			if(me.aimY == me.y)
 				clearInterval(me.timer);
-		},me.speed);
+		},24);
 	}
 	else if(this.aimY > this.y)   // 原图形正下方运动
 	{
-		this.speed = this.time / (this.aimY - this.y);
+		this.speed = (this.aimY - this.y)/(this,time/24);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -181,11 +204,13 @@ Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 			//重画画布上的图形
 			canvas.restore();
 			//绘制移动图形
-			me.y++;
+			me.y += me.speed;
+			if(me.y > me.aimY)
+				me.y = me.aimY;
 			me.draw(me.x,me.y);
 			//判断是否到达目标位置
-			if(me.aimY == me.y)
+			if(me.aimY ==  me.y)
 				clearInterval(me.timer);
-		},me.speed);
+		},24);
 	}
 }
