@@ -1,28 +1,70 @@
-
 canvas = function(width,height)
 {
 	this.w = width;
 	this.h = height;
 	this.Shape = new Array(); //用于保存画板上存在的图形对象
-	this.llink = new Array(); //用于保存动画命令
-	this.time = 0;
+	this.queue = new Array(); //用于保存动画命令
+	this.animate_timer = 0;   //动画命令计时器
 }
-canvas.prototype.cmd = function(string,time)  //动画命令控制器  string是要执行的动画命令  time是该动画命令所占用的时间
+function addAlgorithmControlBar(type,value)
 {
-	if(string == "setup")       
+	var element = document.createElement("input");
+	element.setAttribute("type",type);
+	element.setAttribute("value",value);
+	element.setAttribute("class","controler");
+
+	var father = document.getElementById("AlgorithmControlBar");
+	
+	father.appendChild(element);
+	return element;
+}
+function disabledAlgorithmControlBar()
+{
+	var father = document.getElementById("AlgorithmControlBar");
+
+}
+canvas.prototype.cmd = function()  //动画命令控制器 
+{
+	var me = this;
+	if(arguments[0] == "Setup")       
 	{
-		this.time = 0;
-		return 0;
+		this.animate_timer = 0;
+		this.rear = 0;
+		this.front = 0;
 	}
-    if(string == "delay")
+    else if(arguments[0] == "Delay")
 	{
-		this.time += time;
-		return this.time;
+		this.animate_timer += arguments[1];
 	}
-	setTimeout(string,this.time);
-	this.time += time;
-	//	this.time += parseInt( string.substring( string.lastIndexOf(',')+1 , string.lastIndexOf(')') ) );
-	return this.time;
+	else
+	{
+		this.queue[this.rear++] = arguments;
+
+		if(arguments[0] == "Draw")
+		{
+			setTimeout(function(){
+				me.queue[me.front][1].draw(me.queue[me.front][2],me.queue[me.front][3]);
+				me.front++;
+			},me.animate_timer);
+		}
+		else if(arguments[0] == "Move")
+		{
+			setTimeout(function(){
+				me.queue[me.front][1].move(me.queue[me.front][2],me.queue[me.front][3],me.queue[me.front][4]);
+				me.front++;
+			},me.animate_timer);
+			this.animate_timer += arguments[1].timeOfMove(arguments[2],arguments[3],arguments[4]);
+		}
+		else if(arguments[0] == "Delete")
+		{
+			setTimeout(function(){
+				me.queue[me.front][1].del();
+				me.front++;
+			},me.animate_timer);
+		}
+	}
+	
+	return this.animate_timer;
 }
 canvas.prototype.exist = function(obj)  //判断obj图形对象是否在画板上存在
 {
@@ -55,6 +97,7 @@ canvas.prototype.clear = function() //清空画板
 {
 	ctx.clearRect(0,0,this.w,this.h);
 }
+
 Rectangle = function(width,height,x,y,text) //矩形长、宽，位置
 {
 	this.text = text;      //矩形填充的文本内容
@@ -92,27 +135,26 @@ Rectangle.prototype.clear = function() //橡皮擦擦掉矩形内部
 {
 	ctx.clearRect(this.x,this.y,this.w,this.h);
 }
-Rectangle.prototype.del = function()
+Rectangle.prototype.del = function()  //从画板上删除该矩形
 {
 	canvas.del(this);
 	canvas.restore();
 }
-Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
+Rectangle.prototype.move = function(x,y,speed,action) //移动一个巨型
 {
 	//设置目标位置
 	this.aimX = x;
 	this.aimY = y;
-	if(time)  //设置移动时间
-		this.time = time;
+	if(speed)  //设置移动速度
+		this.speed = speed;
 	else
-		this.time = 3000;
+		this.speed = 5;
 	if(action)  //设置移动路线
 		this.action = action;
 	else
 		this.action = "line";
 
 	var me = this;  //setInterval 里不能直接调用this.draw,所以使用变量作用域解决这个问题
-	
 	
 	//默认沿着两点间的直线路径移动
 	if(me.x != me.aimX)
@@ -127,7 +169,6 @@ Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 	}
 	if(this.aimX > this.x)   // 原图形右侧运动
 	{
-		this.speed = (this.aimX - this.x)/(this,time/24);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -148,10 +189,11 @@ Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 			if(me.aimX == me.x)
 				clearInterval(me.timer);
 		},24);
+
+		return Math.ceil( (this.aimX - this.x) / this.speed ) * 24;
 	}
 	else if(this.aimX < this.x)   // 原图形左侧运动
 	{
-		this.speed = (this.x - this.aimX)/(this,time/24);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -172,10 +214,11 @@ Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 			if(me.aimX == me.x)
 				clearInterval(me.timer);
 		},24);
+		
+		return Math.ceil( (this.x - this.aimX) / this.speed ) * 24;
 	}
 	else if(this.aimY < this.y)   // 原图形正上方运动
 	{
-		this.speed = (this.y - this.aimY)/(this,time/24);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -192,10 +235,11 @@ Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 			if(me.aimY == me.y)
 				clearInterval(me.timer);
 		},24);
+		
+		return Math.ceil( (this.y - this.aimY) / this.speed ) * 24;
 	}
 	else if(this.aimY > this.y)   // 原图形正下方运动
 	{
-		this.speed = (this.aimY - this.y)/(this,time/24);
 		this.timer = setInterval(function(){
 			//擦干净画布
 			canvas.clear();
@@ -212,5 +256,32 @@ Rectangle.prototype.move = function(x,y,time,action) //移动一个巨型
 			if(me.aimY ==  me.y)
 				clearInterval(me.timer);
 		},24);
+		
+		return Math.ceil( (this.aimY - this.y) / this.speed ) * 24;
+	}
+}
+
+Rectangle.prototype.timeOfMove = function(x,y,speed) //计算移动一个巨型的动画时间
+{
+	//设置目标位置
+	this.aimX = x;
+	this.aimY = y;
+	this.speed = speed;
+
+	if(this.aimX > this.x)   // 原图形右侧运动
+	{
+		return Math.ceil( (this.aimX - this.x) / this.speed ) * 24;
+	}
+	else if(this.aimX < this.x)   // 原图形左侧运动
+	{
+		return Math.ceil( (this.x - this.aimX) / this.speed ) * 24;
+	}
+	else if(this.aimY < this.y)   // 原图形正上方运动
+	{
+		return Math.ceil( (this.y - this.aimY) / this.speed ) * 24;
+	}
+	else if(this.aimY > this.y)   // 原图形正下方运动
+	{
+		return Math.ceil( (this.aimY - this.y) / this.speed ) * 24;
 	}
 }

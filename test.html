@@ -4,13 +4,10 @@
 		<script src="Animation/rectangle.js"></script>
 	</head>
 
-	<body>
-		<div id="controlBar">
-			<input type="text" id="text"/>
-
-			<input type="button" value="Create a Stack" onclick="create();" />
-			<input type="button" value="PUSH" id="push"/>
-			<input type="button" value="POP" id="pop"/>
+	<body onload="init();">
+		<h3 id="AlgorithmName">
+		</h3>
+		<div id="AlgorithmControlBar">
 		</div>
 		<canvas id="canvas" width="960" height="600" style="border:1px solid #000000;"></canvas>
 		
@@ -19,55 +16,95 @@
 		var ctx = Mycanvas.getContext("2d");
 		
 		var canvas = new canvas(Mycanvas.width,Mycanvas.height);
-		var ArrayStack;
-		function create()
-		{
-			value = $("#text").val();
-			 ArrayStack = new Stack(value);
-			$("#push").click(function(){
-				value = $("#text").val();
-				ArrayStack.push(value);
-			});
-			$("#pop").click(function(){
-				value = $("#text").val();
-				ArrayStack.pop();
-			});
-		}
+		var speed = 1; //全局动画速度百分比 1 = normal速度的百分之百
+		var SHAPE_WIDTH = 30;
+		var SHAPE_HEIGHT = 30;
+		var START_X = 30;
+		var START_Y = 30;
+		var END_X = 300;
+		var END_Y = 500;
+		var MOVE_SPEED = 5;
+		var DELAY_TIME = 1000;
+		var ALGORITHM_NAME = "堆栈(数组)";	
+	
 		Stack = function(size)
 		{
-			this.stack = new Array();
-			this.top = 0;
-			if(size)
-				this.size = size;
+		
 		}
-	Stack.WIDTH = 30;
-	Stack.HEIGHT = 30;
-	Stack.X = 30;
-	Stack.Y = 30;
-	Stack.time = 1000;
-	Stack.ENDX = 300;
-	Stack.ENDY = 500;
+		Stack.prototype.create = function(stackSize)
+		{
+			this.stack = new Array();
+			this.size = 10;
+			this.top = 0;
+			if(stackSize)
+				this.size = stackSize;
+		}
+		function init()
+		{
+			var SimpleStack = new Stack();
+			SimpleStack.addControls(SimpleStack);
+		}
+		Stack.prototype.addControls = function(obj)
+		{
+			$("#AlgorithmName").html(ALGORITHM_NAME);
+			this.TextInput = addAlgorithmControlBar("text","");
+			this.CreatStackButton = addAlgorithmControlBar("button","Creat Stack");
+			this.CreatStackButton.onclick = function(){
+				var stackSize = obj.TextInput.value;
+				obj.create(stackSize);
+				obj.TextInput.value = "";
+				obj.PushButton.disabled = false;
+			}
+
+			this.PushButton = addAlgorithmControlBar("button","Push");
+			this.PushButton.onclick = function(){
+				var value = obj.TextInput.value;
+				obj.push(value);	
+				obj.TextInput.value = "";
+			}
+
+			this.PopButton = addAlgorithmControlBar("button","Pop");
+			this.PopButton.onclick = function(){
+				obj.pop();
+			}
+
+			this.PushButton.disabled = true;
+			this.PopButton.disabled = true;
+		}
 		Stack.prototype.push = function( value )
 		{
-			
-		 this.stack[this.top] = new Rectangle(Stack.WIDTH,Stack.HEIGHT,Stack.X,Stack.Y,value);
-		 canvas.cmd("setup");
-		 canvas.cmd("ArrayStack.stack[ArrayStack.top].draw()",100);
-		 if(this.top == 0)
-		 	waitTime = canvas.cmd("ArrayStack.stack[ArrayStack.top].move(Stack.ENDX,Stack.ENDY,Stack.time)",Stack.time);
-		 else
-		 	waitTime = canvas.cmd("ArrayStack.stack[ArrayStack.top].move(ArrayStack.stack[ArrayStack.top-1].x,ArrayStack.stack[ArrayStack.top-1].y-Stack.WIDTH,Stack.time)",Stack.time);
-		 setTimeout("ArrayStack.top++",waitTime);	
+			this.stack[this.top] = new Rectangle(SHAPE_WIDTH,SHAPE_HEIGHT,START_X,START_Y,value);
+			$(".controler").attr("disabled","disabled");
+			canvas.cmd("Setup");	
+		 	canvas.cmd("Draw",this.stack[this.top],START_X,START_Y);
+		 	canvas.cmd("Delay",DELAY_TIME);
+		
+			if(this.top == 0)
+		 		waitTime = canvas.cmd("Move",this.stack[this.top],END_X,END_Y,MOVE_SPEED);
+		 	else
+		 		waitTime = canvas.cmd("Move",this.stack[this.top],this.stack[this.top-1].x,this.stack[this.top-1].y-SHAPE_WIDTH,MOVE_SPEED);
+			var me = this; 
+			setTimeout(function(){
+				me.top++
+				$(".controler").removeAttr("disabled");
+			},waitTime);		
 		}
 		Stack.prototype.pop = function()
 		{
+			var me = this;
 		 	this.top--;
-			canvas.cmd("setup");
-		    canvas.cmd("ArrayStack.stack[ArrayStack.top].move(Stack.X,Stack.Y,Stack.time)",Stack.time);
-			canvas.cmd("delay",700);
-			canvas.cmd("ArrayStack.stack[ArrayStack.top].del()",0);
-		}
+			$(".controler").attr("disabled","disabled");
 
+			canvas.cmd("Setup");
+		    canvas.cmd("Move",this.stack[this.top],START_X,START_Y,MOVE_SPEED);
+			canvas.cmd("Delay",DELAY_TIME);
+			waitTime = canvas.cmd("Delete",this.stack[this.top]);
+			setTimeout(function(){
+				$(".controler").removeAttr("disabled");
+				if(me.top <= 0)
+					me.PopButton.disabled = true;
+			},waitTime);		
+		}
 	</script>
 
 	</body>
