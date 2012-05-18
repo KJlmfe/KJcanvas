@@ -51,6 +51,8 @@ canvas.prototype.cmd = function()  //动画命令控制器
 
 		if(arguments[0] == "Draw")   //画一个图形
 		{
+			me.queue[me.front][1].x = me.queue[me.front][2];
+			me.queue[me.front][1].y = me.queue[me.front][3];
 			setTimeout(function(){
 				me.queue[me.front][1].draw(me.queue[me.front][2],me.queue[me.front][3]);
 				me.front++;
@@ -81,12 +83,20 @@ canvas.prototype.save = function(obj) //保存obj图形对象到Shape数组
 }
 canvas.prototype.del = function(obj) //从Shape里删除一个图形对象
 {
-	for(i=0;i<this.Shape.length;i++)
-		if(this.Shape[i] == obj)
-		{
+	if(obj == null)   //如果无参数,默认清空所有对象
+	{
+		for(i=0;i<this.Shape.length;i++)
 			this.Shape[i] = null;
-			break;
-		}
+	}
+	else
+	{
+		for(i=0;i<this.Shape.length;i++)
+			if(this.Shape[i] == obj)
+			{
+				this.Shape[i] = null;
+				break;
+			}
+	}
 }
 canvas.prototype.exist = function(obj)  //判断obj图形对象是否在画板上存在
 {

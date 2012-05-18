@@ -12,10 +12,8 @@ var SHAPE_MOVE_SPEED = 5;  //默认图新移动速度
 var SHAPE_MOVE_PATH = "LINE"; //默认图新移动方式(直线)
 var REFRESH_TIME = 24; //默认画面刷新时间
 
-Rectangle = function(width,height,x,y,text) //矩形类(宽，高，位置，填充的文本内容)
+Rectangle = function(width,height,text,backColor,edgeColor,textColor) //矩形类(宽，高，位置，填充的文本内容)
 {
-	this.x = SHAPE_START_X;  //位置
-	this.y = SHAPE_START_Y;
 	
 	this.w = SHAPE_WIDTH;  //大小
 	this.h = SHAPE_HEIGHT;
@@ -31,21 +29,32 @@ Rectangle = function(width,height,x,y,text) //矩形类(宽，高，位置，填
 		this.w = width;
 		this.h = height;
 	}
-	if(x!=null && y!=null)
-	{
-		this.x = x;
-		this.y = y;
-	}
 	if(text!=null)
 	{
 		this.text = text;
+	}
+	if(backColor!=null)
+	{
+		this.backColor = backColor;
+	}
+	if(edgeColor!=null)
+	{
+		this.edgeColor = edgeColor;
+	}
+	if(textColor!=null)
+	{
+		this.textColor = textColor;
 	}
 }
 Rectangle.prototype.draw = function(x,y) //在x,y地方画出该矩形
 {
 	if(!canvas.exist(this))    //每在画板上画一个图形对象，都要将该对象保存到画板的Shape里 
 		canvas.save(this);
-
+	if(this.x == null || this.y == null)
+	{
+		this.x = SHAPE_START_X;  //位置
+		this.y = SHAPE_START_Y;
+	}
 	if(x!=null && y!=null)   //更新当前位置
 	{
 		this.x = x;
