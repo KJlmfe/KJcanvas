@@ -40,11 +40,16 @@ Stack.SHAPE_MOVE_SPEED = 5;  //默认图新移动速度
 Stack.SHAPE_MOVE_PATH = "LINE"; //默认图新移动方式(直线)
 Stack.OVERFLOW_INFO = "堆栈吃饱了,再压栈,堆栈会撑死的！";
 Stack.EMPTY_INFO = "堆栈里空空如也了,弹不出东西了！";
-
+Stack.POINTER_FONT = "20px sans-serif";
+Stack.POINTER_MOVE_SPEED = 2;
+Stack.POINTER_START_X = Stack.FRAME_START_X + Stack.FRAME_WIDTH+100;
+Stack.POINTER_START_Y = Stack.FRAME_START_Y + Stack.FRAME_HEIGHT/2;
+Stack.POINTER_COLOR = "000";
 Stack.prototype.create = function(stackSize)
 {
 	this.stack = new Array();
 	this.frame = new Array();
+	this.pointer = new Label("top",Stack.POINTER_COLOR,Stack.POINTER_FONT);
 	this.size = Stack.SIZE;
 	this.top = 0;
 	if(Positive_Integer.test(stackSize))
@@ -53,7 +58,7 @@ Stack.prototype.create = function(stackSize)
 	canvas.del();
 	canvas.clear();
 	canvas.cmd("Setup");
-	
+	canvas.cmd("Draw",this.pointer,Stack.POINTER_START_X,Stack.POINTER_START_Y);
 	for(i=0; i<this.size; i++)
 	{
 		this.frame[i] = new Rectangle(
@@ -81,14 +86,18 @@ Stack.prototype.push = function( value )
 		canvas.cmd("Setup");	
  		canvas.cmd("Draw",this.stack[this.top],Stack.SHAPE_START_X,Stack.SHAPE_START_Y);
  		canvas.cmd("Delay",DELAY_TIME);
-
+		this.pointer.text = "top";
  		waitTime = canvas.cmd(
 			"Move", this.stack[this.top],
 			this.frame[this.top].x+(Stack.FRAME_WIDTH-Stack.SHAPE_WIDTH)/2,
 			this.frame[this.top].y+(Stack.FRAME_HEIGHT-Stack.SHAPE_HEIGHT)/2,
-			Stack.SHAPE_MOVE_SPEED
+			Stack.SHAPE_MOVE_SPEED,
+			
+			"Move",this.pointer,
+			this.frame[this.top].x+(Stack.FRAME_WIDTH+100),this.frame[this.top].y+(Stack.FRAME_HEIGHT/2),
+			Stack.POINTER_MOVE_SPEED
 			);
-
+		this.pointer.text = "top = "+this.top;
 		var me = this; 
 		setTimeout(function(){
 			me.top++
@@ -107,7 +116,16 @@ Stack.prototype.pop = function()
 	 	this.top--;
 
 		canvas.cmd("Setup");
-	   	canvas.cmd("Move",this.stack[this.top],Stack.SHAPE_START_X,Stack.SHAPE_START_Y,Stack.SHAPE_MOVE_SPEED);
+		this.pointer.text = "top = "+this.top;
+	   	canvas.cmd(
+			"Move",this.stack[this.top],
+			Stack.SHAPE_START_X,Stack.SHAPE_START_Y,
+			Stack.SHAPE_MOVE_SPEED,
+			
+			"Move",this.pointer,
+			this.frame[this.top].x+(Stack.FRAME_WIDTH+100),this.frame[this.top].y+(Stack.FRAME_HEIGHT/2),
+			Stack.POINTER_MOVE_SPEED
+		);
 		canvas.cmd("Delay",DELAY_TIME);
 	
 		waitTime = canvas.cmd("Delete",this.stack[this.top]);

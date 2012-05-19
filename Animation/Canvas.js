@@ -48,7 +48,6 @@ canvas.prototype.cmd = function()  //动画命令控制器
 	else
 	{
 		this.queue[this.rear++] = arguments;  //动画命令存入队列
-
 		if(arguments[0] == "Draw")   //画一个图形
 		{
 			me.queue[me.front][1].x = me.queue[me.front][2];
@@ -60,11 +59,29 @@ canvas.prototype.cmd = function()  //动画命令控制器
 		}
 		else if(arguments[0] == "Move")  //移动一个图形
 		{
-			setTimeout(function(){
-				me.queue[me.front][1].move(me.queue[me.front][2],me.queue[me.front][3],me.queue[me.front][4]*me.animate_speed);
+			setTimeout(function(){     //处理多个图形并发移动情况
+				k = 0;
+				while(me.queue[me.front][k] == "Move")
+				{
+					me.queue[me.front][k+1].move(
+						me.queue[me.front][k+2], me.queue[me.front][k+3],
+						me.queue[me.front][k+4]*me.animate_speed
+						);
+					k += 5;
+				}
 				me.front++;
-			},me.animate_timer);
-			this.animate_timer += arguments[1].timeOfMove(arguments[2],arguments[3],arguments[4]);
+				},me.animate_timer);
+			
+			max_timer = 0;
+			j = 0;
+			while(arguments[j] == "Move")
+			{
+				tmp_timer = arguments[j+1].timeOfMove(arguments[j+2],arguments[j+3],arguments[j+4]);
+				if(max_timer < tmp_timer)
+					max_timer = tmp_timer;	
+				j+=5;
+			}
+			this.animate_timer += max_timer;
 		}
 		else if(arguments[0] == "Delete")  //删除一个图形
 		{
