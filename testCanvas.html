@@ -13,6 +13,26 @@
 		<canvas id="canvas" width="960" height="600" style="border:1px solid #000000;"></canvas>
 	
 		<script type="text/javascript">
+			father = function()
+			{
+					this.y = "yyyy";
+			}
+			father.prototype.abc = function()
+			{
+					alert(this.x);
+			}
+			child = function()
+			{
+				this.x = "323";	
+			}
+			child.prototype = new father;
+			child.prototype.abcc = function()
+			{
+				alert(this.x);
+				alert(this.y);
+			}
+		var vv = new child;
+		vv.abcc();
 		 var canvas = document.getElementById('canvas'); 
  		 var ctx = canvas.getContext('2d'); 
 			ctx.beginPath();

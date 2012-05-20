@@ -1,32 +1,27 @@
-var Positive_Integer = /^[0-9]*[1-9][0-9]*$/;
-var CANVAS_WIDTH = 1000;  //默认画板宽度
-var CANVAS_HEIGHT = 550;  //默认画板高度
-var DELAY_TIME = 600; //默认延迟时间
-var REFRESH_TIME = 24; //默认画面刷新时间
-var MAX_ANIMATE_SPEED = 5;  //最大动画速度
-
 function init()
 {
-	var ArrayStack = new Stack();
-	ArrayStack.addControls(ArrayStack);
+	var ArrayStack = new Stack();  //初始化一个堆栈对象
+	ArrayStack.addControls(ArrayStack);  //添加堆栈用户控制器
 
-	var Mycanvas= document.getElementById("canvas");
-	canvas = new canvas(Mycanvas);
+	var Mycanvas = document.getElementsByTagName("canvas")[0]; //初始化canvas对象
+	ArrayStack.canvas = new Canvas(Mycanvas);  //将该canvas对象绑定到该堆栈上
 }
 
 Stack = function(size)
 {
-
 }
+Stack.ALGORITHM_NAME = "堆栈(数组)"; //算法名	
+Stack.SIZE = 7; //默认堆栈的大小
+Stack.OVERFLOW_INFO = "堆栈吃饱了,再压栈,堆栈会撑死的！";
+Stack.EMPTY_INFO = "堆栈里空空如也了,弹不出东西了！";
+
 Stack.FRAME_WIDTH = 60;
 Stack.FRAME_HEIGHT = 60;
-Stack.FRAME_START_X = (CANVAS_WIDTH-Stack.FRAME_WIDTH)/2;
-Stack.FRAME_START_Y = CANVAS_HEIGHT-Stack.FRAME_HEIGHT-10;
+Stack.FRAME_START_X = (Canvas.WIDTH-Stack.FRAME_WIDTH)/2;
+Stack.FRAME_START_Y = Canvas.HEIGHT-Stack.FRAME_HEIGHT-10;
 Stack.FRAME_TEXT = "";
 Stack.FRAME_BACKCOLOR = "FFF";
 Stack.FRAME_EDGECOLOR = "000";
-Stack.SIZE = 7; //默认堆栈的大小
-Stack.ALGORITHM_NAME = "堆栈(数组)"; //算法名	
 
 Stack.SHAPE_BACKCOLOR = "ABC";  //默认图形填充背景色
 Stack.SHAPE_EDGECOLOR = "000";  //默认图形边框颜色
@@ -38,16 +33,18 @@ Stack.SHAPE_START_X = 0;           //默认图新位置
 Stack.SHAPE_START_Y = 0;
 Stack.SHAPE_MOVE_SPEED = 5;  //默认图新移动速度
 Stack.SHAPE_MOVE_PATH = "LINE"; //默认图新移动方式(直线)
-Stack.OVERFLOW_INFO = "堆栈吃饱了,再压栈,堆栈会撑死的！";
-Stack.EMPTY_INFO = "堆栈里空空如也了,弹不出东西了！";
+Stack.SHAPE_FONT = "10px sans-serif";
+
 Stack.POINTER_FONT = "20px sans-serif";
 Stack.POINTER_MOVE_SPEED = 2;
 Stack.POINTER_START_X = Stack.FRAME_START_X + Stack.FRAME_WIDTH+100;
 Stack.POINTER_START_Y = Stack.FRAME_START_Y + Stack.FRAME_HEIGHT/2;
 Stack.POINTER_COLOR = "000";
-Stack.prototype.create = function(stackSize)
+
+Stack.prototype = new Algorithm();
+Stack.prototype.create = function(stackSize)  //初始化堆栈大小,并绘制该堆栈
 {
-	this.stack = new Array();
+	this.stack = new Array();  
 	this.frame = new Array();
 	this.pointer = new Label("top",Stack.POINTER_COLOR,Stack.POINTER_FONT);
 	this.size = Stack.SIZE;
@@ -55,10 +52,10 @@ Stack.prototype.create = function(stackSize)
 	if(Positive_Integer.test(stackSize))
 		this.size = stackSize;
 	
-	canvas.del();
-	canvas.clear();
-	canvas.cmd("Setup");
-	canvas.cmd("Draw",this.pointer,Stack.POINTER_START_X,Stack.POINTER_START_Y);
+	this.canvas.del();
+	this.canvas.clear();
+	this.canvas.cmd("Setup");
+	this.canvas.cmd("Draw",this.pointer,Stack.POINTER_START_X,Stack.POINTER_START_Y);
 	for(i=0; i<this.size; i++)
 	{
 		this.frame[i] = new Rectangle(
@@ -66,7 +63,7 @@ Stack.prototype.create = function(stackSize)
 			Stack.FRAME_TEXT, 
 			Stack.FRAME_BACKCOLOR, Stack.FRAME_EDGECOLOR
 			); 
-		canvas.cmd("Draw",this.frame[i], Stack.FRAME_START_X, Stack.FRAME_START_Y-i*Stack.FRAME_HEIGHT);
+		this.canvas.cmd("Draw",this.frame[i], Stack.FRAME_START_X, Stack.FRAME_START_Y-i*Stack.FRAME_HEIGHT);
 	}
 }
 Stack.prototype.push = function( value )
@@ -80,14 +77,15 @@ Stack.prototype.push = function( value )
 		this.stack[this.top] = new Rectangle(
 			Stack.SHAPE_WIDTH, Stack.SHAPE_HEIGHT,
 			value,
-			Stack.SHAPE_BACKCOLOR, Stack.SHAPE_EDGECOLOR
+			Stack.SHAPE_BACKCOLOR, Stack.SHAPE_EDGECOLOR, Stack.SHAPE_TEXTCOLOR,
+			Stack.SHAPE_FONT
 			);
 
-		canvas.cmd("Setup");	
- 		canvas.cmd("Draw",this.stack[this.top],Stack.SHAPE_START_X,Stack.SHAPE_START_Y);
- 		canvas.cmd("Delay",DELAY_TIME);
+		this.canvas.cmd("Setup");	
+		this.canvas.cmd("Draw",this.stack[this.top],Stack.SHAPE_START_X,Stack.SHAPE_START_Y);
+ 		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
 		this.pointer.text = "top";
- 		waitTime = canvas.cmd(
+ 		waitTime = this.canvas.cmd(
 			"Move", this.stack[this.top],
 			this.frame[this.top].x+(Stack.FRAME_WIDTH-Stack.SHAPE_WIDTH)/2,
 			this.frame[this.top].y+(Stack.FRAME_HEIGHT-Stack.SHAPE_HEIGHT)/2,
@@ -115,9 +113,9 @@ Stack.prototype.pop = function()
 	
 	 	this.top--;
 
-		canvas.cmd("Setup");
+		this.canvas.cmd("Setup");
 		this.pointer.text = "top = "+this.top;
-	   	canvas.cmd(
+	   	this.canvas.cmd(
 			"Move",this.stack[this.top],
 			Stack.SHAPE_START_X,Stack.SHAPE_START_Y,
 			Stack.SHAPE_MOVE_SPEED,
@@ -126,9 +124,9 @@ Stack.prototype.pop = function()
 			this.frame[this.top].x+(Stack.FRAME_WIDTH+100),this.frame[this.top].y+(Stack.FRAME_HEIGHT/2),
 			Stack.POINTER_MOVE_SPEED
 		);
-		canvas.cmd("Delay",DELAY_TIME);
+		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
 	
-		waitTime = canvas.cmd("Delete",this.stack[this.top]);
+		waitTime = this.canvas.cmd("Delete",this.stack[this.top]);
 	
 		var me = this;	
 		setTimeout(function(){
@@ -141,8 +139,8 @@ Stack.prototype.pop = function()
 Stack.prototype.addControls = function(obj)
 {
 	$("#AlgorithmName").html(Stack.ALGORITHM_NAME);
-	this.TextInput = addAlgorithmControlBar("text","");
-	this.CreatStackButton = addAlgorithmControlBar("button","Creat Stack");
+	this.TextInput = this.addAlgorithmControlBar("text","");
+	this.CreatStackButton = this.addAlgorithmControlBar("button","Creat Stack");
 	this.CreatStackButton.onclick = function(){
 		var stackSize = obj.TextInput.value;
 		obj.create(stackSize);
@@ -150,30 +148,18 @@ Stack.prototype.addControls = function(obj)
 		obj.PushButton.disabled = false;
 	}
 
-	this.PushButton = addAlgorithmControlBar("button","Push");
+	this.PushButton = this.addAlgorithmControlBar("button","Push");
 	this.PushButton.onclick = function(){
 		var value = obj.TextInput.value;
 		obj.push(value);	
 		obj.TextInput.value = "";
 	}
 
-	this.PopButton = addAlgorithmControlBar("button","Pop");
+	this.PopButton = this.addAlgorithmControlBar("button","Pop");
 	this.PopButton.onclick = function(){
 		obj.pop();
 	}
 
 	this.PushButton.disabled = true;
 	this.PopButton.disabled = true;
-}
-function addAlgorithmControlBar(type,value)
-{
-	var element = document.createElement("input");
-	element.setAttribute("type",type);
-	element.setAttribute("value",value);
-	element.setAttribute("class","controler");
-
-	var father = document.getElementById("AlgorithmControlBar");
-	
-	father.appendChild(element);
-	return element;
 }
