@@ -47,6 +47,7 @@ Stack.prototype.create = function(stackSize)  //初始化堆栈大小,并绘制�
 	this.stack = new Array();  
 	this.frame = new Array();
 	this.pointer = new Label("top",Stack.POINTER_COLOR,Stack.POINTER_FONT);
+	this.line = new Line();
 	this.size = Stack.SIZE;
 	this.top = 0;
 	if(Positive_Integer.test(stackSize))
@@ -80,10 +81,9 @@ Stack.prototype.push = function( value )
 			Stack.SHAPE_BACKCOLOR, Stack.SHAPE_EDGECOLOR, Stack.SHAPE_TEXTCOLOR,
 			Stack.SHAPE_FONT
 			);
-
 		this.canvas.cmd("Setup");	
 		this.canvas.cmd("Draw",this.stack[this.top],Stack.SHAPE_START_X,Stack.SHAPE_START_Y);
- 		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
+		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
 		this.pointer.text = "top";
  		waitTime = this.canvas.cmd(
 			"Move", this.stack[this.top],
@@ -95,6 +95,9 @@ Stack.prototype.push = function( value )
 			this.frame[this.top].x+(Stack.FRAME_WIDTH+100),this.frame[this.top].y+(Stack.FRAME_HEIGHT/2),
 			Stack.POINTER_MOVE_SPEED
 			);
+		this.line.startObject = this.pointer;
+		this.line.endObject = this.frame[this.top];
+		this.canvas.cmd("Draw",this.line);
 		this.pointer.text = "top = "+this.top;
 		var me = this; 
 		setTimeout(function(){

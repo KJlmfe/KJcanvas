@@ -178,3 +178,12 @@ Shape.prototype.timeOfMove = function(canvas,x,y,speed) //计算移动矩形的�
 		return Math.ceil( (this.aimY - this.y) / this.move_speed ) * this.canvas.refresh_time;
 	}
 }
+Shape.prototype.getPosition_X = function()
+{
+	return this.x;
+}
+Shape.prototype.getPosition_Y = function()
+{
+	return this.y;
+}
+
