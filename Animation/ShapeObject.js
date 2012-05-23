@@ -11,13 +11,17 @@ Shape = function() //图形类(所有图形的父类)
 	this.backColor = Shape.BACKCOLOR;  //背景色
 	this.edgeColor = Shape.EDGECOLOR;  //边框色
 	this.textColor = Shape.TEXTCOLOR;  //文本色
-	
+	this.lineColor = Shape.LINECOLOR;  //线条色	
 	this.font = Shape.FONT;  //字体
 	 
  	this.x = Shape.START_X;	 //起始位置
 	this.y = Shape.START_Y;
-	this.aimX = Shape.END_X;  //目标位置
+	this.aimX = Shape.END_X;  //移动目标位置
 	this.aimY = Shape.END_Y;
+	this.end_x = Shape.END_X;  //末尾位置
+	this.end_y = Shape.END_Y;
+
+	this.lineWidth = Shape.LINEWIDTH;  //线条宽度
 	this.move_speed = Shape.MOVE_SPEED; //移动速度 
 	this.move_path = Shape.MOVE_PATH;  //移动路线
 }
@@ -39,7 +43,9 @@ Shape.prototype.draw = function(canvas,x,y)  //在canvas画板上的x,y位置画
 	this.x = x == null ? this.x : x;
 	this.y = y == null ? this.y : y;
 
+	this.canvas.ctx.save();
 	this.drawMethod();  //调用图形绘画方法
+	this.canvas.ctx.restore();
 }
 Shape.prototype.move = function(x,y,speed,path) //移动一个巨型
 {
