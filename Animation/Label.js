@@ -1,8 +1,6 @@
-Label = function(text,textColor,font) //文本标签类
+Label = function(cfg) //文本标签类
 {
-	this.text = (text!=null && text!="") ? text : this.text;
-	this.textColor = textColor == null ? this.textColor : textColor;
-	this.font = font == null ? this.font : font;
+	this.setArguments(cfg);
 }
 Label.prototype = new Shape;  //继承图形父类
 Label.prototype.drawMethod = function() //绘画文本标签的方法

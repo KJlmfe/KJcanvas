@@ -1,65 +1,61 @@
 Shape = function() //图形类(所有图形的父类)
 {
-	//图形大小
-	this.w = Shape.WIDTH;  
-	this.h = Shape.HEIGHT;
+	this.w = Shape.WIDTH;   //矩形宽
+	this.h = Shape.HEIGHT;		//矩形高
+	this.r = Shape.RADIUS;		//圆半径
+	this.length = Shape.LENGTH;   //线段长度
+
+ 	this.x = Shape.X;	 //矩形的中心  圆的圆心  线段的中点
+	this.y = Shape.Y;
+	this.aim_x= Shape.AIM_X;  //移动的目标位置
+	this.aim_y= Shape.AIM_Y;
 	
+	this.start_x = Shape.START_X;   //线段的起始位置
+	this.start_y = Shape.START_Y;
+	this.end_x = Shape.END_X;      //线段的末尾位置
+	this.end_y = Shape.END_Y;
+
 	this.text = Shape.TEXT;  //文本内容
 	this.textAlign = Shape.TEXTALIGN; //文本对其方式
 	this.textBaseline = Shape.TEXTBASELINE;
 
-	this.backColor = Shape.BACKCOLOR;  //背景色
-	this.edgeColor = Shape.EDGECOLOR;  //边框色
+	this.backColor = Shape.BACKCOLOR;  //矩形 圆 背景色
+	this.edgeColor = Shape.EDGECOLOR;  //矩形 圆 边框色
 	this.textColor = Shape.TEXTCOLOR;  //文本色
-	this.lineColor = Shape.LINECOLOR;  //线条色	
+	this.lineColor = Shape.LINECOLOR;  //线段 线条色	
 	this.font = Shape.FONT;  //字体
 	 
- 	this.x = Shape.START_X;	 //起始位置
-	this.y = Shape.START_Y;
-	this.aimX = Shape.END_X;  //移动目标位置
-	this.aimY = Shape.END_Y;
-	this.end_x = Shape.END_X;  //末尾位置
-	this.end_y = Shape.END_Y;
+	this.edgeWidth = Shape.EDGEWIDTH; //矩形 圆 边框宽度
+	this.lineWidth = Shape.LINEWIDTH;  //线段 宽度
 
-	this.lineWidth = Shape.LINEWIDTH;  //线条宽度
 	this.move_speed = Shape.MOVE_SPEED; //移动速度 
-	this.move_path = Shape.MOVE_PATH;  //移动路线
+	
+	this.argument = new Array(1000);
+	this.saveArgumentsFlag = false;
+
 }
 Shape.prototype.del = function()  //从画板上删除该图形
 {
 	this.canvas.del(this);
 	this.canvas.restore();
 }
-Shape.prototype.draw = function(canvas,x,y)  //在canvas画板上的x,y位置画出该图形
+Shape.prototype.draw = function()  //在this.canvas画板上的x,y位置画出该图形
 {
-	this.canvas = canvas == null ? this.canvas : canvas;
-	
-	if(!this.canvas.exist(this))    //每在画板上画一个图形对象，都要将该对象保存到画板的Shape里 
+	if(!this.canvas.exist(this))    //每在画板上画一个图形对象，都要将该对象保存到画板的Shape里 	
 		this.canvas.save(this);
-
-	//更新当前位置
-	this.x = this.x == null ? Shape.START_X : this.x;  
-	this.y = this.y == null ? Shape.START_Y : this.y
-	this.x = x == null ? this.x : x;
-	this.y = y == null ? this.y : y;
 
 	this.canvas.ctx.save();
 	this.drawMethod();  //调用图形绘画方法
 	this.canvas.ctx.restore();
 }
-Shape.prototype.move = function(x,y,speed,path) //移动一个巨型
+Shape.prototype.move = function() //移动
 {
-	//设置目标位置、移动速度、移动路径
-	this.aimX = x == null ? Shape.END_X : x;
-	this.aimY = y == null ? Shape.END_Y : y
-	this.move_speed = speed == null ? Shape.MOVE_SPEED : speed;
-
 	var me = this;  //setInterval 里不能直接调用this.draw,所以使用变量作用域解决这个问题
 	
 	//默认沿着两点间的直线路径移动
-	if(me.x != me.aimX)   //求出直线方程的k与b
+	if(me.x != me.aim_x)   //求出直线方程的k与b
 	{
-		me.k = (me.y - me.aimY) / (me.x - me.aimX);  
+		me.k = (me.y - me.aim_y) / (me.x - me.aim_x);  
 		me.b = me.y - me.k*me.x;
 	}
 	else
@@ -68,7 +64,7 @@ Shape.prototype.move = function(x,y,speed,path) //移动一个巨型
 		me.b = 0;
 	}
 	
-	if(this.aimX > this.x)   // 原图形右侧运动
+	if(this.aim_x > this.x)   // 原图形右侧运动
 	{
 		this.timer = setInterval(function(){
 			//擦干净画布
@@ -80,18 +76,18 @@ Shape.prototype.move = function(x,y,speed,path) //移动一个巨型
 			//绘制移动图形
 			me.x += me.move_speed;
 			me.y = me.k*me.x + me.b;
-			if(me.x >= me.aimX)
+			if(me.x >= me.aim_x)
 			{
-				me.x = me.aimX;
-				me.y = me.aimY;
+				me.x = me.aim_x;
+				me.y = me.aim_y;
 			}
 			me.draw(me.canvas,me.x,me.y);
 			//判断是否到达目标位置
-			if(me.aimX == me.x)
+			if(me.aim_x == me.x)
 				clearInterval(me.timer);
 		},me.canvas.refresh_time);
 	}
-	else if(this.aimX < this.x)   // 原图形左侧运动
+	else if(this.aim_x < this.x)   // 原图形左侧运动
 	{
 		this.timer = setInterval(function(){
 			//擦干净画布
@@ -103,18 +99,18 @@ Shape.prototype.move = function(x,y,speed,path) //移动一个巨型
 			//绘制移动图形
 			me.x -= me.move_speed;
 			me.y = me.k*me.x + me.b;
-			if(me.x <= me.aimX)
+			if(me.x <= me.aim_x)
 			{
-				me.x = me.aimX;
-				me.y = me.aimY;
+				me.x = me.aim_x;
+				me.y = me.aim_y;
 			}
 			me.draw(me.canvas,me.x,me.y);
 			//判断是否到达目标位置
-			if(me.aimX == me.x)
+			if(me.aim_x == me.x)
 				clearInterval(me.timer);
 		},me.canvas.refresh_time);
 	}
-	else if(this.aimY < this.y)   // 原图形正上方运动
+	else if(this.aim_y < this.y)   // 原图形正上方运动
 	{
 		this.timer = setInterval(function(){
 			//擦干净画布
@@ -125,15 +121,15 @@ Shape.prototype.move = function(x,y,speed,path) //移动一个巨型
 			me.canvas.restore();
 			//绘制移动图形
 			me.y -= me.move_speed;
-			if(me.y < me.aimY)
-				me.y = me.aimY;
+			if(me.y < me.aim_y)
+				me.y = me.aim_y;
 			me.draw(me.canvas,me.x,me.y);
 			//判断是否到达目标位置
-			if(me.aimY == me.y)
+			if(me.aim_y == me.y)
 				clearInterval(me.timer);
 		},me.canvas.refresh_time);
 	}
-	else if(this.aimY > this.y)   // 原图形正下方运动
+	else if(this.aim_y > this.y)   // 原图形正下方运动
 	{
 		this.timer = setInterval(function(){
 			//擦干净画布
@@ -144,46 +140,95 @@ Shape.prototype.move = function(x,y,speed,path) //移动一个巨型
 			me.canvas.restore();
 			//绘制移动图形
 			me.y += me.move_speed;
-			if(me.y > me.aimY)
-				me.y = me.aimY;
+			if(me.y > me.aim_y)
+				me.y = me.aim_y;
 			me.draw(me.canvas,me.x,me.y);
 			//判断是否到达目标位置
-			if(me.aimY ==  me.y)
+			if(me.aim_y ==  me.y)
 				clearInterval(me.timer);
 		},me.canvas.refresh_time);
 	}
 }
-Shape.prototype.timeOfMove = function(canvas,x,y,speed) //计算移动矩形的动画时间
+Shape.prototype.timeOfMove = function() //计算移动矩形的动画时间
 {
-	this.canvas = canvas;
-	//设置目标位置
-	this.aimX = x == null ? Shape.END_X : x;
-	this.aimY = y == null ? Shape.END_Y : y
-	this.move_speed = speed == null ? Shape.MOVE_SPEED : speed;
-	
-	if(this.aimX > this.x)   // 原图形右侧运动
+	if(this.aim_x > this.x)   // 原图形右侧运动
 	{
-		return Math.ceil( (this.aimX - this.x) / this.move_speed ) * this.canvas.refresh_time;
+		return Math.ceil( (this.aim_x - this.x) / this.move_speed ) * this.canvas.refresh_time;
 	}
-	else if(this.aimX < this.x)   // 原图形左侧运动
+	else if(this.aim_x < this.x)   // 原图形左侧运动
 	{
-		return Math.ceil( (this.x - this.aimX) / this.move_speed ) * this.canvas.refresh_time;
+		return Math.ceil( (this.x - this.aim_x) / this.move_speed ) * this.canvas.refresh_time;
 	}
-	else if(this.aimY < this.y)   // 原图形正上方运动
+	else if(this.aim_y < this.y)   // 原图形正上方运动
 	{
-		return Math.ceil( (this.y - this.aimY) / this.move_speed ) * this.canvas.refresh_time;
+		return Math.ceil( (this.y - this.aim_y) / this.move_speed ) * this.canvas.refresh_time;
 	}
-	else if(this.aimY > this.y)   // 原图形正下方运动
+	else if(this.aim_y > this.y)   // 原图形正下方运动
 	{
-		return Math.ceil( (this.aimY - this.y) / this.move_speed ) * this.canvas.refresh_time;
+		return Math.ceil( (this.aim_y - this.y) / this.move_speed ) * this.canvas.refresh_time;
 	}
 }
-Shape.prototype.getPosition_X = function()
+Shape.prototype.timeOfDraw = function()
 {
-	return this.x;
+	return 0;
 }
-Shape.prototype.getPosition_Y = function()
+Shape.prototype.timeOfDelete = function()
 {
-	return this.y;
+	return 0;
+}
+Shape.prototype.getPosition_X = function(direction)
+{
+	if(direction == "right")
+		return this.x+this.width;
+}
+Shape.prototype.getPosition_Y = function(direction)
+{
+	if(direction == "right")
+		return this.y+this.height/2;
+}
+//Shape.prototype.setArguments = function(command,start)
+//{
+	//if(start == null) 
+		//start = 0;
+	//for(var i=start;;i+=2)
+	//{
+		//if(command[i] == "END" || command[i] == null)
+			//break;
+		//else
+		//{
+			//var cmd;
+			//if(typeof(command[i+1]) == "string")
+				//cmd = "this." + command[i] + "=" + "\"" + command[i+1] + "\"";
+			//else if(typeof(command[i+1]) == "object")
+				//cmd = "this." + command[i] + "=command[i+1]";
+			//else
+				//cmd = "this." + command[i] + "=" + command[i+1];
+			//eval(cmd);
+		//}
+	//}
+//}
+Shape.prototype.saveArguments = function()
+{
+	for(var x in this)
+	{
+		var type = typeof(this[x]);
+		if(type == "number" || type == "string" || type == "object")
+			this.argument[x] = this[x];
+	}
+	this.saveArgumentsFlag = true;
+}
+Shape.prototype.restoreArguments = function(cfg)
+{
+	for(var x in this)
+	{
+		var type = typeof(this[x]);
+		if(type == "number" || type == "string" || type == "object")
+			this[x] = this.argument[x];
+	}
+}
+Shape.prototype.setArguments = function(cfg)
+{
+	for(var x in cfg)
+		this[x] = cfg[x];
 }
 

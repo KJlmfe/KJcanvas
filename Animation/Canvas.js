@@ -30,11 +30,13 @@ Canvas = function(myCanvas,width,height,border,animate_speed,delay_time,refresh_
 Canvas.prototype.cmd = function()  //动画命令控制器 
 {
 	var me = this;
+	var tmp_shape = new Array();
 	if(arguments[0] == "Setup")  //新的一轮动画开始
 	{
 		this.animate_timer = 0;  //动画计时器清零 
 		this.rear = 0;			//队列首尾指针复位
 		this.front = 0;
+		this.animate_shape = new Array();
 	}
     else if(arguments[0] == "Delay")  //延迟效果,该期间画面静止无变化
 	{
@@ -47,51 +49,84 @@ Canvas.prototype.cmd = function()  //动画命令控制器
 		arguments[1] = arguments[1] == null ? Canvas.DELAY_TIME : arguments[1]; //得到延迟时间
 		this.animate_timer += arguments[1]* this.delay_speed; //累加动画时间
 	}
+	else if(arguments[0] == "END")
+	{
+		for(var i=0;i<this.animate_shape.length;i++)
+		{
+			this.animate_shape[i].restoreArguments();
+		}
+	}
 	else
 	{
 		this.queue[this.rear++] = arguments;  //动画命令存入队列
-		if(arguments[0] == "Draw")   //画一个图形
-		{
-			me.queue[me.front][1].x = me.queue[me.front][2];  
-			me.queue[me.front][1].y = me.queue[me.front][3];
-			setTimeout(function(){
-				me.queue[me.front][1].draw(me,me.queue[me.front][2],me.queue[me.front][3]);
-				me.front++;
-			},me.animate_timer);
-		}
-		else if(arguments[0] == "Move")  //移动一个图形
-		{
-			setTimeout(function(){     //处理多个图形并发移动情况
-				k = 0;
-				while(me.queue[me.front][k] == "Move")
-				{
-					me.queue[me.front][k+1].move(
-						me.queue[me.front][k+2], me.queue[me.front][k+3],
-						me.queue[me.front][k+4]*me.animate_speed
-						);
-					k += 5;
-				}
-				me.front++;
-				},me.animate_timer);
-			
-			max_timer = 0;
-			j = 0;
-			while(arguments[j] == "Move")  //计算所有并发移动图形中耗时最长的时间
+		
+		setTimeout(function(){     //处理多个图形并发移动情况
+			var k = 0;
+			while(me.queue[me.front][k] != null)
 			{
-				tmp_timer = arguments[j+1].timeOfMove(this,arguments[j+2],arguments[j+3],arguments[j+4]);
-				if(max_timer < tmp_timer)
-					max_timer = tmp_timer;	
-				j+=5;
+				if(me.queue[me.front][k] == "Draw")
+				{
+					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
+					me.queue[me.front][k+1].draw();
+				}
+				else if(me.queue[me.front][k] == "Move")
+				{
+					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
+					me.queue[me.front][k+1].move();
+				}
+				else if(me.queue[me.front][k] == "Delete")
+				{
+					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
+					me.queue[me.front][k+1].del();
+				}
+				k++;
 			}
-			this.animate_timer += max_timer;
-		}
-		else if(arguments[0] == "Delete")  //删除一个图形
+			me.front++;
+		},me.animate_timer);
+	
+		var max_timer = -1;
+		var k = 0;
+		
+		while(arguments[k] != null)
 		{
-			setTimeout(function(){
-				me.queue[me.front][1].del();
-				me.front++;
-			},me.animate_timer);
+			var tmp_timer = 0;
+
+			if(arguments[k] == "Draw")
+			{
+				if(arguments[k+1].saveArgumentsFlag == false)
+				{
+					arguments[k+1].saveArguments();
+					this.animate_shape.push(arguments[k+1]);
+				}
+				arguments[k+1].setArguments(arguments[k+2]);
+				tmp_timer = arguments[k+1].timeOfDraw();
+			}
+			else if(arguments[k] == "Move")
+			{
+				if(arguments[k+1].saveArgumentsFlag == false)
+				{
+					arguments[k+1].saveArguments();
+					this.animate_shape.push(arguments[k+1]);
+				}
+				arguments[k+1].setArguments(arguments[k+2]);
+				tmp_timer = arguments[k+1].timeOfMove();
+			}
+			else if(arguments[k] == "Delete")
+			{
+				if(arguments[k+1].saveArgumentsFlag == false)
+				{
+					arguments[k+1].saveArguments();
+					this.animate_shape.push(arguments[k+1]);
+				}
+				arguments[k+1].setArguments(arguments[k+2]);
+				tmp_timer = arguments[k+1].timeOfDelete();
+			}
+
+			max_timer = max_timer < tmp_timer ? tmp_timer : max_timer;
+			k++;
 		}
+
+		this.animate_timer += max_timer;
 	}
 	
 	return this.animate_timer;  //返回动画耗时时间
@@ -135,3 +170,4 @@ Canvas.prototype.clear = function() //清空画板
 {
 	this.ctx.clearRect(0,0,this.w,this.h);
 }
+

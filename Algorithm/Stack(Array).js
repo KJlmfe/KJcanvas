@@ -1,15 +1,15 @@
 function init()
 {
-	var ArrayStack = new Stack();  //初始化一个堆栈对象
-	ArrayStack.addControls(ArrayStack);  //添加堆栈用户控制器
+	var Data_Structure = new Stack();  //初始化一个堆栈对象
+	Data_Structure.addControls(Data_Structure);  //添加堆栈用户控制器
 
 	var Mycanvas = document.getElementsByTagName("canvas")[0]; //初始化canvas对象
-	ArrayStack.canvas = new Canvas(Mycanvas);  //将该canvas对象绑定到该堆栈上
+	Data_Structure.canvas = new Canvas(Mycanvas);  //将该canvas对象绑定到该堆栈上
 }
 
 Stack = function(size)
-{
-}
+{}
+
 Stack.ALGORITHM_NAME = "堆栈(数组)"; //算法名	
 Stack.SIZE = 7; //默认堆栈的大小
 Stack.OVERFLOW_INFO = "堆栈吃饱了,再压栈,堆栈会撑死的！";
@@ -38,34 +38,68 @@ Stack.SHAPE_FONT = "10px sans-serif";
 Stack.POINTER_FONT = "20px sans-serif";
 Stack.POINTER_MOVE_SPEED = 2;
 Stack.POINTER_START_X = Stack.FRAME_START_X + Stack.FRAME_WIDTH+100;
-Stack.POINTER_START_Y = Stack.FRAME_START_Y + Stack.FRAME_HEIGHT/2;
+Stack.POINTER_START_Y = Stack.FRAME_START_Y + Stack.FRAME_HEIGHT;
 Stack.POINTER_COLOR = "000";
+
+Stack.LINE_START_X = Stack.FRAME_START_X + Stack.FRAME_WIDTH/2 + 20;
+Stack.LINE_START_Y = Stack.FRAME_START_Y + Stack.FRAME_HEIGHT;
+Stack.LINE_END_X = Stack.POINTER_START_X - 45; 
+Stack.LINE_END_Y = Stack.FRAME_START_Y + Stack.FRAME_HEIGHT;
+Stack.LINE_COLOR = "F00";
 
 Stack.prototype = new Algorithm();
 Stack.prototype.create = function(stackSize)  //初始化堆栈大小,并绘制该堆栈
 {
 	this.stack = new Array();  
 	this.frame = new Array();
-	this.pointer = new Label("top",Stack.POINTER_COLOR,Stack.POINTER_FONT);
-	this.line = new Line();
+	this.pointer = new Label({
+		canvas : this.canvas,
+		text : "top = -1",
+		textColor : Stack.POINTER_COLOR,
+		font : Stack.POINTER_FONT
+		});
+	this.line = new Line({
+		canvas : this.canvas,
+		lineColor : Stack.LINE_COLOR
+	});
+
 	this.size = Stack.SIZE;
-	this.top = 0;
 	if(Positive_Integer.test(stackSize))
 		this.size = stackSize;
+	this.top = 0;
 	
 	this.canvas.del();
 	this.canvas.clear();
 	this.canvas.cmd("Setup");
-	this.canvas.cmd("Draw",this.pointer,Stack.POINTER_START_X,Stack.POINTER_START_Y);
-	for(i=0; i<this.size; i++)
+	this.canvas.cmd(
+		"Draw",this.pointer,{
+		x : Stack.POINTER_START_X,
+		y : Stack.POINTER_START_Y
+		},
+		
+		"Draw",this.line,{
+		start_x : Stack.LINE_START_X,
+		start_y : Stack.LINE_START_Y,
+		end_x : Stack.LINE_END_X,
+		end_y : Stack.LINE_END_Y	
+		});
+	for(var i=0; i<this.size; i++)
 	{
-		this.frame[i] = new Rectangle(
-			Stack.FRAME_WIDTH, Stack.FRAME_HEIGHT, 
-			Stack.FRAME_TEXT, 
-			Stack.FRAME_BACKCOLOR, Stack.FRAME_EDGECOLOR
-			); 
-		this.canvas.cmd("Draw",this.frame[i], Stack.FRAME_START_X, Stack.FRAME_START_Y-i*Stack.FRAME_HEIGHT);
+		this.frame[i] = new Rectangle({
+			canvas : this.canvas,
+			w : Stack.FRAME_WIDTH,
+			h : Stack.FRAME_HEIGHT,
+			text : Stack.FRAME_TEXT,
+			backColor : Stack.FRAME_BACKCOLOR,
+			edgeColor : Stack.FRAME_EDGECOLOR
+			});
+		this.canvas.cmd(
+			"Draw", this.frame[i],{
+			x : Stack.FRAME_START_X,
+			y : Stack.FRAME_START_Y-i*Stack.FRAME_HEIGHT
+			});
 	}
+	this.canvas.cmd("END");
 }
 Stack.prototype.push = function( value )
 {
@@ -75,30 +109,43 @@ Stack.prototype.push = function( value )
 	{
 		$(".controler").attr("disabled","disabled");  //禁用所有控制元素
 	
-		this.stack[this.top] = new Rectangle(
-			Stack.SHAPE_WIDTH, Stack.SHAPE_HEIGHT,
-			value,
-			Stack.SHAPE_BACKCOLOR, Stack.SHAPE_EDGECOLOR, Stack.SHAPE_TEXTCOLOR,
-			Stack.SHAPE_FONT
-			);
-		this.canvas.cmd("Setup");	
-		this.canvas.cmd("Draw",this.stack[this.top],Stack.SHAPE_START_X,Stack.SHAPE_START_Y);
+		this.stack[this.top] = new Rectangle({
+			canvas : this.canvas,
+			w : Stack.SHAPE_WIDTH,
+			h : Stack.SHAPE_HEIGHT,
+			text : value,
+			backColor : Stack.SHAPE_BACKCOLOR, 
+			edgeColor : Stack.SHAPE_EDGECOLOR, 
+			textColor : Stack.SHAPE_TEXTCOLOR,
+			font : Stack.SHAPE_FONT,
+		});
+		
+		this.canvas.cmd("Setup");
+		this.canvas.cmd(
+			"Draw",this.stack[this.top],{
+			x : Stack.SHAPE_START_X,
+			y : Stack.SHAPE_START_Y
+		});
 		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
-		this.pointer.text = "top";
- 		waitTime = this.canvas.cmd(
-			"Move", this.stack[this.top],
-			this.frame[this.top].x+(Stack.FRAME_WIDTH-Stack.SHAPE_WIDTH)/2,
-			this.frame[this.top].y+(Stack.FRAME_HEIGHT-Stack.SHAPE_HEIGHT)/2,
-			Stack.SHAPE_MOVE_SPEED,
-			
-			"Move",this.pointer,
-			this.frame[this.top].x+(Stack.FRAME_WIDTH+100),this.frame[this.top].y+(Stack.FRAME_HEIGHT/2),
-			Stack.POINTER_MOVE_SPEED
-			);
-		this.line.startObject = this.pointer;
-		this.line.endObject = this.frame[this.top];
-		this.canvas.cmd("Draw",this.line);
-		this.pointer.text = "top = "+this.top;
+ 		this.canvas.cmd(
+			"Move", this.stack[this.top],{
+			aim_x : this.frame[this.top].x,
+			aim_y : this.frame[this.top].y,
+			move_speed : Stack.SHAPE_MOVE_SPEED
+			},
+			"Move",this.pointer,{
+			text : "top = " + this.top,
+			aim_x : this.pointer.x,
+			aim_y : this.pointer.y - Stack.FRAME_HEIGHT,
+			move_speed : Stack.POINTER_MOVE_SPEED
+			},
+			"Move",this.line,{
+			aim_x : this.line.start_x, 
+			aim_y : this.line.start_y - Stack.FRAME_HEIGHT, 
+			move_speed : Stack.POINTER_MOVE_SPEED
+			});
+		var waitTime = this.canvas.cmd("END");
+	
 		var me = this; 
 		setTimeout(function(){
 			me.top++
@@ -117,20 +164,29 @@ Stack.prototype.pop = function()
 	 	this.top--;
 
 		this.canvas.cmd("Setup");
-		this.pointer.text = "top = "+this.top;
 	   	this.canvas.cmd(
-			"Move",this.stack[this.top],
-			Stack.SHAPE_START_X,Stack.SHAPE_START_Y,
-			Stack.SHAPE_MOVE_SPEED,
+			"Move",this.stack[this.top],{
+			aim_x : Stack.SHAPE_START_X,
+			aim_y : Stack.SHAPE_START_Y,
+			move_speed : Stack.SHAPE_MOVE_SPEED
+			},
+
+			"Move",this.pointer,{
+			text : "top = " + (this.top - 1),
+			aim_x : this.pointer.x,
+			aim_y : this.pointer.y + Stack.FRAME_HEIGHT,
+			move_speed : Stack.POINTER_MOVE_SPEED
+			},
 			
-			"Move",this.pointer,
-			this.frame[this.top].x+(Stack.FRAME_WIDTH+100),this.frame[this.top].y+(Stack.FRAME_HEIGHT/2),
-			Stack.POINTER_MOVE_SPEED
-		);
+			"Move",this.line,{
+			aim_x : this.line.start_x, 
+			aim_y : this.line.start_y + Stack.FRAME_HEIGHT, 
+			move_speed : Stack.POINTER_MOVE_SPEED
+			});
 		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
-	
-		waitTime = this.canvas.cmd("Delete",this.stack[this.top]);
-	
+		this.canvas.cmd("Delete",this.stack[this.top]);
+		var waitTime = this.canvas.cmd("END");	
+		
 		var me = this;	
 		setTimeout(function(){
 			$(".controler").removeAttr("disabled");

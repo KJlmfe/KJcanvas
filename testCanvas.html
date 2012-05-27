@@ -35,19 +35,95 @@
 		vv.abcc();
 		 var canvas = document.getElementById('canvas'); 
  		 var ctx = canvas.getContext('2d'); 
+		ctx.fillStyle = "f00";  
+		ctx.fillRect(10,20,300,400);  //画一个实体矩形
+ctx.strokeStyle = "00f"
+ctx.lineWidth = 1;
+ctx.lineCap = 'round';
+ctx.strokeRect(10,20,300,400); //勾画出矩形边框
+ctx.fillStyle = "black";
+ctx.textAlign = "center";
+ctx.fillText("好好学习",10,20);
 			ctx.beginPath();
-			ctx.lineWidth = 2;
-			ctx.moveTo(10,10);
+			ctx.lineWidth = 10;
+			
+		ctx.moveTo(10,10);
 			ctx.lineTo(50,10);
 			ctx.strokeStyle = "000";
 			ctx.stroke();
 			ctx.fillText("324234",400,400);
-		/*	ctx.lineTo(100,25);
+			ctx.lineTo(100,25);
 			ctx.closePath();*/
-		
-
-		
-		</script>
+/*			
+			father = function()
+			{
+				this.info = "I am a good father";
+			}
+			child = function(cfg)
+			{
+				for(var x in cfg)
+					this[x] = cfg[x];
+			}
+			var simplefather = new father();
+			var c = new child({
+				age : 18,
+				father : simplefather
+			});
+			alert(c.father.info);
+			alert(c.age);
+	/*
+			father = function()
+			{
+				
+			}
+			father.prototype.tt = function()
+			{
+				
+			}
+			var tmp = new father();
+			tmp.x = 123;
+			for(var ele in tmp)
+			{
+				alert(ele + typeof(ele));
+			}
+			var meme = tmp;
+			tmp.x = 456;
+			tmp = meme;
+			abc = new Array();
+			abc[hh]="123";
+			alert(abc[hh]);
+	*/
+		simple = function()
+		{
+			this.x = 123;
+			this.y = 456;
+			this.z = 789;
+			this.argument = new Array();
+		}
+		simple.prototype.test = function()
+		{
+			alert(this.x);
+		}
+		simple.prototype.saveArgument = function()
+		{
+			for(var ele in this)
+				if(ele != 'argument')
+					this.argument[ele] = this[ele];
+		}
+		simple.prototype.restoreArgument = function()
+		{
+			for(var ele in this)
+				if(ele != 'argument')
+					this[ele] = this.argument[ele];
+		}
+		var abc = new simple();
+		alert(abc.y);   //显示456
+		abc.saveArgument();
+		abc.y = "xxxx";
+		alert(abc.y);   //显示xxxx
+		abc.restoreArgument();
+		alert(abc.y);   //显示456
+	</script>
 	
 	</body>
 </html>
