@@ -1,5 +1,7 @@
 Rectangle = function(cfg)
 {
+	this.argument = new Array(1000);
+	this.saveArgumentsFlag = false;
 	this.setArguments(cfg);
 }
 Rectangle.prototype = new Shape;  //继承图形父类

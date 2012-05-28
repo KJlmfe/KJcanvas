@@ -30,8 +30,6 @@ Shape = function() //图形类(所有图形的父类)
 
 	this.move_speed = Shape.MOVE_SPEED; //移动速度 
 	
-	this.argument = new Array(1000);
-	this.saveArgumentsFlag = false;
 
 }
 Shape.prototype.del = function()  //从画板上删除该图形
@@ -176,37 +174,6 @@ Shape.prototype.timeOfDelete = function()
 {
 	return 0;
 }
-Shape.prototype.getPosition_X = function(direction)
-{
-	if(direction == "right")
-		return this.x+this.width;
-}
-Shape.prototype.getPosition_Y = function(direction)
-{
-	if(direction == "right")
-		return this.y+this.height/2;
-}
-//Shape.prototype.setArguments = function(command,start)
-//{
-	//if(start == null) 
-		//start = 0;
-	//for(var i=start;;i+=2)
-	//{
-		//if(command[i] == "END" || command[i] == null)
-			//break;
-		//else
-		//{
-			//var cmd;
-			//if(typeof(command[i+1]) == "string")
-				//cmd = "this." + command[i] + "=" + "\"" + command[i+1] + "\"";
-			//else if(typeof(command[i+1]) == "object")
-				//cmd = "this." + command[i] + "=command[i+1]";
-			//else
-				//cmd = "this." + command[i] + "=" + command[i+1];
-			//eval(cmd);
-		//}
-	//}
-//}
 Shape.prototype.saveArguments = function()
 {
 	for(var x in this)

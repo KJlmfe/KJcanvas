@@ -11,7 +11,3 @@ Label.prototype.drawMethod = function() //绘画文本标签的方法
 	this.canvas.ctx.textBaseline = this.textBaseline;
 	this.canvas.ctx.fillText(this.text,this.x,this.y);  
 }
-Label.prototype.clear = function() //橡皮擦擦掉该文本标签
-{
-	this.canvas.ctx.clearRect("",this.x,this.y);
-}

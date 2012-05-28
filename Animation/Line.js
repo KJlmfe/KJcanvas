@@ -23,10 +23,6 @@ Line.prototype.drawMethod = function() //绘画矩形的方法
 	this.canvas.ctx.strokeStyle = this.lineColor;
 	this.canvas.ctx.stroke();
 }
-Line.prototype.clear = function() //橡皮擦擦掉矩形内部
-{
-	this.canvas.ctx.clearRect(this.start_x,this.start_y,this.w,this.h);
-}
 Line.prototype.move = function() //移动
 {
 	var me = this;  //setInterval 里不能直接调用this.draw,所以使用变量作用域解决这个问题
