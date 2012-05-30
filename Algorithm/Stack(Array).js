@@ -87,8 +87,8 @@ Stack.prototype.create = function(stackSize)  //初始化堆栈大小,并绘制�
 	{
 		this.frame[i] = new Rectangle({
 			canvas : this.canvas,
-			w : Stack.FRAME_WIDTH,
-			h : Stack.FRAME_HEIGHT,
+			width : Stack.FRAME_WIDTH,
+			height : Stack.FRAME_HEIGHT,
 			text : i,
 			backColor : Stack.FRAME_BACKCOLOR,
 			edgeColor : Stack.FRAME_EDGECOLOR
@@ -111,8 +111,8 @@ Stack.prototype.push = function( value )
 	
 		this.stack[this.top] = new Rectangle({
 			canvas : this.canvas,
-			w : Stack.SHAPE_WIDTH,
-			h : Stack.SHAPE_HEIGHT,
+			width : Stack.SHAPE_WIDTH,
+			height : Stack.SHAPE_HEIGHT,
 			text : value,
 			backColor : Stack.SHAPE_BACKCOLOR, 
 			edgeColor : Stack.SHAPE_EDGECOLOR, 
@@ -143,8 +143,10 @@ Stack.prototype.push = function( value )
 			});
 		this.canvas.cmd(
 			"Move",this.line,{
-			aim_x : this.line.start_x, 
-			aim_y : this.line.start_y - Stack.FRAME_HEIGHT, 
+			aim_start_x : this.line.start_x, 
+			aim_start_y : this.line.start_y - Stack.FRAME_HEIGHT, 
+			aim_end_x : this.line.end_x, 
+			aim_end_y : this.line.end_y - Stack.FRAME_HEIGHT, 
 			move_speed : Stack.POINTER_MOVE_SPEED
 			});
 		this.canvas.cmd("EndParallel");
@@ -202,8 +204,10 @@ Stack.prototype.pop = function()
 			},
 			
 			"Move",this.line,{
-			aim_x : this.line.start_x, 
-			aim_y : this.line.start_y + Stack.FRAME_HEIGHT, 
+			aim_start_x : this.line.start_x, 
+			aim_start_y : this.line.start_y + Stack.FRAME_HEIGHT, 
+			aim_end_x : this.line.end_x, 
+			aim_end_y : this.line.end_y + Stack.FRAME_HEIGHT, 
 			move_speed : Stack.POINTER_MOVE_SPEED
 			});
 		this.canvas.cmd("Delay",Canvas.DELAY_TIME);

@@ -8,208 +8,223 @@ function init()
 }
 
 Stack = function(size)
-{
-	this.top = null;
-}
+{}
 
-Stack.ALGORITHM_NAME = "堆栈(数组)"; //算法名	
-Stack.SIZE = 7; //默认堆栈的大小
-Stack.OVERFLOW_INFO = "堆栈吃饱了,再压栈,堆栈会撑死的！";
+Stack.ALGORITHM_NAME = "堆栈(链表实现)"; //算法名	
 Stack.EMPTY_INFO = "堆栈里空空如也了,弹不出东西了！";
 
-Stack.FRAME_WIDTH = 60;
-Stack.FRAME_HEIGHT = 60;
-Stack.FRAME_START_X = (Canvas.WIDTH-Stack.FRAME_WIDTH)/2;
-Stack.FRAME_START_Y = Canvas.HEIGHT-Stack.FRAME_HEIGHT-10;
-Stack.FRAME_TEXT = "";
-Stack.FRAME_BACKCOLOR = "FFF";
-Stack.FRAME_EDGECOLOR = "000";
+Stack.DATASHAPE_WIDTH = 60;
+Stack.DATASHAPE_HEIGHT = 60;
+Stack.DATASHAPE_FONT = "16px sans-serif";
 
-Stack.SHAPE_BACKCOLOR = "ABC";  //默认图形填充背景色
-Stack.SHAPE_EDGECOLOR = "000";  //默认图形边框颜色
-Stack.SHAPE_TEXTCOLOR = "C00";  //默认图形填充文本颜色
-Stack.SHAPE_TEXT = "shape";    //默认图新填充的文本内容
-Stack.SHAPE_WIDTH = 40;       //默认图形宽度
-Stack.SHAPE_HEIGHT = 40;      //默认图形高度
-Stack.SHAPE_START_X = 200;           //默认图新位置
-Stack.SHAPE_START_Y = 200;
-Stack.SHAPE_MOVE_SPEED = 5;  //默认图新移动速度
-Stack.SHAPE_MOVE_PATH = "LINE"; //默认图新移动方式(直线)
-Stack.SHAPE_FONT = "10px sans-serif";
+Stack.DATASHAPE_TOP_X = 100;
+Stack.DATASHAPE_TOP_Y = 100;
+Stack.DATASHAPE_GAP_X = 100;
+Stack.DATASHAPE_PUSH_X = 150;
+Stack.DATASHAPE_PUSH_Y = 200;
 
+Stack.DATASHAPE_BACKCOLOR = "FFCAAC";  //默认图形填充背景色
+Stack.DATASHAPE_EDGECOLOR = "D58FFF";  //默认图形边框颜色
+Stack.DATASHAPE_TEXTCOLOR = "FF2451";  //默认图形填充文本颜色
+
+Stack.DATASHAPE_MOVE_SPEED = 2;  //默认图新移动速度
+Stack.POINTER_MOVE_SPEED = 3;
+Stack.DELAY_TIME = 1500;
+
+Stack.POINTER_COLOR = "4DDC12";
+Stack.POINTER_WIDTH = 3;
 Stack.POINTER_FONT = "20px sans-serif";
-Stack.POINTER_MOVE_SPEED = 2;
-Stack.POINTER_START_X = Stack.FRAME_START_X + Stack.FRAME_WIDTH+100;
-Stack.POINTER_START_Y = Stack.FRAME_START_Y + Stack.FRAME_HEIGHT;
-Stack.POINTER_COLOR = "000";
-
-Stack.LINE_START_X = Stack.FRAME_START_X + Stack.FRAME_WIDTH/2 + 20;
-Stack.LINE_START_Y = Stack.FRAME_START_Y + Stack.FRAME_HEIGHT;
-Stack.LINE_END_X = Stack.POINTER_START_X - 45; 
-Stack.LINE_END_Y = Stack.FRAME_START_Y + Stack.FRAME_HEIGHT;
-Stack.LINE_COLOR = "F00";
 
 Stack.prototype = new Algorithm();
 
-Stack.prototype.DataStructure = function(value)
+Stack.prototype.stackNode = function(value)
 {
 	this.data = value;
 	this.next = null;
 	
-	this.dataShape = new Rectangle({
-		text : value
+	this.dataShape = new Rectangle
+	({
+		text : value,
+		width : Stack.DATASHAPE_WIDTH,
+		height : Stack.DATASHAPE_HEIGHT,
+		font : Stack.DATASHAPE_FONT,
+		backColor : Stack.DATASHAPE_BACKCOLOR,
+		edgeColor : Stack.DATASHAPE_EDGECOLOR,
+		textColor : Stack.DATASHAPE_TEXTCOLOR,
+		move_speed : Stack.DATASHAPE_MOVE_SPEED
 	});
 
-	this.nextShape = new Line({
-		startObject : this.dataShape
+	this.pointerShape = new Line
+	({
+		startObject : this.dataShape,
+		lineColor : Stack.POINTER_COLOR,
+		lineWidth : Stack.POINTER_WIDTH
 	});
 }
 Stack.prototype.create = function()  //初始化堆栈大小,并绘制该堆栈
 {
-	this.top = new this.DataStructure("top");
-	this.top.next = new this.DataStructure("null");
-	this.top.nextShape.endObject = this.top.next.dataShape;
+	this.top = new this.stackNode("top");
+	this.top.next = new this.stackNode("null");
 	
 	this.canvas.del();
 	this.canvas.clear();
 	this.canvas.cmd("Setup");
-	
-	this.canvas.cmd(
-		"Draw",this.top.dataShape,{
-		canvas : this.canvas,
-		x : 50,
-		y : 50
-		},
-	
-	"Draw",this.top.next.dataShape,{
-		canvas : this.canvas,
-		x : 400,
-		y :50
+	this.canvas.cmd
+	(
+		"Draw", this.top.dataShape,
+		{
+			canvas : this.canvas,
+			x : Stack.DATASHAPE_TOP_X,
+			y : Stack.DATASHAPE_TOP_Y
+		},	
+
+		"Draw", this.top.next.dataShape,
+		{
+  		 	canvas : this.canvas,
+			x : Stack.DATASHAPE_TOP_X + Stack.DATASHAPE_GAP_X,
+			y :	Stack.DATASHAPE_TOP_Y
 		},
 		
-		"Draw",this.top.nextShape,{
-		canvas : this.canvas
-		});
+		"Draw", this.top.pointerShape,
+		{
+			canvas : this.canvas,
+			endObject : this.top.next.dataShape
+		}
+	);
 	this.canvas.cmd("END");
 }
 Stack.prototype.push = function( value )
 {
-		$(".controler").attr("disabled","disabled");  //禁用所有控制元素
+	$(".controler").attr("disabled","disabled");  //禁用所有控制元素
 	
-		var tmp_data = this.top.next;
-		this.top.next = new this.DataStructure(value);
-		this.top.next.next = tmp_data;
+	var tmp_data = this.top.next;
+	this.top.next = new this.stackNode(value);
+	this.top.next.next = tmp_data;
 
-		this.top.nextShape.endObject = this.top.next.dataShape;
-		if(this.top.next.next)
-			this.top.next.nextShape.endObject = this.top.next.next.dataShape;
-
-		this.canvas.cmd("Setup");
-		this.canvas.cmd(
-			"Draw",this.top.next.dataShape,{
+	this.canvas.cmd("Setup");
+	this.canvas.cmd
+	(
+		"Draw", this.top.next.dataShape,
+		{
 			canvas : this.canvas,
-			x : Stack.SHAPE_START_X,
-			y : Stack.SHAPE_START_Y
-			});
-		this.canvas.cmd("Delay");
-		this.canvas.cmd(
-			"Draw",this.top.next.nextShape,{
-			canvas : this.canvas
-			});
-		this.canvas.cmd("Delay");
-		this.canvas.cmd(
-			"Delete",this.top.nextShape,{
-			});
-		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
-		this.canvas.cmd(
-			"Draw",this.top.nextShape,{
-			});
-
-		var tmp_pointer = this.top.next;
-
-		this.canvas.cmd("StartParallel");
-		this.canvas.cmd(
-			"Move",	tmp_pointer.dataShape,{
+			x : Stack.DATASHAPE_PUSH_X,
+			y : Stack.DATASHAPE_PUSH_Y
+		}
+	);
+	this.canvas.cmd("Delay",Stack.DELAY_TIME);
+	this.canvas.cmd
+	(
+		"Draw", this.top.next.pointerShape,
+		{
+			canvas : this.canvas,
+			endObject : this.top.next.next.dataShape
+		}
+	);
+	this.canvas.cmd("Delay",Stack.DELAY_TIME);
+	this.canvas.cmd
+	(
+		"Move", this.top.pointerShape,
+		{
+			aim_endObject : this.top.next.dataShape,
+			aim_startObject : this.top.pointerShape.startObject,
+			move_speed : 1
+		}
+	);
+	this.canvas.cmd("Delay",Stack.DELAY_TIME);
+   /* this.canvas.cmd*/
+	//(
+		//"Draw", this.top.pointerShape,
+		//{
+	////		endObject : this.top.next.dataShape,
+		//}
+	/*);*/
+	this.canvas.cmd("Delay",Stack.DELAY_TIME);
+	
+	var tmp_pointer = this.top.next;
+	this.canvas.cmd("StartParallel");
+	this.canvas.cmd
+	(
+		"Move",	tmp_pointer.dataShape,
+		{
 			aim_x : tmp_pointer.next.dataShape.x,
 			aim_y : tmp_pointer.next.dataShape.y
-			});
-
-		tmp_pointer = tmp_pointer.next;
-		while(tmp_pointer)
-		{
-			this.canvas.cmd(
-				"Move",	tmp_pointer.dataShape,{
-				aim_x : tmp_pointer.dataShape.x + 100,
-				aim_y : tmp_pointer.dataShape.y
-				});
-			tmp_pointer = tmp_pointer.next;
 		}
-		this.canvas.cmd("EndParallel");
-         //this.canvas.cmd(
-		 //
-			//"Move", this.stack[this.top],{
-			//aim_x : this.frame[this.top].x,
-			//aim_y : this.frame[this.top].y,
-			//move_speed : Stack.SHAPE_MOVE_SPEED
-			//},
-			//"Move",this.pointer,{
-			//text : "top = " + this.top,
-			//aim_x : this.pointer.x,
-			//aim_y : this.pointer.y - Stack.FRAME_HEIGHT,
-			//move_speed : Stack.POINTER_MOVE_SPEED
-			//},
-			//"Move",this.line,{
-			//aim_x : this.line.start_x, 
-			//aim_y : this.line.start_y - Stack.FRAME_HEIGHT, 
-			//move_speed : Stack.POINTER_MOVE_SPEED
-			//});
-		var waitTime = this.canvas.cmd("END");
+	);
+
+	tmp_pointer = tmp_pointer.next;
+	while(tmp_pointer)
+	{
+		this.canvas.cmd
+		(
+			"Move",	tmp_pointer.dataShape,
+			{
+				aim_x : tmp_pointer.dataShape.x + Stack.DATASHAPE_GAP_X,
+				aim_y : tmp_pointer.dataShape.y
+			}
+		);
+		tmp_pointer = tmp_pointer.next;
+	}
+	this.canvas.cmd("EndParallel");
+	var waitTime = this.canvas.cmd("END");
 	
-		var me = this; 
-		setTimeout(function(){
-			$(".controler").removeAttr("disabled");
+	var me = this; 
+	setTimeout(function(){
+		$(".controler").removeAttr("disabled");
 		},waitTime);
 }
 Stack.prototype.pop = function()
 {
-	if(this.top <= 0)
+	if(this.top.next.next == null)
 		alert(Stack.EMPTY_INFO);
 	else
 	{
 		$(".controler").attr("disabled","disabled");
 	
-	 	this.top--;
-
-		this.canvas.cmd("Setup");
-	   	this.canvas.cmd(
-			"Move",this.stack[this.top],{
-			aim_x : Stack.SHAPE_START_X,
-			aim_y : Stack.SHAPE_START_Y,
-			move_speed : Stack.SHAPE_MOVE_SPEED
-			},
-
-			"Move",this.pointer,{
-			text : "top = " + (this.top - 1),
-			aim_x : this.pointer.x,
-			aim_y : this.pointer.y + Stack.FRAME_HEIGHT,
-			move_speed : Stack.POINTER_MOVE_SPEED
-			},
-			
-			"Move",this.line,{
-			aim_x : this.line.start_x, 
-			aim_y : this.line.start_y + Stack.FRAME_HEIGHT, 
-			move_speed : Stack.POINTER_MOVE_SPEED
-			});
-		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
-		this.canvas.cmd("Delete",this.stack[this.top]);
+		this.canvas.cmd("Setup");	
+		this.canvas.cmd("StartParallel");
+		this.canvas.cmd
+		(
+			"Move",	this.top.next.dataShape,
+			{
+				aim_x : Stack.DATASHAPE_PUSH_X,
+				aim_y : Stack.DATASHAPE_PUSH_Y
+			}
+		);
+		var tmp_pointer = this.top.next;
+		while(tmp_pointer.next !=  null)
+		{
+			this.canvas.cmd
+			(
+				"Move", tmp_pointer.next.dataShape,
+				{
+					aim_x : tmp_pointer.dataShape.x,
+					aim_y : tmp_pointer.dataShape.y
+				}
+			);
+			tmp_pointer = tmp_pointer.next;
+		}
+		this.canvas.cmd("EndParallel");
+		this.canvas.cmd("Delay",Stack.DELAY_TIME);
+		this.canvas.cmd("Delete",this.top.pointerShape);
+		this.canvas.cmd("Delay",Stack.DELAY_TIME);
+		this.canvas.cmd
+			(
+				"Draw", this.top.pointerShape,
+				{
+			    	endObject : this.top.next.next.dataShape
+				}
+			);
+		this.canvas.cmd("Delay",Stack.DELAY_TIME);
+		this.canvas.cmd("Delete",this.top.next.dataShape,{},"Delete",this.top.next.pointerShape,{});
+		
 		var waitTime = this.canvas.cmd("END");	
 		
 		var me = this;	
 		setTimeout(function(){
 			$(".controler").removeAttr("disabled");
-		/*	if(me.top <= 0)
-				me.PopButton.disabled = true;*/
 		},waitTime);		
+		
+		this.top.next = this.top.next.next;
 	}
 }
 Stack.prototype.addControls = function(obj)
@@ -218,8 +233,7 @@ Stack.prototype.addControls = function(obj)
 	this.TextInput = this.addAlgorithmControlBar("text","");
 	this.CreatStackButton = this.addAlgorithmControlBar("button","Creat Stack");
 	this.CreatStackButton.onclick = function(){
-		var stackSize = obj.TextInput.value;
-		obj.create(stackSize);
+		obj.create();
 		obj.TextInput.value = "";
 		obj.PushButton.disabled = false;
 	}

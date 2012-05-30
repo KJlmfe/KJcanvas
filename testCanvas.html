@@ -93,7 +93,7 @@ ctx.fillText("好好学习",10,20);
 			abc[hh]="123";
 			alert(abc[hh]);
 	*/
-		simple = function()
+	/*	simple = function()
 		{
 			this.x = 123;
 			this.y = 456;
@@ -123,6 +123,18 @@ ctx.fillText("好好学习",10,20);
 		alert(abc.y);   //显示xxxx
 		abc.restoreArgument();
 		alert(abc.y);   //显示456
+	*/
+	var x = "1243";
+	function change(y)
+	{
+		y.set(456);
+	}
+	change(
+	{
+		set : function(v){ x = v},
+		get : function(){return x}
+	});
+	alert(x);
 	</script>
 	
 	</body>

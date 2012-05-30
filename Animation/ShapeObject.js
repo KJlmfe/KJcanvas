@@ -192,6 +192,8 @@ Shape.prototype.restoreArguments = function(cfg)
 		if(type == "number" || type == "string" || type == "object")
 			this[x] = this.argument[x];
 	}
+	this.saveArgumentsFlag = false;
+
 }
 Shape.prototype.setArguments = function(cfg)
 {
