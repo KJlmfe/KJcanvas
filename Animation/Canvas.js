@@ -26,6 +26,7 @@ Canvas = function(myCanvas,width,height,border,animate_speed,delay_time,refresh_
 
 	this.Shape = new Array(); //初始化保存画板上存在的图形对象
 	this.queue = new Array(); //初始化保存动画命令的队列
+	this.parallelSignal = false;
 }
 Canvas.prototype.cmd = function()  //动画命令控制器 
 {
@@ -56,8 +57,27 @@ Canvas.prototype.cmd = function()  //动画命令控制器
 			this.animate_shape[i].restoreArguments();
 		}
 	}
-	else
+	else if(arguments[0] == "StartParallel")
 	{
+		this.parallelSignal = true;	
+		this.parallelArguments = new Array();
+	}
+	else 
+	{
+		if(arguments[0] == "EndParallel")
+		{
+			this.parallelSignal = false;
+			arguments = this.parallelArguments;
+		}
+		if(this.parallelSignal)
+		{
+			for(var i=0;i<arguments.length;i++)
+			{
+				this.parallelArguments.push(arguments[i]);
+			}
+		}
+		else
+		{
 		this.queue[this.rear++] = arguments;  //动画命令存入队列
 		
 		setTimeout(function(){     //处理多个图形并发移动情况
@@ -127,6 +147,7 @@ Canvas.prototype.cmd = function()  //动画命令控制器
 		}
 
 		this.animate_timer += max_timer;
+		}
 	}
 	
 	return this.animate_timer;  //返回动画耗时时间

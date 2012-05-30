@@ -127,6 +127,28 @@ Stack.prototype.push = function( value )
 			y : Stack.SHAPE_START_Y
 		});
 		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
+		this.canvas.cmd("StartParallel");
+		this.canvas.cmd(
+			"Move", this.stack[this.top],{
+			aim_x : this.frame[this.top].x,
+			aim_y : this.frame[this.top].y,
+			move_speed : Stack.SHAPE_MOVE_SPEED
+			});
+		this.canvas.cmd(
+			"Move",this.pointer,{
+			text : "top = " + this.top,
+			aim_x : this.pointer.x,
+			aim_y : this.pointer.y - Stack.FRAME_HEIGHT,
+			move_speed : Stack.POINTER_MOVE_SPEED
+			});
+		this.canvas.cmd(
+			"Move",this.line,{
+			aim_x : this.line.start_x, 
+			aim_y : this.line.start_y - Stack.FRAME_HEIGHT, 
+			move_speed : Stack.POINTER_MOVE_SPEED
+			});
+		this.canvas.cmd("EndParallel");
+		/*
  		this.canvas.cmd(
 			"Move", this.stack[this.top],{
 			aim_x : this.frame[this.top].x,
@@ -144,6 +166,7 @@ Stack.prototype.push = function( value )
 			aim_y : this.line.start_y - Stack.FRAME_HEIGHT, 
 			move_speed : Stack.POINTER_MOVE_SPEED
 			});
+		*/
 		var waitTime = this.canvas.cmd("END");
 	
 		var me = this; 

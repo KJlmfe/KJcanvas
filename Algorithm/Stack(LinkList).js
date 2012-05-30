@@ -127,6 +127,7 @@ Stack.prototype.push = function( value )
 
 		var tmp_pointer = this.top.next;
 
+		this.canvas.cmd("StartParallel");
 		this.canvas.cmd(
 			"Move",	tmp_pointer.dataShape,{
 			aim_x : tmp_pointer.next.dataShape.x,
@@ -143,7 +144,9 @@ Stack.prototype.push = function( value )
 				});
 			tmp_pointer = tmp_pointer.next;
 		}
+		this.canvas.cmd("EndParallel");
          //this.canvas.cmd(
+		 //
 			//"Move", this.stack[this.top],{
 			//aim_x : this.frame[this.top].x,
 			//aim_y : this.frame[this.top].y,
