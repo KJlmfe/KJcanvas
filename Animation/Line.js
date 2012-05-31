@@ -31,9 +31,7 @@ Line.prototype.move = function() //移动
 	if(this.aim_StartShape != null)
 	{
 		this.aim_start_x = this.aim_StartShape.x;
-		this.aim_start_y = this.aim_StartShape.y;
-
-		this.StartShape = null;
+		this.aim_start_y = this.aim_StartShape.y;	
 	}
 	else 
 	{
@@ -41,14 +39,14 @@ Line.prototype.move = function() //移动
 			this.aim_start_x = this.start_x;
 		if(this.aim_start_y == null)
 			this.aim_start_y = this.start_y;
+		
+		this.aim_StartShape = this.StartShape;
 	}
-
+	
 	if(this.aim_EndShape != null)
 	{
 		this.aim_end_x = this.aim_EndShape.x;
 		this.aim_end_y = this.aim_EndShape.y;
-
-		this.EndShape =  null;
 	}
 	else 
 	{
@@ -56,7 +54,12 @@ Line.prototype.move = function() //移动
 			this.aim_end_x = this.end_x;
 		if(this.aim_end_y == null)
 			this.aim_end_y = this.end_y;
+
+		this.aim_EndShape = this.EndShape;
 	}
+
+	this.StartShape = null;
+	this.EndShape = null;
 
 	var me = this;  //setInterval 里不能直接调用this.draw,所以使用变量作用域解决这个问题
 	
@@ -168,10 +171,8 @@ Line.prototype.move = function() //移动
 			//判断是否到达目标位置
 			if(me.start_x == me.aim_start_x && me.start_y == me.aim_start_y  && me.end_x == me.aim_end_x && me.end_y == me.aim_end_y)
 			{
-				if(me.aim_StartShape != null)
-					me.StartShape = me.aim_StartShape;
-				if(me.aim_EndShape != null)
-					me.EndShape = me.aim_EndShape;
+				me.StartShape = me.aim_StartShape;
+				me.EndShape = me.aim_EndShape;
 				clearInterval(me.timer);
 			}
 		},me.Canvas.refresh_time);

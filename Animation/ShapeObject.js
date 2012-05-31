@@ -44,21 +44,42 @@ Shape.prototype.draw = function()  //在this.Canvas画板上的x,y位置画出�
 	this.drawMethod();  //调用图形绘画方法
 	this.Canvas.ctx.restore();
 }
+Shape.prototype.fadeIn = function()  //在this.Canvas画板上的x,y位置画出该图形
+{
+	if(!this.Canvas.exist(this))    //每在画板上画一个图形对象，都要将该对象保存到画板的Shape里 	
+		this.Canvas.save(this);
+	this.Canvas.ctx.save();
+	this.alpha = this.startAlpha;
+	var me = this;
+	this.fadeInTimer = setInterval(function(){
+		me.alpha += me.fadeSpeed;
+		if(me.alpha >= me.endAlpha)
+			me.alpha = me.endAlpha;
+		me.drawMethod();
+		if(me.alpha == me.endAlpha)
+		{
+			me.Canvas.ctx.restore();
+			clearInterval(me.fadeInTimer);
+		}
+	},me.Canvas.refresh_time);
+}
 Shape.prototype.fadeOut = function()  //在this.Canvas画板上的x,y位置画出该图形
 {
 	if(!this.Canvas.exist(this))    //每在画板上画一个图形对象，都要将该对象保存到画板的Shape里 	
 		this.Canvas.save(this);
 	this.Canvas.ctx.save();
+	this.alpha = this.endAlpha;
 	var me = this;
-	this.drawTimer = setInterval(function(){
-		me.alpha += me.fadeSpeed;
-		if(me.alpha >= me.aimAlpha)
-			me.alpha = me.aimAlpha;
+	this.fadeOutTimer = setInterval(function(){
+		me.alpha -= me.fadeSpeed;
+		if(me.alpha <= me.startAlpha)
+			me.alpha = me.startAlpha;
+		me.del();
 		me.drawMethod();
-		if(me.alpha == me.aimAlpha)
+		if(me.alpha == me.startAlpha)
 		{
 			me.Canvas.ctx.restore();
-			clearInterval(me.drawTimer);
+			clearInterval(me.fadeOutTimer);
 		}
 	},me.Canvas.refresh_time);
 }
@@ -187,15 +208,19 @@ Shape.prototype.timeOfMove = function() //计算移动矩形的动画时间
 }
 Shape.prototype.timeOfDraw = function()
 {
-	return 0;
+	return 100;
 }
 Shape.prototype.timeOfFadeIn = function()
 {
-	return (this.aimAlpha - this.alpha)/this.fadeSpeed * this.Canvas.refresh_time;
+	return (this.endAlpha - this.startAlpha)/this.fadeSpeed * this.Canvas.refresh_time;
+}
+Shape.prototype.timeOfFadeOut = function()
+{
+	return (this.endAlpha - this.startAlpha)/this.fadeSpeed * this.Canvas.refresh_time;
 }
 Shape.prototype.timeOfDelete = function()
 {
-	return 0;
+	return 100;
 }
 Shape.prototype.saveArguments = function()
 {

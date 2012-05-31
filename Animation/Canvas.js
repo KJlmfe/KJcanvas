@@ -92,6 +92,11 @@ Canvas.prototype.cmd = function()  //动画命令控制器
 				else if(me.queue[me.front][k] == "FadeIn")
 				{
 					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
+					me.queue[me.front][k+1].fadeIn();
+				}
+				else if(me.queue[me.front][k] == "FadeOut")
+				{
+					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
 					me.queue[me.front][k+1].fadeOut();
 				}
 				else if(me.queue[me.front][k] == "Move")
@@ -135,6 +140,16 @@ Canvas.prototype.cmd = function()  //动画命令控制器
 				}
 				arguments[k+1].setArguments(arguments[k+2]);
 				tmp_timer = arguments[k+1].timeOfFadeIn();
+			}
+			else if(arguments[k] == "FadeOut")
+			{
+				if(arguments[k+1].saveArgumentsFlag == false)
+				{
+					arguments[k+1].saveArguments();
+					this.animate_shape.push(arguments[k+1]);
+				}
+				arguments[k+1].setArguments(arguments[k+2]);
+				tmp_timer = arguments[k+1].timeOfFadeOut();
 			}
 			else if(arguments[k] == "Move")
 			{
@@ -206,4 +221,8 @@ Canvas.prototype.clear = function() //清空画板
 {
 	this.ctx.clearRect(0,0,this.w,this.h);
 }
-
+Canvas.prototype.init = function()  //新建一个干净的画板
+{
+	this.Shape = new Array();  
+	this.clear();
+}
