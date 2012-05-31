@@ -1,20 +1,20 @@
 Canvas = function(myCanvas,width,height,border,animate_speed,delay_time,refresh_time,max_animate_speed) //画板类(myCanvas为DOM里Canvas对象)
 {
 	//得到DOM里画板对象
-	this.canvas = myCanvas == null ? document.getElementsByTagName("canvas")[0] : myCanvas;
+	this.Canvas = myCanvas == null ? document.getElementsByTagName("Canvas")[0] : myCanvas;
 	
-	//初始化全局canvas的2d上下文
-	this.ctx = this.canvas.getContext("2d"); 
+	//初始化全局Canvas的2d上下文
+	this.ctx = this.Canvas.getContext("2d"); 
 	
 	//设置画板大小,边框
 	this.w = width == null ? Canvas.WIDTH : width;
 	this.h = height == null ? Canvas.HEIGHT : height;
 	this.border = border == null ? Canvas.BORDER : border;
 	
-	//初始化DOM里canvas样式 
-	this.canvas.width = this.w;
-	this.canvas.height = this.h;
-	$(this.canvas).css("border",this.border);
+	//初始化DOM里Canvas样式 
+	this.Canvas.width = this.w;
+	this.Canvas.height = this.h;
+	$(this.Canvas).css("border",this.border);
 	
 	//设置动画速度（0-Canvas.MAX_ANIMATE_SPEED）如果为x,表示为默认速度的x倍
 	this.animate_speed = animate_speed == null ? Canvas.ANIMATE_SPEED : animate_speed; 
@@ -89,7 +89,7 @@ Canvas.prototype.cmd = function()  //动画命令控制器
 					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
 					me.queue[me.front][k+1].draw();
 				}
-				else if(me.queue[me.front][k] == "FadeOut")
+				else if(me.queue[me.front][k] == "FadeIn")
 				{
 					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
 					me.queue[me.front][k+1].fadeOut();
@@ -126,7 +126,7 @@ Canvas.prototype.cmd = function()  //动画命令控制器
 				arguments[k+1].setArguments(arguments[k+2]);
 				tmp_timer = arguments[k+1].timeOfDraw();
 			}
-			else if(arguments[k] == "FadeOut")
+			else if(arguments[k] == "FadeIn")
 			{
 				if(arguments[k+1].saveArgumentsFlag == false)
 				{
@@ -134,7 +134,7 @@ Canvas.prototype.cmd = function()  //动画命令控制器
 					this.animate_shape.push(arguments[k+1]);
 				}
 				arguments[k+1].setArguments(arguments[k+2]);
-				tmp_timer = arguments[k+1].timeOfFadeOut();
+				tmp_timer = arguments[k+1].timeOfFadeIn();
 			}
 			else if(arguments[k] == "Move")
 			{

@@ -7,16 +7,16 @@ Rectangle = function(cfg)
 Rectangle.prototype = new Shape;  //继承图形父类
 Rectangle.prototype.drawMethod = function() //绘画矩形的方法
 {
-	this.canvas.ctx.globalAlpha = this.alpha;
-	this.canvas.ctx.fillStyle = this.backColor;  
-	this.canvas.ctx.fillRect(this.x-this.width/2,this.y-this.height/2,this.width,this.height);  //画一个实体矩形
-	this.canvas.ctx.strokeStyle = this.edgeColor;
-	this.canvas.ctx.lineWidth = this.edgeWidth;
-	this.canvas.ctx.strokeRect(this.x-this.width/2,this.y-this.height/2,this.width,this.height); //勾画出矩形边框
+	this.Canvas.ctx.globalAlpha = this.alpha;
+	this.Canvas.ctx.fillStyle = this.backColor;  
+	this.Canvas.ctx.fillRect(this.x-this.width/2,this.y-this.height/2,this.width,this.height);  //画一个实体矩形
+	this.Canvas.ctx.strokeStyle = this.edgeColor;
+	this.Canvas.ctx.lineWidth = this.edgeWidth;
+	this.Canvas.ctx.strokeRect(this.x-this.width/2,this.y-this.height/2,this.width,this.height); //勾画出矩形边框
 
-	this.canvas.ctx.fillStyle = this.textColor;      //在矩形中间绘制文本
-	this.canvas.ctx.textAlign = this.textAlign;
-	this.canvas.ctx.font = this.font;
-	this.canvas.ctx.textBaseline = this.textBaseline; 
-	this.canvas.ctx.fillText(this.text,this.x,this.y);  
+	this.Canvas.ctx.fillStyle = this.textColor;      //在矩形中间绘制文本
+	this.Canvas.ctx.textAlign = this.textAlign;
+	this.Canvas.ctx.font = this.font;
+	this.Canvas.ctx.textBaseline = this.textBaseline; 
+	this.Canvas.ctx.fillText(this.text,this.x,this.y);  
 }

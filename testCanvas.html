@@ -13,7 +13,7 @@
 		<canvas id="canvas" width="960" height="600" style="border:1px solid #000000;"></canvas>
 	
 		<script type="text/javascript">
-	/*		father = function()
+			father = function()
 			{
 					this.y = "yyyy";
 			}
@@ -26,13 +26,16 @@
 				this.x = "323";	
 			}
 			child.prototype = new father;
-			child.prototype.abcc = function()
+			child.prototype.abc = function()
 			{
-				alert(this.x);
+				alert(this.y);
+				this.y = "fhewjf";
 				alert(this.y);
 			}
 		var vv = new child;
-		vv.abcc();
+		var bb = new child;
+		bb.abc();
+		/*
 		 var canvas = document.getElementById('canvas'); 
  		 var ctx = canvas.getContext('2d'); 
 		ctx.fillStyle = "f00";  
@@ -71,7 +74,7 @@ ctx.fillText("好好学习",10,20);
 			});
 			alert(c.father.info);
 			alert(c.age);
-	/*
+	
 			father = function()
 			{
 				
@@ -124,7 +127,7 @@ ctx.fillText("好好学习",10,20);
 		abc.restoreArgument();
 		alert(abc.y);   //显示456
 	*/
-	var x = "1243";
+	/*var x = "1243";
 	function change(y)
 	{
 		y.set(456);
@@ -134,7 +137,7 @@ ctx.fillText("好好学习",10,20);
 		set : function(v){ x = v},
 		get : function(){return x}
 	});
-	alert(x);
+	alert(x);*/
 	</script>
 	
 	</body>

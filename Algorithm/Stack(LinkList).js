@@ -1,13 +1,13 @@
 function init()
 {
-	var Data_Structure = new Stack();  //初始化一个堆栈对象
-	Data_Structure.addControls(Data_Structure);  //添加堆栈用户控制器
-
-	var Mycanvas = document.getElementsByTagName("canvas")[0]; //初始化canvas对象
-	Data_Structure.canvas = new Canvas(Mycanvas);  //将该canvas对象绑定到该堆栈上
+	var canvas = document.getElementsByTagName("Canvas")[0]; //初始化Canvas对象
+	KJCanvas = new Canvas(canvas);  //将该Canvas对象绑定到该堆栈上
+	
+	var DataStructure = new Stack();  //初始化一个堆栈对象
+	DataStructure.addControls(DataStructure);  //添加堆栈用户动画界面控制器
 }
 
-Stack = function(size)
+Stack = function()
 {}
 
 Stack.ALGORITHM_NAME = "堆栈(链表实现)"; //算法名	
@@ -27,13 +27,21 @@ Stack.DATASHAPE_BACKCOLOR = "FFCAAC";  //默认图形填充背景色
 Stack.DATASHAPE_EDGECOLOR = "D58FFF";  //默认图形边框颜色
 Stack.DATASHAPE_TEXTCOLOR = "FF2451";  //默认图形填充文本颜色
 
-Stack.DATASHAPE_MOVE_SPEED = 2;  //默认图新移动速度
-Stack.POINTER_MOVE_SPEED = 3;
+Stack.DATASHAPE_MOVESPEED = 2;  //默认图新移动速度
+Stack.POINTERSHAPE_MOVESPEED = 3;
 Stack.DELAY_TIME = 1500;
 
-Stack.POINTER_COLOR = "4DDC12";
-Stack.POINTER_WIDTH = 3;
-Stack.POINTER_FONT = "20px sans-serif";
+Stack.POINTERSHAPE_COLOR = "4DDC12";
+Stack.POINTERSHAPE_WIDTH = 3;
+
+Stack.DATASHAPE_ALPHA = 0;
+Stack.DATASHAPE_AIMALPHA = 1;
+Stack.DATASHAPE_FADESPEED = 0.05;
+
+Stack.POINTERSHAPE_ALPHA = 0;
+Stack.POINTERSHAPE_AIMALPHA = 1;
+Stack.POINTERSHAPE_FADESPEED = 0.05;
+
 
 Stack.prototype = new Algorithm();
 
@@ -42,65 +50,61 @@ Stack.prototype.stackNode = function(value)
 	this.data = value;
 	this.next = null;
 	
-	this.dataShape = new Rectangle
+	this.DataShape = new Rectangle
 	({
 		text : value,
+		font : Stack.DATASHAPE_FONT,
 		width : Stack.DATASHAPE_WIDTH,
 		height : Stack.DATASHAPE_HEIGHT,
-		font : Stack.DATASHAPE_FONT,
 		backColor : Stack.DATASHAPE_BACKCOLOR,
 		edgeColor : Stack.DATASHAPE_EDGECOLOR,
 		textColor : Stack.DATASHAPE_TEXTCOLOR,
-		move_speed : Stack.DATASHAPE_MOVE_SPEED
+		moveSpeed : Stack.DATASHAPE_MOVESPEED,
+		alpha : Stack.DATASHAPE_ALPHA,
+		aimAlpha : Stack.DATASHAPE_AIMALPHA,
+		fadeSpeed : Stack.DATASHAPE_FADESPEED,
+		Canvas : KJCanvas
 	});
 
-	this.pointerShape = new Line
+	this.PointerShape = new Line
 	({
-		startObject : this.dataShape,
-		lineColor : Stack.POINTER_COLOR,
-		lineWidth : Stack.POINTER_WIDTH
+		StartShape : this.DataShape,
+		lineColor : Stack.POINTERSHAPE_COLOR,
+		lineWidth : Stack.POINTERSHAPE_WIDTH,
+		alpha : Stack.POINTERSHAPE_ALPHA,
+		aimAlpha : Stack.POINTERSHAPE_AIMALPHA,
+		fadeSpeed : Stack.POINTERSHAPE_FADESPEED,
+		Canvas : KJCanvas
 	});
 }
-Stack.prototype.create = function()  //初始化堆栈大小,并绘制该堆栈
+Stack.prototype.create = function()  //初始化堆栈,并绘制该堆栈
 {
 	this.top = new this.stackNode("top");
 	this.top.next = new this.stackNode("null");
 	
-	this.canvas.del();
-	this.canvas.clear();
-	this.canvas.cmd("Setup");
-	this.canvas.cmd
+	KJCanvas.del();
+	KJCanvas.clear();
+	KJCanvas.cmd("Setup");
+	KJCanvas.cmd
 	(
-		"FadeOut", this.top.dataShape,
+		"FadeIn", this.top.DataShape,
 		{
-			canvas : this.canvas,
 			x : Stack.DATASHAPE_TOP_X,
 			y : Stack.DATASHAPE_TOP_Y,
-			alpha : 0,
-			aim_alpha : 1,
-			drawSpeed : 0.01
 		},	
 
-		"FadeOut", this.top.next.dataShape,
+		"FadeIn", this.top.next.DataShape,
 		{
-  		 	canvas : this.canvas,
 			x : Stack.DATASHAPE_TOP_X + Stack.DATASHAPE_GAP_X,
 			y :	Stack.DATASHAPE_TOP_Y,
-			alpha : 0,
-			aim_alpha : 1,
-			drawSpeed : 0.01
 		},
 		
-		"FadeOut", this.top.pointerShape,
+		"FadeIn", this.top.PointerShape,
 		{
-			canvas : this.canvas,
-			endObject : this.top.next.dataShape,
-			alpha : 0,
-			aim_alpha : 1,
-			drawSpeed : 0.01
+			EndShape : this.top.next.DataShape,
 		}
 	);
-	this.canvas.cmd("END");
+	KJCanvas.cmd("END");
 }
 Stack.prototype.push = function( value )
 {
@@ -110,75 +114,67 @@ Stack.prototype.push = function( value )
 	this.top.next = new this.stackNode(value);
 	this.top.next.next = tmp_data;
 
-	this.canvas.cmd("Setup");
-	this.canvas.cmd
+	KJCanvas.cmd("Setup");
+	KJCanvas.cmd
 	(
-		"FadeOut", this.top.next.dataShape,
+		"FadeIn", this.top.next.DataShape,
 		{
-			canvas : this.canvas,
 			x : Stack.DATASHAPE_PUSH_X,
 			y : Stack.DATASHAPE_PUSH_Y,
-			alpha : 0,
-			aim_alpha : 1,
-			drawSpeed : 0.01
 		}
 	);
-	this.canvas.cmd("Delay",Stack.DELAY_TIME);
-	this.canvas.cmd
+	KJCanvas.cmd("Delay",Stack.DELAY_TIME);
+	KJCanvas.cmd
 	(
-		"FadeOut", this.top.next.pointerShape,
+		"FadeIn", this.top.next.PointerShape,
 		{
-			canvas : this.canvas,
-			endObject : this.top.next.pointerShape.startObject,
-			alpha : 0,
-			aim_alpha : 1,
-			drawSpeed : 0.01
+			EndShape : this.top.next.PointerShape.StartShape,
 		}
 	);
-	this.canvas.cmd
+	KJCanvas.cmd
 	(
-		"Move", this.top.next.pointerShape,
+		"Move", this.top.next.PointerShape,
 		{
-			aim_endObject : this.top.next.next.dataShape,
+			aim_EndShape : this.top.next.next.DataShape,
 		}
 	);
 	
-	this.canvas.cmd("Delay",Stack.DELAY_TIME);
-	this.canvas.cmd
+	KJCanvas.cmd("Delay",Stack.DELAY_TIME);
+	KJCanvas.cmd
 	(
-		"Move", this.top.pointerShape,
+		"Move", this.top.PointerShape,
 		{
-			aim_endObject : this.top.next.dataShape,
-			move_speed : 1
+			aim_EndShape : this.top.next.DataShape,
+			moveSpeed : 1
 		}
 	);
-	this.canvas.cmd("Delay",Stack.DELAY_TIME);
+	KJCanvas.cmd("Delay",Stack.DELAY_TIME);
 	
 	var tmp_pointer = this.top.next;
-	this.canvas.cmd("StartParallel");
-	this.canvas.cmd
+	KJCanvas.cmd("StartParallel");
+	KJCanvas.cmd
 	(
-		"Move",	tmp_pointer.dataShape,
+		"Move",	tmp_pointer.DataShape,
 		{
-			aim_x : tmp_pointer.next.dataShape.x,
-			aim_y : tmp_pointer.next.dataShape.y
+			aim_x : tmp_pointer.next.DataShape.x,
+			aim_y : tmp_pointer.next.DataShape.y
 		}
 	);
 
 	tmp_pointer = tmp_pointer.next;
 	while(tmp_pointer)
 	{
-		this.canvas.cmd
+		KJCanvas.cmd
 		(
-			"Move",	tmp_pointer.dataShape,
+			"Move",	tmp_pointer.DataShape,
 			{
-				aim_x : tmp_pointer.dataShape.x + Stack.DATASHAPE_GAP_X,
+				aim_x : tmp_pointer.DataShape.x + Stack.DATASHAPE_GAP_X,
 			}
 		);
 		tmp_pointer = tmp_pointer.next;
 	}
-	this.canvas.cmd("EndParallel");
-	var waitTime = this.canvas.cmd("END");
+	KJCanvas.cmd("EndParallel");
+	var waitTime = KJCanvas.cmd("END");
 	
 	var me = this; 
 	setTimeout(function(){
@@ -193,11 +189,11 @@ Stack.prototype.pop = function()
 	{
 		$(".controler").attr("disabled","disabled");
 	
-		this.canvas.cmd("Setup");	
-		this.canvas.cmd("StartParallel");
-		this.canvas.cmd
+		KJCanvas.cmd("Setup");	
+		KJCanvas.cmd("StartParallel");
+		KJCanvas.cmd
 		(
-			"Move",	this.top.next.dataShape,
+			"Move",	this.top.next.DataShape,
 			{
 				aim_x : Stack.DATASHAPE_PUSH_X,
 				aim_y : Stack.DATASHAPE_PUSH_Y
@@ -206,37 +202,37 @@ Stack.prototype.pop = function()
 		var tmp_pointer = this.top.next;
 		while(tmp_pointer.next !=  null)
 		{
-			this.canvas.cmd
+			KJCanvas.cmd
 			(
-				"Move", tmp_pointer.next.dataShape,
+				"Move", tmp_pointer.next.DataShape,
 				{
-					aim_x : tmp_pointer.dataShape.x,
-					aim_y : tmp_pointer.dataShape.y
+					aim_x : tmp_pointer.DataShape.x,
+					aim_y : tmp_pointer.DataShape.y
 				}
 			);
 			tmp_pointer = tmp_pointer.next;
 		}
-		this.canvas.cmd("EndParallel");
-		this.canvas.cmd("Delay",Stack.DELAY_TIME);
-		this.canvas.cmd
+		KJCanvas.cmd("EndParallel");
+		KJCanvas.cmd("Delay",Stack.DELAY_TIME);
+		KJCanvas.cmd
 			(
-				"Move", this.top.pointerShape,
+				"Move", this.top.PointerShape,
 				{
-			    	aim_endObject : this.top.next.next.dataShape
+			    	aim_EndShape : this.top.next.next.DataShape
 				}
 			);
-		this.canvas.cmd("Delay",Stack.DELAY_TIME);
-		this.canvas.cmd
+		KJCanvas.cmd("Delay",Stack.DELAY_TIME);
+		KJCanvas.cmd
 		(
-			"Move", this.top.next.pointerShape,
+			"Move", this.top.next.PointerShape,
 			{
-				aim_endObject : this.top.next.pointerShape.startObject,
-				move_speed : 0.5
+				aim_EndShape : this.top.next.PointerShape.StartShape,
+				moveSpeed : 0.5
 			}
 		)
-		this.canvas.cmd("Delete",this.top.next.dataShape,{},"Delete",this.top.next.pointerShape,{});
+		KJCanvas.cmd("Delete",this.top.next.DataShape,{},"Delete",this.top.next.PointerShape,{});
 		
-		var waitTime = this.canvas.cmd("END");	
+		var waitTime = KJCanvas.cmd("END");	
 		
 		var me = this;	
 		setTimeout(function(){
