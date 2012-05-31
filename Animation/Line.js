@@ -18,6 +18,7 @@ Line.prototype.drawMethod = function() //绘画矩形的方法
 		this.end_y = this.endObject.y;
 	}
 
+	this.canvas.ctx.globalAlpha = this.alpha;
 	this.canvas.ctx.beginPath();
 	this.canvas.ctx.lineWidth = this.lineWidth;
 	this.canvas.ctx.moveTo(this.start_x,this.start_y);
@@ -34,12 +35,27 @@ Line.prototype.move = function() //移动
 
 		this.startObject = null;
 	}
+	else 
+	{
+		if(this.aim_start_x == null)
+			this.aim_start_x = this.start_x;
+		if(this.aim_start_y == null)
+			this.aim_start_y = this.start_y;
+	}
+
 	if(this.aim_endObject != null)
 	{
 		this.aim_end_x = this.aim_endObject.x;
 		this.aim_end_y = this.aim_endObject.y;
 
 		this.endObject =  null;
+	}
+	else 
+	{
+		if(this.aim_end_x == null)
+			this.aim_end_x = this.end_x;
+		if(this.aim_end_y == null)
+			this.aim_end_y = this.end_y;
 	}
 
 	var me = this;  //setInterval 里不能直接调用this.draw,所以使用变量作用域解决这个问题
@@ -152,8 +168,10 @@ Line.prototype.move = function() //移动
 			//判断是否到达目标位置
 			if(me.start_x == me.aim_start_x && me.start_y == me.aim_start_y  && me.end_x == me.aim_end_x && me.end_y == me.aim_end_y)
 			{
-				me.startObject = me.aim_startObject;
-				me.endObject = me.aim_endObject;
+				if(me.aim_startObject != null)
+					me.startObject = me.aim_startObject;
+				if(me.aim_endObject != null)
+					me.endObject = me.aim_endObject;
 				clearInterval(me.timer);
 			}
 		},me.canvas.refresh_time);

@@ -7,6 +7,7 @@ Rectangle = function(cfg)
 Rectangle.prototype = new Shape;  //继承图形父类
 Rectangle.prototype.drawMethod = function() //绘画矩形的方法
 {
+	this.canvas.ctx.globalAlpha = this.alpha;
 	this.canvas.ctx.fillStyle = this.backColor;  
 	this.canvas.ctx.fillRect(this.x-this.width/2,this.y-this.height/2,this.width,this.height);  //画一个实体矩形
 	this.canvas.ctx.strokeStyle = this.edgeColor;

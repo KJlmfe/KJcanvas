@@ -50,6 +50,7 @@ Stack.LINE_COLOR = "F00";
 Stack.prototype = new Algorithm();
 Stack.prototype.create = function(stackSize)  //初始化堆栈大小,并绘制该堆栈
 {
+	$(".controler").attr("disabled","disabled");  //禁用所有控制元素
 	this.stack = new Array();  
 	this.frame = new Array();
 	this.pointer = new Label({
@@ -83,6 +84,7 @@ Stack.prototype.create = function(stackSize)  //初始化堆栈大小,并绘制�
 		end_x : Stack.LINE_END_X,
 		end_y : Stack.LINE_END_Y	
 		});
+	this.canvas.cmd("StartParallel");
 	for(var i=0; i<this.size; i++)
 	{
 		this.frame[i] = new Rectangle({
@@ -94,12 +96,20 @@ Stack.prototype.create = function(stackSize)  //初始化堆栈大小,并绘制�
 			edgeColor : Stack.FRAME_EDGECOLOR
 			});
 		this.canvas.cmd(
-			"Draw", this.frame[i],{
+			"FadeOut", this.frame[i],{
 			x : Stack.FRAME_START_X,
-			y : Stack.FRAME_START_Y-i*Stack.FRAME_HEIGHT
+			y : Stack.FRAME_START_Y-i*Stack.FRAME_HEIGHT,
+			aim_alpha : 1,
+			alpha : 0.3,
+			drawSpeed : 0.01
 			});
 	}
-	this.canvas.cmd("END");
+	this.canvas.cmd("EndParallel");
+	var waitTime = this.canvas.cmd("END");
+	var me = this; 
+		setTimeout(function(){
+			$(".controler").removeAttr("disabled");
+		},waitTime);	
 }
 Stack.prototype.push = function( value )
 {
@@ -122,9 +132,12 @@ Stack.prototype.push = function( value )
 		
 		this.canvas.cmd("Setup");
 		this.canvas.cmd(
-			"Draw",this.stack[this.top],{
+			"FadeOut",this.stack[this.top],{
 			x : Stack.SHAPE_START_X,
-			y : Stack.SHAPE_START_Y
+			y : Stack.SHAPE_START_Y,
+			aim_alpha : 1,
+			alpha : 0,
+			drawSpeed : 0.03
 		});
 		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
 		this.canvas.cmd("StartParallel");

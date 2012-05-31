@@ -71,24 +71,33 @@ Stack.prototype.create = function()  //初始化堆栈大小,并绘制该堆栈
 	this.canvas.cmd("Setup");
 	this.canvas.cmd
 	(
-		"Draw", this.top.dataShape,
+		"FadeOut", this.top.dataShape,
 		{
 			canvas : this.canvas,
 			x : Stack.DATASHAPE_TOP_X,
-			y : Stack.DATASHAPE_TOP_Y
+			y : Stack.DATASHAPE_TOP_Y,
+			alpha : 0,
+			aim_alpha : 1,
+			drawSpeed : 0.01
 		},	
 
-		"Draw", this.top.next.dataShape,
+		"FadeOut", this.top.next.dataShape,
 		{
   		 	canvas : this.canvas,
 			x : Stack.DATASHAPE_TOP_X + Stack.DATASHAPE_GAP_X,
-			y :	Stack.DATASHAPE_TOP_Y
+			y :	Stack.DATASHAPE_TOP_Y,
+			alpha : 0,
+			aim_alpha : 1,
+			drawSpeed : 0.01
 		},
 		
-		"Draw", this.top.pointerShape,
+		"FadeOut", this.top.pointerShape,
 		{
 			canvas : this.canvas,
-			endObject : this.top.next.dataShape
+			endObject : this.top.next.dataShape,
+			alpha : 0,
+			aim_alpha : 1,
+			drawSpeed : 0.01
 		}
 	);
 	this.canvas.cmd("END");
@@ -104,40 +113,45 @@ Stack.prototype.push = function( value )
 	this.canvas.cmd("Setup");
 	this.canvas.cmd
 	(
-		"Draw", this.top.next.dataShape,
+		"FadeOut", this.top.next.dataShape,
 		{
 			canvas : this.canvas,
 			x : Stack.DATASHAPE_PUSH_X,
-			y : Stack.DATASHAPE_PUSH_Y
+			y : Stack.DATASHAPE_PUSH_Y,
+			alpha : 0,
+			aim_alpha : 1,
+			drawSpeed : 0.01
 		}
 	);
 	this.canvas.cmd("Delay",Stack.DELAY_TIME);
 	this.canvas.cmd
 	(
-		"Draw", this.top.next.pointerShape,
+		"FadeOut", this.top.next.pointerShape,
 		{
 			canvas : this.canvas,
-			endObject : this.top.next.next.dataShape
+			endObject : this.top.next.pointerShape.startObject,
+			alpha : 0,
+			aim_alpha : 1,
+			drawSpeed : 0.01
 		}
 	);
+	this.canvas.cmd
+	(
+		"Move", this.top.next.pointerShape,
+		{
+			aim_endObject : this.top.next.next.dataShape,
+		}
+	);
+	
 	this.canvas.cmd("Delay",Stack.DELAY_TIME);
 	this.canvas.cmd
 	(
 		"Move", this.top.pointerShape,
 		{
 			aim_endObject : this.top.next.dataShape,
-			aim_startObject : this.top.pointerShape.startObject,
 			move_speed : 1
 		}
 	);
-	this.canvas.cmd("Delay",Stack.DELAY_TIME);
-   /* this.canvas.cmd*/
-	//(
-		//"Draw", this.top.pointerShape,
-		//{
-	////		endObject : this.top.next.dataShape,
-		//}
-	/*);*/
 	this.canvas.cmd("Delay",Stack.DELAY_TIME);
 	
 	var tmp_pointer = this.top.next;
@@ -159,7 +173,6 @@ Stack.prototype.push = function( value )
 			"Move",	tmp_pointer.dataShape,
 			{
 				aim_x : tmp_pointer.dataShape.x + Stack.DATASHAPE_GAP_X,
-				aim_y : tmp_pointer.dataShape.y
 			}
 		);
 		tmp_pointer = tmp_pointer.next;
@@ -205,16 +218,22 @@ Stack.prototype.pop = function()
 		}
 		this.canvas.cmd("EndParallel");
 		this.canvas.cmd("Delay",Stack.DELAY_TIME);
-		this.canvas.cmd("Delete",this.top.pointerShape);
-		this.canvas.cmd("Delay",Stack.DELAY_TIME);
 		this.canvas.cmd
 			(
-				"Draw", this.top.pointerShape,
+				"Move", this.top.pointerShape,
 				{
-			    	endObject : this.top.next.next.dataShape
+			    	aim_endObject : this.top.next.next.dataShape
 				}
 			);
 		this.canvas.cmd("Delay",Stack.DELAY_TIME);
+		this.canvas.cmd
+		(
+			"Move", this.top.next.pointerShape,
+			{
+				aim_endObject : this.top.next.pointerShape.startObject,
+				move_speed : 0.5
+			}
+		)
 		this.canvas.cmd("Delete",this.top.next.dataShape,{},"Delete",this.top.next.pointerShape,{});
 		
 		var waitTime = this.canvas.cmd("END");	

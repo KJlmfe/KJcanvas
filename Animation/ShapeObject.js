@@ -7,8 +7,6 @@ Shape = function() //图形类(所有图形的父类)
 
  	this.x = Shape.X;	 //矩形的中心  圆的圆心  线段的中点
 	this.y = Shape.Y;
-	this.aim_x= Shape.AIM_X;  //移动的目标位置
-	this.aim_y= Shape.AIM_Y;
 	
 	this.start_x = Shape.START_X;   //线段的起始位置
 	this.start_y = Shape.START_Y;
@@ -29,7 +27,7 @@ Shape = function() //图形类(所有图形的父类)
 	this.lineWidth = Shape.LINEWIDTH;  //线段 宽度
 
 	this.move_speed = Shape.MOVE_SPEED; //移动速度 
-	
+	this.alpha = 1;	
 
 }
 Shape.prototype.del = function()  //从画板上删除该图形
@@ -46,10 +44,31 @@ Shape.prototype.draw = function()  //在this.canvas画板上的x,y位置画出�
 	this.drawMethod();  //调用图形绘画方法
 	this.canvas.ctx.restore();
 }
+Shape.prototype.fadeOut = function()  //在this.canvas画板上的x,y位置画出该图形
+{
+	if(!this.canvas.exist(this))    //每在画板上画一个图形对象，都要将该对象保存到画板的Shape里 	
+		this.canvas.save(this);
+	this.canvas.ctx.save();
+	var me = this;
+	this.drawTimer = setInterval(function(){
+		me.alpha += me.drawSpeed;
+		if(me.alpha >= me.aim_alpha)
+			me.alpha = me.aim_alpha;
+		me.drawMethod();
+		if(me.alpha == me.aim_alpha)
+		{
+			me.canvas.ctx.restore();
+			clearInterval(me.drawTimer);
+		}
+	},me.canvas.refresh_time);
+}
 Shape.prototype.move = function() //移动
 {
 	var me = this;  //setInterval 里不能直接调用this.draw,所以使用变量作用域解决这个问题
-	
+	if(this.aim_x == null)
+		this.aim_x = this.x;
+	if(this.aim_y == null)
+		this.aim_y = this.y;
 	//默认沿着两点间的直线路径移动
 	if(me.x != me.aim_x)   //求出直线方程的k与b
 	{
@@ -169,6 +188,10 @@ Shape.prototype.timeOfMove = function() //计算移动矩形的动画时间
 Shape.prototype.timeOfDraw = function()
 {
 	return 0;
+}
+Shape.prototype.timeOfFadeOut = function()
+{
+	return (this.aim_alpha - this.alpha)/this.drawSpeed * this.canvas.refresh_time;
 }
 Shape.prototype.timeOfDelete = function()
 {

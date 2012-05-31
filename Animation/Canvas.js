@@ -89,6 +89,11 @@ Canvas.prototype.cmd = function()  //动画命令控制器
 					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
 					me.queue[me.front][k+1].draw();
 				}
+				else if(me.queue[me.front][k] == "FadeOut")
+				{
+					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
+					me.queue[me.front][k+1].fadeOut();
+				}
 				else if(me.queue[me.front][k] == "Move")
 				{
 					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
@@ -120,6 +125,16 @@ Canvas.prototype.cmd = function()  //动画命令控制器
 				}
 				arguments[k+1].setArguments(arguments[k+2]);
 				tmp_timer = arguments[k+1].timeOfDraw();
+			}
+			else if(arguments[k] == "FadeOut")
+			{
+				if(arguments[k+1].saveArgumentsFlag == false)
+				{
+					arguments[k+1].saveArguments();
+					this.animate_shape.push(arguments[k+1]);
+				}
+				arguments[k+1].setArguments(arguments[k+2]);
+				tmp_timer = arguments[k+1].timeOfFadeOut();
 			}
 			else if(arguments[k] == "Move")
 			{
