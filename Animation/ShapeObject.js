@@ -32,20 +32,25 @@ Shape = function() //图形类(所有图形的父类)
 }
 Shape.prototype.del = function()  //从画板上删除该图形
 {
+	this.Canvas.cmdRunning++;
 	this.Canvas.del(this);
 	this.Canvas.restore();
+	this.Canvas.cmdRunning--;
 }
 Shape.prototype.draw = function()  //在this.Canvas画板上的x,y位置画出该图形
 {
+	this.Canvas.cmdRunning++;
 	if(!this.Canvas.exist(this))    //每在画板上画一个图形对象，都要将该对象保存到画板的Shape里 	
 		this.Canvas.save(this);
 
 	this.Canvas.ctx.save();
 	this.drawMethod();  //调用图形绘画方法
 	this.Canvas.ctx.restore();
+	this.Canvas.cmdRunning--;
 }
 Shape.prototype.fadeIn = function()  //在this.Canvas画板上的x,y位置画出该图形
 {
+	this.Canvas.cmdRunning++;
 	if(!this.Canvas.exist(this))    //每在画板上画一个图形对象，都要将该对象保存到画板的Shape里 	
 		this.Canvas.save(this);
 	this.Canvas.ctx.save();
@@ -59,12 +64,14 @@ Shape.prototype.fadeIn = function()  //在this.Canvas画板上的x,y位置画出
 		if(me.alpha == me.endAlpha)
 		{
 			me.Canvas.ctx.restore();
+			me.Canvas.cmdRunning--;
 			clearInterval(me.fadeInTimer);
 		}
 	},me.Canvas.refresh_time);
 }
 Shape.prototype.fadeOut = function()  //在this.Canvas画板上的x,y位置画出该图形
 {
+	this.Canvas.cmdRunning++;
 	if(!this.Canvas.exist(this))    //每在画板上画一个图形对象，都要将该对象保存到画板的Shape里 	
 		this.Canvas.save(this);
 	this.Canvas.ctx.save();
@@ -79,12 +86,14 @@ Shape.prototype.fadeOut = function()  //在this.Canvas画板上的x,y位置画�
 		if(me.alpha == me.startAlpha)
 		{
 			me.Canvas.ctx.restore();
+			me.Canvas.cmdRunning--;
 			clearInterval(me.fadeOutTimer);
 		}
 	},me.Canvas.refresh_time);
 }
 Shape.prototype.move = function() //移动
 {
+	this.Canvas.cmdRunning++;
 	var me = this;  //setInterval 里不能直接调用this.draw,所以使用变量作用域解决这个问题
 	if(this.aim_x == null)
 		this.aim_x = this.x;
@@ -122,7 +131,10 @@ Shape.prototype.move = function() //移动
 			me.draw(me.Canvas,me.x,me.y);
 			//判断是否到达目标位置
 			if(me.aim_x == me.x)
-				clearInterval(me.timer);
+			{
+				me.Canvas.cmdRunning--;
+				clearInterval(me.timer);			
+			}
 		},me.Canvas.refresh_time);
 	}
 	else if(this.aim_x < this.x)   // 原图形左侧运动
@@ -145,7 +157,10 @@ Shape.prototype.move = function() //移动
 			me.draw(me.Canvas,me.x,me.y);
 			//判断是否到达目标位置
 			if(me.aim_x == me.x)
-				clearInterval(me.timer);
+			{
+				me.Canvas.cmdRunning--;
+				clearInterval(me.timer);			
+			}
 		},me.Canvas.refresh_time);
 	}
 	else if(this.aim_y < this.y)   // 原图形正上方运动
@@ -164,7 +179,10 @@ Shape.prototype.move = function() //移动
 			me.draw(me.Canvas,me.x,me.y);
 			//判断是否到达目标位置
 			if(me.aim_y == me.y)
-				clearInterval(me.timer);
+			{
+				me.Canvas.cmdRunning--;
+				clearInterval(me.timer);			
+			}
 		},me.Canvas.refresh_time);
 	}
 	else if(this.aim_y > this.y)   // 原图形正下方运动
@@ -183,44 +201,12 @@ Shape.prototype.move = function() //移动
 			me.draw(me.Canvas,me.x,me.y);
 			//判断是否到达目标位置
 			if(me.aim_y ==  me.y)
-				clearInterval(me.timer);
+			{
+				me.Canvas.cmdRunning--;
+				clearInterval(me.timer);			
+			}
 		},me.Canvas.refresh_time);
 	}
-}
-Shape.prototype.timeOfMove = function() //计算移动矩形的动画时间
-{
-	if(this.aim_x > this.x)   // 原图形右侧运动
-	{
-		return Math.ceil( (this.aim_x - this.x) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-	else if(this.aim_x < this.x)   // 原图形左侧运动
-	{
-		return Math.ceil( (this.x - this.aim_x) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-	else if(this.aim_y < this.y)   // 原图形正上方运动
-	{
-		return Math.ceil( (this.y - this.aim_y) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-	else if(this.aim_y > this.y)   // 原图形正下方运动
-	{
-		return Math.ceil( (this.aim_y - this.y) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-}
-Shape.prototype.timeOfDraw = function()
-{
-	return 100;
-}
-Shape.prototype.timeOfFadeIn = function()
-{
-	return (this.endAlpha - this.startAlpha)/this.fadeSpeed * this.Canvas.refresh_time;
-}
-Shape.prototype.timeOfFadeOut = function()
-{
-	return (this.endAlpha - this.startAlpha)/this.fadeSpeed * this.Canvas.refresh_time;
-}
-Shape.prototype.timeOfDelete = function()
-{
-	return 100;
 }
 Shape.prototype.saveArguments = function()
 {

@@ -30,6 +30,106 @@ Canvas = function(myCanvas,width,height,border,animate_speed,delay_time,refresh_
 }
 Canvas.prototype.cmd = function()  //动画命令控制器 
 {
+	if(arguments[0] == "Setup")  //新的一轮动画开始
+	{
+		this.rear = 0;			//队列首尾指针复位
+		this.front = 0;
+		this.cmdRunning = 0;
+	}
+	else if(arguments[0] == "END")   //表示所有动画命令输入结束
+	{
+		this.queue[this.rear++] = arguments;  //动画命令存入队列
+		var me = this;
+		this.cmdTimer = setInterval(function()
+		{
+			if(me.cmdRunning == 0)  //表示之前的动画命令执行结束了	
+			{
+				var k = 0;
+				while(me.queue[me.front][k] != null)
+				{
+					if(me.queue[me.front][k] == "Draw")
+					{
+						me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
+						me.queue[me.front][k+1].draw();
+					}
+					else if(me.queue[me.front][k] == "FadeIn")
+					{
+						me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
+						me.queue[me.front][k+1].fadeIn();
+					}
+					else if(me.queue[me.front][k] == "FadeOut")
+					{
+						me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
+						me.queue[me.front][k+1].fadeOut();
+					}
+					else if(me.queue[me.front][k] == "Move")
+					{
+						me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
+						me.queue[me.front][k+1].move();
+					}
+					else if(me.queue[me.front][k] == "Delete")
+					{
+						me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
+						me.queue[me.front][k+1].del();
+					}
+					else if(me.queue[me.front][k] == "Delay")
+					{
+						me.cmdRunning++;
+						var delaytime = me.queue[me.front][k+1];
+						setTimeout(function(){
+							me.cmdRunning--;
+						},delaytime);
+					}
+					else if(me.queue[me.front][k] == "END")
+					{
+						alert("finsihifsd");
+					}
+					k++;
+				}
+				me.front++;
+			}
+		},100);
+	}
+	else if(arguments[0] == "StartParallel")
+	{
+		this.parallelSignal = true;	
+		this.parallelArguments = new Array();
+	}
+	else 
+	{
+		if(arguments[0] == "EndParallel")
+		{
+			this.parallelSignal = false;
+			arguments = this.parallelArguments;
+		}
+		if(this.parallelSignal)
+		{
+			for(var i=0;i<arguments.length;i++)
+			{
+				this.parallelArguments.push(arguments[i]);
+			}
+		}
+		else
+		{
+			this.queue[this.rear++] = arguments;  //动画命令存入队列
+		}
+	}
+/*
+    else if(arguments[0] == "Delay")  //延迟效果,该期间画面静止无变化
+	{
+		//根据动画速度，计算延迟速度(例如:用户设置的是延迟5秒,但动画速度为2(正常速度的两倍),则实际延迟时间为2.5秒)
+		if(this.animate_speed < 1)
+			this.delay_speed = Canvas.MAX_ANIMATE_SPEED * (1 - this.animate_speed);
+		else
+			this.delay_speed = 1 - (this.animate_speed-1) / (Canvas.MAX_ANIMATE_SPEED-1);
+	
+		arguments[1] = arguments[1] == null ? Canvas.DELAY_TIME : arguments[1]; //得到延迟时间
+		this.animate_timer += arguments[1]* this.delay_speed; //累加动画时间
+	}
+*/	
+}
+Canvas.prototype.oldcmd = function()  //动画命令控制器 
+{
 	var me = this;
 	var tmp_shape = new Array();
 	if(arguments[0] == "Setup")  //新的一轮动画开始

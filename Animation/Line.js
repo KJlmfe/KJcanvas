@@ -28,6 +28,7 @@ Line.prototype.drawMethod = function() //绘画矩形的方法
 }
 Line.prototype.move = function() //移动
 {
+	this.Canvas.cmdRunning++;
 	if(this.aim_StartShape != null)
 	{
 		this.aim_start_x = this.aim_StartShape.x;
@@ -173,45 +174,8 @@ Line.prototype.move = function() //移动
 			{
 				me.StartShape = me.aim_StartShape;
 				me.EndShape = me.aim_EndShape;
+				me.Canvas.cmdRunning--;
 				clearInterval(me.timer);
 			}
 		},me.Canvas.refresh_time);
-}
-Line.prototype.timeOfMove = function() //计算移动矩形的动画时间
-{
-	if(this.aim_start_x > this.start_x)   // 原图形右侧运动
-	{
-		var timer1 = Math.ceil( (this.aim_start_x - this.start_x) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-	else if(this.aim_start_x < this.start_x)   // 原图形左侧运动
-	{
-		var timer1 =  Math.ceil( (this.start_x - this.aim_start_x) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-	else if(this.aim_start_y < this.start_y)   // 原图形正上方运动
-	{
-		var timer1 =  Math.ceil( (this.start_y - this.aim_start_y) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-	else if(this.aim_start_y > this.start_y)   // 原图形正下方运动
-	{
-		var timer1 =  Math.ceil( (this.aim_start_y - this.start_y) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-
-	if(this.aim_end_x > this.end_x)   // 原图形右侧运动
-	{
-		var timer2 = Math.ceil( (this.aim_end_x - this.end_x) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-	else if(this.aim_end_x < this.end_x)   // 原图形左侧运动
-	{
-		var timer2 =  Math.ceil( (this.end_x - this.aim_end_x) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-	else if(this.aim_end_y < this.end_y)   // 原图形正上方运动
-	{
-		var timer2 =  Math.ceil( (this.end_y - this.aim_end_y) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-	else if(this.aim_end_y > this.end_y)   // 原图形正下方运动
-	{
-		var timer2 =  Math.ceil( (this.aim_end_y - this.end_y) / this.moveSpeed ) * this.Canvas.refresh_time;
-	}
-
-	return timer1 > timer2 ? timer1 : timer2;
 }
