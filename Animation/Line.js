@@ -177,5 +177,5 @@ Line.prototype.move = function() //移动
 				me.Canvas.cmdRunning--;
 				clearInterval(me.timer);
 			}
-		},me.Canvas.refresh_time);
+		},me.Canvas.refreshTime);
 }

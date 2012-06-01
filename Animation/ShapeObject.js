@@ -67,7 +67,7 @@ Shape.prototype.fadeIn = function()  //在this.Canvas画板上的x,y位置画出
 			me.Canvas.cmdRunning--;
 			clearInterval(me.fadeInTimer);
 		}
-	},me.Canvas.refresh_time);
+	},me.Canvas.refreshTime);
 }
 Shape.prototype.fadeOut = function()  //在this.Canvas画板上的x,y位置画出该图形
 {
@@ -89,7 +89,7 @@ Shape.prototype.fadeOut = function()  //在this.Canvas画板上的x,y位置画�
 			me.Canvas.cmdRunning--;
 			clearInterval(me.fadeOutTimer);
 		}
-	},me.Canvas.refresh_time);
+	},me.Canvas.refreshTime);
 }
 Shape.prototype.move = function() //移动
 {
@@ -135,7 +135,7 @@ Shape.prototype.move = function() //移动
 				me.Canvas.cmdRunning--;
 				clearInterval(me.timer);			
 			}
-		},me.Canvas.refresh_time);
+		},me.Canvas.refreshTime);
 	}
 	else if(this.aim_x < this.x)   // 原图形左侧运动
 	{
@@ -161,7 +161,7 @@ Shape.prototype.move = function() //移动
 				me.Canvas.cmdRunning--;
 				clearInterval(me.timer);			
 			}
-		},me.Canvas.refresh_time);
+		},me.Canvas.refreshTime);
 	}
 	else if(this.aim_y < this.y)   // 原图形正上方运动
 	{
@@ -183,7 +183,7 @@ Shape.prototype.move = function() //移动
 				me.Canvas.cmdRunning--;
 				clearInterval(me.timer);			
 			}
-		},me.Canvas.refresh_time);
+		},me.Canvas.refreshTime);
 	}
 	else if(this.aim_y > this.y)   // 原图形正下方运动
 	{
@@ -205,7 +205,7 @@ Shape.prototype.move = function() //移动
 				me.Canvas.cmdRunning--;
 				clearInterval(me.timer);			
 			}
-		},me.Canvas.refresh_time);
+		},me.Canvas.refreshTime);
 	}
 }
 Shape.prototype.saveArguments = function()

@@ -1,328 +1,179 @@
-Canvas = function(myCanvas,width,height,border,animate_speed,delay_time,refresh_time,max_animate_speed) //画板类(myCanvas为DOM里Canvas对象)
+KJcanvas = function(cfg) //画板类(cfg为参数对象)
+{	
+	//进行参数默认设置
+
+	//得到DOM里canvas对象
+	this.Canvas = document.getElementsByTagName("canvas")[0];
+	//设置画板大小,边框
+	this.width = KJcanvas.WIDTH;
+	this.height = KJcanvas.HEIGHT;
+	this.border = KJcanvas.BORDER;
+	//设置动画速度（0-KJcanvas.MAX_ANIMATION_SPEED）如果为x,表示为默认速度的x倍
+	this.animationSpeed = KJcanvas.ANIMATION_SPEED; 
+	this.maxAnimationSpeed = KJcanvas.MAX_ANIMATION_SPEED; //最大动画速度倍率
+	this.refreshTime = KJcanvas.REFRESH_TIME;  //动画页面刷新间隔时间
+	this.cmdRefreshTime = KJcanvas.CMD_REFRESH_TIME; //动画控制器刷新间隔时间
+
+	this.ShapeOnCanvas = new Array(); 	//初始化保存画板上存在的图形对象
+	this.cmdQueue = new Array(); 		//初始化保存动画命令的队列
+
+	this.setArguments(cfg);
+}
+KJcanvas.prototype.setArguments = function(cfg)
 {
-	//得到DOM里画板对象
-	this.Canvas = myCanvas == null ? document.getElementsByTagName("Canvas")[0] : myCanvas;
-	
-	//初始化全局Canvas的2d上下文
+	for(var x in cfg)   //设置用户指定的参数
+		this[x] = cfg[x];
+
+	//初始化canvas的2d上下文
 	this.ctx = this.Canvas.getContext("2d"); 
 	
-	//设置画板大小,边框
-	this.w = width == null ? Canvas.WIDTH : width;
-	this.h = height == null ? Canvas.HEIGHT : height;
-	this.border = border == null ? Canvas.BORDER : border;
-	
-	//初始化DOM里Canvas样式 
-	this.Canvas.width = this.w;
-	this.Canvas.height = this.h;
+	//初始化DOM里canvas样式 
+	this.Canvas.width = this.width;
+	this.Canvas.height = this.height;
 	$(this.Canvas).css("border",this.border);
 	
-	//设置动画速度（0-Canvas.MAX_ANIMATE_SPEED）如果为x,表示为默认速度的x倍
-	this.animate_speed = animate_speed == null ? Canvas.ANIMATE_SPEED : animate_speed; 
-	this.max_animate_speed = max_animate_speed == null ? Canvas.MAX_ANIMATE_SPEED : max_animate_speed;//最大动画速度倍率
-	this.animate_timer = 0;   //初始化动画命令计时器
-	
-	this.refresh_time = refresh_time == null ? Canvas.REFRESH_TIME : refresh_time;  //动画页面刷新间隔时间
-	this.delay_time = delay_time == null ? Canvas.DELAY_TIME : delay_time;  //动画延迟静止时间
-
-	this.Shape = new Array(); //初始化保存画板上存在的图形对象
-	this.queue = new Array(); //初始化保存动画命令的队列
-	this.parallelSignal = false;
+	//根据动画速度，计算延迟速度(例如:用户设置的是延迟5秒,但动画速度为2(正常速度的两倍),则实际延迟时间为2.5秒)
+	if(this.animationSpeed < 1)  
+		this.delaySpeed = this.maxAnimationSpeed * (1 - this.animationSpeed);
+	else
+		this.delaySpeed = 1 - (this.animationSpeed - 1) / (this.maxAnimationSpeed - 1);
 }
-Canvas.prototype.cmd = function()  //动画命令控制器 
+KJcanvas.prototype.cmd = function()  //动画命令控制器 
 {
-	if(arguments[0] == "Setup")  //新的一轮动画开始
+	if(arguments[0] == "Setup")  //动画开始
 	{
 		this.rear = 0;			//队列首尾指针复位
 		this.front = 0;
-		this.cmdRunning = 0;
-	}
-	else if(arguments[0] == "END")   //表示所有动画命令输入结束
-	{
-		this.queue[this.rear++] = arguments;  //动画命令存入队列
+		this.cmdRunning = 0;        //正在运行的动画命令个数
+		this.pauseSignal = false;   //动画暂停信号 true表示暂停
+		this.parallelSignal = false;  //并行动画型号  true表示开始并行动画
 		var me = this;
-		this.cmdTimer = setInterval(function()
+
+		this.cmdTimer = setInterval(function()   //启动动画控制器
 		{
-			if(me.cmdRunning == 0)  //表示之前的动画命令执行结束了	
+			if(me.cmdRunning == 0 && me.front < me.rear && me.pauseSignal == false)  //表示之前的动画命令执行结束了并且存在尚未运行的动画命令且无暂停信号
 			{
 				var k = 0;
-				while(me.queue[me.front][k] != null)
+				while(me.cmdQueue[me.front][k] != null)
 				{
-					if(me.queue[me.front][k] == "Draw")
+					if(me.cmdQueue[me.front][k] == "Draw")    //瞬间绘制一个图形
 					{
-						me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
-						me.queue[me.front][k+1].draw();
+						me.cmdQueue[me.front][k+1].setArguments(me.cmdQueue[me.front][k+2]);  //先设置用户设定的该动画参数
+						me.cmdQueue[me.front][k+1].draw();									 //执行该动画
 					}
-					else if(me.queue[me.front][k] == "FadeIn")
+					else if(me.cmdQueue[me.front][k] == "FadeIn")  //淡入
 					{
-						me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
-						me.queue[me.front][k+1].fadeIn();
+						me.cmdQueue[me.front][k+1].setArguments(me.cmdQueue[me.front][k+2]);
+						me.cmdQueue[me.front][k+1].fadeIn();
 					}
-					else if(me.queue[me.front][k] == "FadeOut")
+					else if(me.cmdQueue[me.front][k] == "FadeOut")  //淡出
 					{
-						me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
-						me.queue[me.front][k+1].fadeOut();
+						me.cmdQueue[me.front][k+1].setArguments(me.cmdQueue[me.front][k+2]);
+						me.cmdQueue[me.front][k+1].fadeOut();
 					}
-					else if(me.queue[me.front][k] == "Move")
+					else if(me.cmdQueue[me.front][k] == "Move")   //移动
 					{
-						me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
-						me.queue[me.front][k+1].move();
+						me.cmdQueue[me.front][k+1].setArguments(me.cmdQueue[me.front][k+2]);
+						me.cmdQueue[me.front][k+1].move();
 					}
-					else if(me.queue[me.front][k] == "Delete")
+					else if(me.cmdQueue[me.front][k] == "Delete")  //瞬间删除一个图形
 					{
-						me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
-						me.queue[me.front][k+1].del();
+						me.cmdQueue[me.front][k+1].setArguments(me.cmdQueue[me.front][k+2]);
+						me.cmdQueue[me.front][k+1].del();
 					}
-					else if(me.queue[me.front][k] == "Delay")
-					{
+					else if(me.cmdQueue[me.front][k] == "Delay")  //画面静止
+					{	
 						me.cmdRunning++;
-						var delaytime = me.queue[me.front][k+1];
-						setTimeout(function(){
+						var delayTime = me.cmdQueue[me.front][k+1] == null ? KJcanvas.DELAY_TIME : me.cmdQueue[me.front][k+1];
+						delayTime *= me.delaySpeed;
+						setTimeout(function()
+						{
 							me.cmdRunning--;
-						},delaytime);
+						},delayTime);
 					}
-					else if(me.queue[me.front][k] == "END")
+					else if(me.cmdQueue[me.front][k] == "END")  //停止动画控制器
 					{
-						alert("finsihifsd");
+						clearInterval(me.cmdTimer);
 					}
 					k++;
 				}
 				me.front++;
 			}
-		},100);
+		},me.cmdRefreshTime);
 	}
-	else if(arguments[0] == "StartParallel")
+	else if(arguments[0] == "Pause")  //动画暂停
+	{
+		this.pauseSignal = true;
+	}
+	else if(arguments[0] == "Continue")  //动画继续
+	{
+		this.pauseSignal = false;
+	}
+	else if(arguments[0] == "StartParallel") //开始并行动画
 	{
 		this.parallelSignal = true;	
-		this.parallelArguments = new Array();
+		this.parallelArguments = new Array();  //并行动画命令存储器
 	}
 	else 
 	{
-		if(arguments[0] == "EndParallel")
+		if(arguments[0] == "EndParallel")  //并行动画结束
 		{
 			this.parallelSignal = false;
-			arguments = this.parallelArguments;
+			arguments = this.parallelArguments;  //将之前的所有并行动画命令转换为一条串行动画命令
 		}
 		if(this.parallelSignal)
 		{
 			for(var i=0;i<arguments.length;i++)
 			{
-				this.parallelArguments.push(arguments[i]);
+				this.parallelArguments.push(arguments[i]);   //将并行动画命令暂时存储
 			}
 		}
 		else
 		{
-			this.queue[this.rear++] = arguments;  //动画命令存入队列
+			this.cmdQueue[this.rear++] = arguments;  //动画命令存入队列
 		}
 	}
-/*
-    else if(arguments[0] == "Delay")  //延迟效果,该期间画面静止无变化
-	{
-		//根据动画速度，计算延迟速度(例如:用户设置的是延迟5秒,但动画速度为2(正常速度的两倍),则实际延迟时间为2.5秒)
-		if(this.animate_speed < 1)
-			this.delay_speed = Canvas.MAX_ANIMATE_SPEED * (1 - this.animate_speed);
-		else
-			this.delay_speed = 1 - (this.animate_speed-1) / (Canvas.MAX_ANIMATE_SPEED-1);
-	
-		arguments[1] = arguments[1] == null ? Canvas.DELAY_TIME : arguments[1]; //得到延迟时间
-		this.animate_timer += arguments[1]* this.delay_speed; //累加动画时间
-	}
-*/	
 }
-Canvas.prototype.oldcmd = function()  //动画命令控制器 
+KJcanvas.prototype.save = function(obj) //保存obj图形对象到ShapeOnCanvas数组
 {
-	var me = this;
-	var tmp_shape = new Array();
-	if(arguments[0] == "Setup")  //新的一轮动画开始
-	{
-		this.animate_timer = 0;  //动画计时器清零 
-		this.rear = 0;			//队列首尾指针复位
-		this.front = 0;
-		this.animate_shape = new Array();
-	}
-    else if(arguments[0] == "Delay")  //延迟效果,该期间画面静止无变化
-	{
-		//根据动画速度，计算延迟速度(例如:用户设置的是延迟5秒,但动画速度为2(正常速度的两倍),则实际延迟时间为2.5秒)
-		if(this.animate_speed < 1)
-			this.delay_speed = Canvas.MAX_ANIMATE_SPEED * (1 - this.animate_speed);
-		else
-			this.delay_speed = 1 - (this.animate_speed-1) / (Canvas.MAX_ANIMATE_SPEED-1);
-	
-		arguments[1] = arguments[1] == null ? Canvas.DELAY_TIME : arguments[1]; //得到延迟时间
-		this.animate_timer += arguments[1]* this.delay_speed; //累加动画时间
-	}
-	else if(arguments[0] == "END")
-	{
-		for(var i=0;i<this.animate_shape.length;i++)
-		{
-			this.animate_shape[i].restoreArguments();
-		}
-	}
-	else if(arguments[0] == "StartParallel")
-	{
-		this.parallelSignal = true;	
-		this.parallelArguments = new Array();
-	}
-	else 
-	{
-		if(arguments[0] == "EndParallel")
-		{
-			this.parallelSignal = false;
-			arguments = this.parallelArguments;
-		}
-		if(this.parallelSignal)
-		{
-			for(var i=0;i<arguments.length;i++)
-			{
-				this.parallelArguments.push(arguments[i]);
-			}
-		}
-		else
-		{
-		this.queue[this.rear++] = arguments;  //动画命令存入队列
-		
-		setTimeout(function(){     //处理多个图形并发移动情况
-			var k = 0;
-			while(me.queue[me.front][k] != null)
-			{
-				if(me.queue[me.front][k] == "Draw")
-				{
-					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
-					me.queue[me.front][k+1].draw();
-				}
-				else if(me.queue[me.front][k] == "FadeIn")
-				{
-					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
-					me.queue[me.front][k+1].fadeIn();
-				}
-				else if(me.queue[me.front][k] == "FadeOut")
-				{
-					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
-					me.queue[me.front][k+1].fadeOut();
-				}
-				else if(me.queue[me.front][k] == "Move")
-				{
-					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
-					me.queue[me.front][k+1].move();
-				}
-				else if(me.queue[me.front][k] == "Delete")
-				{
-					me.queue[me.front][k+1].setArguments(me.queue[me.front][k+2]);
-					me.queue[me.front][k+1].del();
-				}
-				k++;
-			}
-			me.front++;
-		},me.animate_timer);
-	
-		var max_timer = -1;
-		var k = 0;
-		
-		while(arguments[k] != null)
-		{
-			var tmp_timer = 0;
-
-			if(arguments[k] == "Draw")
-			{
-				if(arguments[k+1].saveArgumentsFlag == false)
-				{
-					arguments[k+1].saveArguments();
-					this.animate_shape.push(arguments[k+1]);
-				}
-				arguments[k+1].setArguments(arguments[k+2]);
-				tmp_timer = arguments[k+1].timeOfDraw();
-			}
-			else if(arguments[k] == "FadeIn")
-			{
-				if(arguments[k+1].saveArgumentsFlag == false)
-				{
-					arguments[k+1].saveArguments();
-					this.animate_shape.push(arguments[k+1]);
-				}
-				arguments[k+1].setArguments(arguments[k+2]);
-				tmp_timer = arguments[k+1].timeOfFadeIn();
-			}
-			else if(arguments[k] == "FadeOut")
-			{
-				if(arguments[k+1].saveArgumentsFlag == false)
-				{
-					arguments[k+1].saveArguments();
-					this.animate_shape.push(arguments[k+1]);
-				}
-				arguments[k+1].setArguments(arguments[k+2]);
-				tmp_timer = arguments[k+1].timeOfFadeOut();
-			}
-			else if(arguments[k] == "Move")
-			{
-				if(arguments[k+1].saveArgumentsFlag == false)
-				{
-					arguments[k+1].saveArguments();
-					this.animate_shape.push(arguments[k+1]);
-				}
-				arguments[k+1].setArguments(arguments[k+2]);
-				tmp_timer = arguments[k+1].timeOfMove();
-			}
-			else if(arguments[k] == "Delete")
-			{
-				if(arguments[k+1].saveArgumentsFlag == false)
-				{
-					arguments[k+1].saveArguments();
-					this.animate_shape.push(arguments[k+1]);
-				}
-				arguments[k+1].setArguments(arguments[k+2]);
-				tmp_timer = arguments[k+1].timeOfDelete();
-			}
-
-			max_timer = max_timer < tmp_timer ? tmp_timer : max_timer;
-			k++;
-		}
-
-		this.animate_timer += max_timer;
-		}
-	}
-	
-	return this.animate_timer;  //返回动画耗时时间
+	this.ShapeOnCanvas.push(obj);
 }
-Canvas.prototype.save = function(obj) //保存obj图形对象到Shape数组
-{
-	this.Shape.push(obj);
-}
-Canvas.prototype.del = function(obj) //从Shape里删除一个图形对象
+KJcanvas.prototype.del = function(obj) //从ShapeOnCanvas里删除一个图形对象
 {
 	if(obj == null)   //如果无参数,默认清空所有对象
 	{
-		for(i=0;i<this.Shape.length;i++)
-			this.Shape[i] = null;
+		this.ShapeOnCanva = new Array();
 	}
 	else
 	{
-		for(i=0;i<this.Shape.length;i++)
-			if(this.Shape[i] == obj)
+		for(var i=0; i<this.ShapeOnCanvas.length; i++)
+			if(this.ShapeOnCanvas[i] == obj)
 			{
-				this.Shape[i] = null;
+				this.ShapeOnCanvas[i] = null;
 				break;
 			}
 	}
 }
-Canvas.prototype.exist = function(obj)  //判断obj图形对象是否在画板上存在
+KJcanvas.prototype.exist = function(obj)  //判断obj图形对象是否在画板上存在
 {
-	for(i=0;i<this.Shape.length;i++)
-		if(this.Shape[i] == obj)
+	for(var i=0; i<this.ShapeOnCanvas.length; i++)
+		if(this.ShapeOnCanvas[i] == obj)
 			return true;
 	return false;
 }
-Canvas.prototype.restore = function() //将Shape里的所有图形对象重绘
+KJcanvas.prototype.restore = function() //将ShapeOnCanvas里的所有图形对象重绘
 {
 	this.clear();
-	for(i=0;i<this.Shape.length;i++)
-		if(this.Shape[i])
-			this.Shape[i].draw();
+	for(var i=0; i<this.ShapeOnCanvas.length; i++)
+		if(this.ShapeOnCanvas[i] != null)
+			this.ShapeOnCanvas[i].draw();
 }
-Canvas.prototype.clear = function() //清空画板
+KJcanvas.prototype.clear = function() //清空画板(并没有删除画板上的图形,所以重绘后,那些图形又出现了)
 {
-	this.ctx.clearRect(0,0,this.w,this.h);
+	this.ctx.clearRect(0,0,this.width,this.height);
 }
-Canvas.prototype.init = function()  //新建一个干净的画板
+KJcanvas.prototype.init = function()  //新建一个干净的画板
 {
-	this.Shape = new Array();  
+	this.ShapeOnCanvas = new Array();  
 	this.clear();
 }

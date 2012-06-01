@@ -1,10 +1,11 @@
-Canvas.MAX_ANIMATE_SPEED = 5;  //最大动画速度
-Canvas.ANIMATE_SPEED = 1; 
-Canvas.WIDTH = 1000;  //默认画板宽度
-Canvas.HEIGHT = 550;  //默认画板高度
-Canvas.DELAY_TIME = 600; //默认延迟时间
-Canvas.REFRESH_TIME = 24; //默认画面刷新时间
-Canvas.BORDER = "2px solid #0AF";
+KJcanvas.MAX_ANIMATION_SPEED = 5;  //最大动画速度
+KJcanvas.ANIMATION_SPEED = 1; 
+KJcanvas.WIDTH = 1000;  //默认画板宽度
+KJcanvas.HEIGHT = 550;  //默认画板高度
+KJcanvas.DELAY_TIME = 600; //默认延迟时间
+KJcanvas.REFRESH_TIME = 24; //默认画面刷新时间
+KJcanvas.BORDER = "2px solid #0AF";
+KJcanvas.CMD_REFRESH_TIME = 500;
 
 Shape.BACKCOLOR = "ABC";  //默认图形填充背景色
 Shape.EDGECOLOR = "000";  //默认图形边框颜色

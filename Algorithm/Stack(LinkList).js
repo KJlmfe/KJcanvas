@@ -1,7 +1,7 @@
 function init()
 {
 	var canvas = document.getElementsByTagName("Canvas")[0]; //得到html上canvas元素
-	KJCanvas = new Canvas(canvas);  //用上面的canvas初始化一个全局画板对象(KJCanvas)
+	KJCanvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(KJCanvas)
 	
 	var DataStructure = new Stack();  //初始化一个数据结构对象
 	DataStructure.addControls(DataStructure);  //给该数据结构演示动画添加用户界面控制器
@@ -118,13 +118,13 @@ Stack.prototype.create = function()  //初始化堆栈,并绘制该堆栈
 			aim_EndShape : this.top.next.DataShape
 		}
 	);
-	var waitTime = KJCanvas.cmd("END");
+//	var waitTime = KJCanvas.cmd("Pause");
 	
 	var me = this; 
 	setTimeout(function()
 	{
 		$(".controler").removeAttr("disabled");
-	}, waitTime);
+	}, 1000);
 }
 Stack.prototype.push = function( value )
 {
@@ -134,7 +134,7 @@ Stack.prototype.push = function( value )
 	this.top.next = new this.stackNode(value);
 	this.top.next.next = tmp_data;
 
-	KJCanvas.cmd("Setup");
+//	KJCanvas.cmd("Setup");
 	KJCanvas.cmd
 	(
 		"FadeIn", this.top.next.DataShape,   //入栈元素淡入
@@ -190,16 +190,22 @@ Stack.prototype.push = function( value )
 		tmp_pointer = tmp_pointer.next;
 	}
 	KJCanvas.cmd("EndParallel");
-	var waitTime = KJCanvas.cmd("END");
+//	var waitTime = KJCanvas.cmd("END");
 	
 	var me = this; 
 	setTimeout(function()
 	{
 		$(".controler").removeAttr("disabled");
-	},waitTime);
+	},1000);
 }
 Stack.prototype.pop = function()
 {
+	if(KJCanvas.pauseSignal == false)
+	KJCanvas.cmd("Pause");
+	else
+	KJCanvas.cmd("Continue");
+
+	/*
 	if(this.top.next.next == null)
 		alert(Stack.EMPTY_INFO);
 	else
@@ -248,7 +254,7 @@ Stack.prototype.pop = function()
 			{
 			}
 		);
-		KJCanvas.cmd("Delay",Stack.DELAY_TIME);
+	//	KJCanvas.cmd("Delay",Stack.DELAY_TIME);
 	//	KJCanvas.cmd("FadeOut",this.top.next.DataShape,{});//"Delete",this.top.next.PointerShape,{});
 		
 		var waitTime = KJCanvas.cmd("END");	
@@ -260,6 +266,7 @@ Stack.prototype.pop = function()
 		
 		this.top.next = this.top.next.next;
 	}
+	*/
 }
 Stack.prototype.addControls = function(obj)
 {
