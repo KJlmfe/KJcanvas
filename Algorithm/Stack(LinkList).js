@@ -34,7 +34,7 @@ Stack.DATASHAPE_TEXTCOLOR = "FF2451";  //填充文本色
 Stack.DATASHAPE_STARTALPHA = 0;  //淡入淡出的目标透明度
 Stack.DATASHAPE_ENDALPHA = 1;  //淡入淡出的目标透明度
 
-Stack.DATASHAPE_FADESPEED = 0.05;  //淡入淡出的速度
+Stack.DATASHAPE_FADESPEED = 0.01;  //淡入淡出的速度
 Stack.DATASHAPE_MOVESPEED = 2;  //移动速度
 
 //POINTERSHAPE ---> 连接堆栈元素之间的线条
