@@ -1,0 +1,163 @@
+<html>
+	<head>
+		<title>Construct A Rectangle Class</title>
+		<a http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script src="../ThirdLibrary/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript">
+Rectangle = function(cfg)
+{
+	//参数默认设置
+	this.width = 80;   //矩形宽
+	this.height = 40;		//矩形高
+
+ 	this.x = 500;	 //矩形的位置
+	this.y = 300;
+	
+	this.start_x = this.x;   //移动的起始位置
+	this.start_y = this.y;
+	this.end_x = 100;      //移动的末尾位置
+	this.end_y = 300;
+
+	this.text = "!!^_^!!";  //文本内容
+	this.textAlign = "center" ; //文本对其方式
+	this.textBaseline = "middle";
+
+	this.backColor = "ff4a75";  //背景色
+	this.edgeColor = "58435a";  //边框色
+	this.textColor = "f4fc4f";  //文本色
+	this.font = '16px sans-serif';  //字体
+	 
+	this.edgeWidth = 2; //边框宽度
+
+	this.moveSpeed = 2; //移动速度 
+	this.alpha = 1;	  //透明度
+
+	this.setArguments(cfg);  //设置用户指定参数
+}
+Rectangle.prototype.setArguments = function(cfg)
+{
+	for(var x in cfg)
+		this[x] = cfg[x];
+}
+Rectangle.prototype.drawMethod = function() //绘画矩形的方法
+{
+	ctx.globalAlpha = this.alpha;
+	ctx.fillStyle = this.backColor;  
+	ctx.fillRect(this.x-this.width/2,this.y-this.height/2,this.width,this.height);  //画一个实体矩形
+	ctx.strokeStyle = this.edgeColor;
+	ctx.lineWidth = this.edgeWidth;
+	ctx.strokeRect(this.x-this.width/2,this.y-this.height/2,this.width,this.height); //勾画出矩形边框
+
+	ctx.fillStyle = this.textColor;      //在矩形中间绘制文本
+	ctx.textAlign = this.textAlign;
+	ctx.font = this.font;
+	ctx.textBaseline = this.textBaseline; 
+	ctx.fillText(this.text,this.x,this.y);  
+}
+Rectangle.prototype.move = function()
+{
+	var me = this;
+	//默认沿着两点间的直线路径移动
+	if(me.start_x != me.end_x)   //求出直线方程的k与b
+	{
+		k = (me.start_y - me.end_y) / (me.start_x - me.end_x);  
+		b = me.start_y - k * me.start_x;
+	}
+	else
+	{
+		k = 0;
+		b = 0;
+	}
+	me.x = me.start_x;
+	me.y = me.start_y;
+	var moveTimer = setInterval(function()
+	{
+		//擦干净画布
+		ctx.clearRect(0,0,600,500);
+		//计算图形位置
+		if(me.end_x > me.x)
+		{
+			me.x += me.moveSpeed;
+			me.y = k*me.x + b;
+			if(me.end_x <= me.x)					
+			{
+				me.x = me.end_x;
+				me.y = me.end_y;
+			}
+		}
+		else if(me.end_x < me.x)
+		{
+			me.x -= me.moveSpeed;
+			me.y = k*me.x + b;
+			if(me.end_x >= me.x)
+			{
+				me.x = me.end_x;
+				me.y = me.end_y;
+			}
+		}
+		else if(me.end_y < me.y)
+		{
+			me.y -= me.moveSpeed;
+			if(me.end_y >= me.y)
+			{
+				me.y = me.end_y;
+			}
+		}
+		else if(me.end_y > me.y)
+		{
+			me.y += me.moveSpeed;
+			if(me.end_y <= me.y)
+			{
+				me.y = me.end_y;
+			}
+		}
+		//绘制图形
+		me.drawMethod();	
+		//判断是否到达目标位置
+		if(me.x == me.end_x && me.y == me.end_y)
+		{
+			clearInterval(moveTimer);
+		}
+	},24);  //每24毫秒刷新一下画面
+}
+		</script>
+	</head>
+
+	<body>
+		<h3>Construct A Rectangle Class</h3>
+		<canvas width = "600px" height = "500px" style="float:left; border:2px solid #0AF"></canvas>
+		<pre style="float:left;font-size:18px;" >
+	构造一个矩形类
+
+		属性:长、宽、位置、颜色、移动速度....
+	
+		方法:
+			1.绘制(drawMethod)
+				根据属性,在canvas上绘制矩形
+			2.移动(move)
+				根据属性,在canvas上移动矩形
+			....
+			....
+			....
+		</pre>
+		<script type="text/javascript">
+			var canvas = document.getElementsByTagName("canvas")[0];
+			var ctx = canvas.getContext('2d'); 
+ 
+			var shape1 = new Rectangle();
+		/*	var shape2 = new Rectangle
+			({
+				x : "200",
+				y : "200",
+				backColor : "0afd44",
+				textColor : "ff0000"
+			});*/
+			alert("Draw A Rectangle(1)");
+			shape1.drawMethod();
+			//alert("Draw A Rectangle(2)");
+			//shape2.drawMethod();
+			alert("Move A Rectangle");
+			shape1.move();
+		</script>
+	</body>
+</html>
