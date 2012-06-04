@@ -11,11 +11,9 @@ KJcanvas = function(cfg) //画板类(cfg为参数对象)
 	//设置动画速度（0-KJcanvas.MAX_ANIMATION_SPEED）如果为x,表示为默认速度的x倍
 	this.animationSpeed = KJcanvas.ANIMATION_SPEED; 
 	this.maxAnimationSpeed = KJcanvas.MAX_ANIMATION_SPEED; //最大动画速度倍率
-	this.refreshTime = KJcanvas.REFRESH_TIME;  //动画页面刷新间隔时间
 	this.cmdRefreshTime = KJcanvas.CMD_REFRESH_TIME; //动画控制器刷新间隔时间
 
 	this.ShapeOnCanvas = new Array(); 	//初始化保存画板上存在的图形对象
-	this.cmdQueue = new Array(); 		//初始化保存动画命令的队列
 
 	this.setArguments(cfg);
 }
@@ -42,13 +40,13 @@ KJcanvas.prototype.cmd = function()  //动画命令控制器
 {
 	if(arguments[0] == "Setup")  //动画开始
 	{
+		this.cmdQueue = new Array(); 		//初始化保存动画命令的队列
 		this.rear = 0;			//队列首尾指针复位
 		this.front = 0;
 		this.cmdRunning = 0;        //正在运行的动画命令个数
 		this.pauseSignal = false;   //动画暂停信号 true表示暂停
 		this.parallelSignal = false;  //并行动画型号  true表示开始并行动画
 		var me = this;
-
 		this.cmdTimer = setInterval(function()   //启动动画控制器
 		{
 			if(me.cmdRunning == 0 && me.front < me.rear && me.pauseSignal == false)  //表示之前的动画命令执行结束了并且存在尚未运行的动画命令且无暂停信号
@@ -56,50 +54,40 @@ KJcanvas.prototype.cmd = function()  //动画命令控制器
 				var k = 0;
 				while(me.cmdQueue[me.front][k] != null)
 				{
-					if(me.cmdQueue[me.front][k] == "Draw")    //瞬间绘制一个图形
-					{
-						me.cmdQueue[me.front][k+1].setArguments(me.cmdQueue[me.front][k+2]);  //先设置用户设定的该动画参数
-						me.cmdQueue[me.front][k+1].draw();									 //执行该动画
-					}
-					else if(me.cmdQueue[me.front][k] == "FadeIn")  //淡入
-					{
-						me.cmdQueue[me.front][k+1].setArguments(me.cmdQueue[me.front][k+2]);
-						me.cmdQueue[me.front][k+1].fadeIn();
-					}
-					else if(me.cmdQueue[me.front][k] == "FadeOut")  //淡出
-					{
-						me.cmdQueue[me.front][k+1].setArguments(me.cmdQueue[me.front][k+2]);
-						me.cmdQueue[me.front][k+1].fadeOut();
-					}
-					else if(me.cmdQueue[me.front][k] == "Move")   //移动
-					{
-						me.cmdQueue[me.front][k+1].setArguments(me.cmdQueue[me.front][k+2]);
-						me.cmdQueue[me.front][k+1].move();
-					}
-					else if(me.cmdQueue[me.front][k] == "Delete")  //瞬间删除一个图形
-					{
-						me.cmdQueue[me.front][k+1].setArguments(me.cmdQueue[me.front][k+2]);
-						me.cmdQueue[me.front][k+1].del();
-					}
-					else if(me.cmdQueue[me.front][k] == "Delay")  //画面静止
+					if(me.cmdQueue[me.front][k] == "Delay")  //画面静止
 					{	
-						me.cmdRunning++;
-						var delayTime = me.cmdQueue[me.front][k+1] == null ? KJcanvas.DELAY_TIME : me.cmdQueue[me.front][k+1];
-						delayTime *= me.delaySpeed;
-						setTimeout(function()
+						if(typeof(me.cmdQueue[me.front][k+1]) == "number")
 						{
-							me.cmdRunning--;
-						},delayTime);
+							me.delay(me.cmdQueue[me.front][k+1]);
+							k += 2;
+						}
+						else
+						{
+							me.delay();
+							k += 1;
+						}
 					}
 					else if(me.cmdQueue[me.front][k] == "END")  //停止动画控制器
 					{
 						clearInterval(me.cmdTimer);
 					}
-					k++;
+					else
+					{
+						if(typeof(me.cmdQueue[me.front][k+2]) == "object")
+						{
+							me.cmdQueue[me.front][k+1].dispatcher(me.cmdQueue[me.front][k], me.cmdQueue[me.front][k+2]);
+							k += 3;
+						}
+						else
+						{
+							me.cmdQueue[me.front][k+1].dispatcher(me.cmdQueue[me.front][k]);
+							k += 2;	
+						}
+					}
 				}
 				me.front++;
 			}
-		},me.cmdRefreshTime);
+		}, me.cmdRefreshTime);
 	}
 	else if(arguments[0] == "Pause")  //动画暂停
 	{
@@ -176,4 +164,15 @@ KJcanvas.prototype.init = function()  //新建一个干净的画板
 {
 	this.ShapeOnCanvas = new Array();  
 	this.clear();
+}
+KJcanvas.prototype.delay = function(delayTime)
+{
+	this.cmdRunning++;			
+	delayTime = delayTime == null ? KJcanvas.DELAY_TIME : delayTime;
+	delayTime *= this.delaySpeed;
+	var me = this;
+	setTimeout(function()
+	{
+		me.cmdRunning--;
+	}, delayTime);
 }

@@ -1,12 +1,12 @@
 Line = function(cfg) 
 {
-	this.argument = new Array(1000);
-	this.saveArgumentsFlag = false;
 	this.setArguments(cfg);
 }
 Line.prototype = new Shape;  //继承图形父类
-Line.prototype.drawMethod = function() //绘画矩形的方法
+Line.prototype.draw = function() //绘画矩形的方法
 {
+	this.startAnimation();
+	
 	if(this.StartShape != null)
 	{
 		this.start_x = this.StartShape.x;
@@ -25,10 +25,13 @@ Line.prototype.drawMethod = function() //绘画矩形的方法
 	this.Canvas.ctx.lineTo(this.end_x,this.end_y);
 	this.Canvas.ctx.strokeStyle = this.lineColor;
 	this.Canvas.ctx.stroke();
+
+	this.endAnimation();
 }
 Line.prototype.move = function() //移动
 {
-	this.Canvas.cmdRunning++;
+	this.startAnimation();
+	
 	if(this.aim_StartShape != null)
 	{
 		this.aim_start_x = this.aim_StartShape.x;
@@ -36,11 +39,8 @@ Line.prototype.move = function() //移动
 	}
 	else 
 	{
-		if(this.aim_start_x == null)
-			this.aim_start_x = this.start_x;
-		if(this.aim_start_y == null)
-			this.aim_start_y = this.start_y;
-		
+		this.aim_start_x = this.aim_start_x == null ? this.start_x : this.aim_start_x;
+		this.aim_start_y = this.aim_start_y == null ? this.start_y : this.aim_start_y;
 		this.aim_StartShape = this.StartShape;
 	}
 	
@@ -51,131 +51,117 @@ Line.prototype.move = function() //移动
 	}
 	else 
 	{
-		if(this.aim_end_x == null)
-			this.aim_end_x = this.end_x;
-		if(this.aim_end_y == null)
-			this.aim_end_y = this.end_y;
-
+		this.aim_end_x = this.aim_end_x == null ? this.end_x : this.aim_end_x;
+		this.aim_end_y = this.aim_end_y == null ? this.end_y : this.aim_end_y;
 		this.aim_EndShape = this.EndShape;
 	}
 
 	this.StartShape = null;
 	this.EndShape = null;
 
-	var me = this;  //setInterval 里不能直接调用this.draw,所以使用变量作用域解决这个问题
-	
 	//默认沿着两点间的直线路径移动
-	if(me.start_x != me.aim_start_x)   //求出直线方程的k与b
+	if(this.start_x != this.aim_start_x)   //求出直线方程的k与b
 	{
-		me.start_k = (me.start_y - me.aim_start_y) / (me.start_x - me.aim_start_x);  
-		me.start_b = me.start_y - me.start_k * me.start_x;
+		var start_k = (this.start_y - this.aim_start_y) / (this.start_x - this.aim_start_x);  
+		var start_b = this.start_y - start_k * this.start_x;
+		var start_factor_y = 0;
+		if(this.start_x < this.aim_start_x)
+			var start_factor_x = 1;
+		else
+			var start_factor_x = -1;
 	}
 	else
 	{
-		me.start_k = 0;
-		me.start_b = 0;
+		var start_k = 0;
+		var start_b = 0;
+		var start_factor_x = 0;
+		if(this.start_y < this.aim_start_y)
+			var start_factor_y = 1;
+		else if(this.start_y > this.aim_start_y)
+		 	var start_factor_y = -1;
+		else
+			var start_factor_y = 1;
 	}
 	
-	if(me.end_x != me.aim_end_x)   //求出直线方程的k与b
+	if(this.end_x != this.aim_end_x)   //求出直线方程的k与b
 	{
-		me.end_k = (me.end_y - me.aim_end_y) / (me.end_x - me.aim_end_x);  
-		me.end_b = me.end_y - me.end_k * me.end_x;
+		var end_k = (this.end_y - this.aim_end_y) / (this.end_x - this.aim_end_x);  
+		var end_b = this.end_y - end_k * this.end_x;
+		var end_factor_y = 0;
+		if(this.end_x < this.aim_end_x)
+			var end_factor_x = 1;
+		else
+			var end_factor_x = -1;
 	}
 	else
 	{
-		me.end_k = 0;
-		me.end_b = 0;
+		var end_k = 0;
+		var end_b = 0;
+		var end_factor_x = 0;
+		if(this.end_y < this.aim_end_y)
+			var end_factor_y = 1;
+		else if(this.end_y > this.aim_end_y)
+		 	var end_factor_y = -1;
+		else
+			var end_factor_y = 1;
 	}
-	
-		this.timer = setInterval(function(){
-			//擦干净画布
-			me.Canvas.clear();
-			//把要移动的图形对象从画布上删除
-			me.Canvas.del(me);
-			//重画画布上的图形
-			me.Canvas.restore();
-			//绘制移动图形
-			if(me.aim_start_x > me.start_x)
+
+	var me = this;	
+	this.moveTimer = setInterval(function()
+	{
+		//擦干净画布
+		me.Canvas.clear();
+		//把要移动的图形对象从画布上删除
+		me.del();
+		//绘制移动图形
+		if(Math.abs(me.start_x- me.aim_start_x) <= me.moveSpeed && Math.abs(me.start_y- me.start_aim_y))
+		{
+			me.start_x = me.aim_start_x;
+			me.start_y = me.aim_start_y;
+			var start_flag = true;
+		}
+		else
+		{
+			me.start_x += me.moveSpeed * start_factor_x;
+			if(start_k == 0 && start_b == 0)
 			{
-				me.start_x += me.moveSpeed;
-				me.start_y = me.start_k*me.start_x + me.start_b;
-				if(me.aim_start_x <= me.start_x)
-				{
-					me.start_x = me.aim_start_x;
-					me.start_y = me.aim_start_y;
-				}
+				me.start_y = start_k * me.start_x + start_b;
 			}
-			else if(me.aim_start_x < me.start_x)
+			else
 			{
-				me.start_x -= me.moveSpeed;
-				me.start_y = me.start_k*me.start_x + me.start_b;
-				if(me.aim_start_x >= me.start_x)
-				{
-					me.start_x = me.aim_start_x;
-					me.start_y = me.aim_start_y;
-				}
+				me.start_y +=  me.moveSpeed * start_factor_y;
 			}
-			else if(me.aim_start_y < me.start_y)
+			var start_flag = false; 
+		}
+		if(Math.abs(me.end_x- me.aim_end_x) <= me.moveSpeed && Math.abs(me.end_y- me.end_aim_y))
+		{
+			me.end_x = me.aim_end_x;
+			me.end_y = me.aim_end_y;
+			var end_flag = true;
+		}
+		else
+		{
+			me.end_x += me.moveSpeed * end_factor_x;
+			if(end_k == 0 && end_b == 0)
 			{
-				me.start_y -= me.moveSpeed;
-				if(me.aim_start_y >= me.start_y)
-				{
-					me.start_y = me.aim_start_y;
-				}
+				me.end_y = end_k * me.end_x + end_b;
 			}
-			else if(me.aim_start_y > me.start_y)
+			else
 			{
-				me.start_y += me.moveSpeed;
-				if(me.aim_start_y <= me.start_y)
-				{
-					me.start_y = me.aim_start_y;
-				}
+				me.end_y +=  me.moveSpeed * end_factor_y;
 			}
-			
-			if(me.aim_end_x > me.end_x)
-			{
-				me.end_x += me.moveSpeed;
-				me.end_y = me.end_k*me.end_x + me.end_b;
-				if(me.aim_end_x <= me.end_x)
-				{
-					me.end_x = me.aim_end_x;
-					me.end_y = me.aim_end_y;
-				}
-			}
-			else if(me.aim_end_x < me.end_x)
-			{
-				me.end_x -= me.moveSpeed;
-				me.end_y = me.end_k*me.end_x + me.end_b;
-				if(me.aim_end_x >= me.end_x)
-				{
-					me.end_x = me.aim_end_x;
-					me.end_y = me.aim_end_y;
-				}
-			}
-			else if(me.aim_end_y < me.end_y)
-			{
-				me.end_y -= me.moveSpeed;
-				if(me.aim_end_y >= me.end_y)
-				{
-					me.end_y = me.aim_end_y;
-				}
-			}
-			else if(me.aim_end_y > me.end_y)
-			{
-				me.end_y += me.moveSpeed;
-				if(me.aim_end_y <= me.end_y)
-				{
-					me.end_y = me.aim_end_y;
-				}
-			}	
+			//me.end_y = end_k * me.end_x + end_b + me.moveSpeed * end_factor_y + me.end_y * Math.abs(end_factor_y);
+			var end_flag = false;
+		}
+		if(start_flag && end_flag)
+		{
+			me.StartShape = me.aim_StartShape;
+			me.EndShape = me.aim_EndShape;
 			me.draw();
-			//判断是否到达目标位置
-			if(me.start_x == me.aim_start_x && me.start_y == me.aim_start_y  && me.end_x == me.aim_end_x && me.end_y == me.aim_end_y)
-			{
-				me.StartShape = me.aim_StartShape;
-				me.EndShape = me.aim_EndShape;
-				me.Canvas.cmdRunning--;
-				clearInterval(me.timer);
-			}
-		},me.Canvas.refreshTime);
+			me.endAnimation();
+			clearInterval(me.moveTimer);			
+		}
+		else
+			me.draw();
+	}, me.Canvas.refreshTime);
 }
