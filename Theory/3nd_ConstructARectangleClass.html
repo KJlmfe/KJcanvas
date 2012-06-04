@@ -145,17 +145,19 @@ Rectangle.prototype.move = function()
 			var ctx = canvas.getContext('2d'); 
  
 			var shape1 = new Rectangle();
-		/*	var shape2 = new Rectangle
+			
+			var shape2 = new Rectangle
 			({
 				x : "200",
 				y : "200",
 				backColor : "0afd44",
 				textColor : "ff0000"
-			});*/
+			});
+
 			alert("Draw A Rectangle(1)");
 			shape1.drawMethod();
-			//alert("Draw A Rectangle(2)");
-			//shape2.drawMethod();
+			alert("Draw A Rectangle(2)");
+			shape2.drawMethod();
 			alert("Move A Rectangle");
 			shape1.move();
 		</script>

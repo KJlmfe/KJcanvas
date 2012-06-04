@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<title>Crazy Rectangle</title>
+		<a http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script src="../ThirdLibrary/jquery-1.7.2.min.js"></script>
+		<script src="AnimationLibrary.js"></script>
+	</head>
+
+	<body>
+		<h3>Crazy Rectangle</h3>
+		<canvas></canvas>
+		<script type="text/javascript">
+		function randomColor() 
+		{
+    		var rand = Math.floor(Math.random( ) * 0xFFFFFF).toString(16);
+    		if(rand.length == 6)
+			{
+   		 	    return rand;
+   		 	}
+			else
+			{
+   	    		 return randomColor();
+   			 }
+		}
+
+		var myCanvas = new KJcanvas();
+		var shape = new Array();
+	
+		myCanvas.cmd("Setup");
+		for(var i=0;i<20;i++)
+		{
+			var x = Math.floor(Math.random()*800); 
+			var y = Math.floor(Math.random()*500);
+			var width = Math.floor(Math.random()*100); 
+			var height = Math.floor(Math.random()*100);
+			var backColor = randomColor(); 
+			var edgeColor = randomColor(); 
+			var end_x = Math.floor(Math.random()*800); 
+			var end_y = Math.floor(Math.random()*500);
+			var moveSpeed = Math.floor(Math.random()*10);
+				
+			shape[i] = new Rectangle
+			({
+				Canvas : myCanvas,
+				x : x,
+				y : y,
+				width : width,
+				height : height,
+				backColor : backColor,
+				edgeColor : edgeColor,
+				end_x : end_x,
+				end_y : end_y,
+				moveSpeed : moveSpeed
+			});
+		}
+		//myCanvas.cmd("StartParallel");
+		for(var i=0;i<20;i++)
+		{
+			myCanvas.cmd("Draw",shape[i],{});
+			myCanvas.cmd("Move",shape[i],{})
+		}
+	//	myCanvas.cmd("EndParallel");
+		myCanvas.cmd("End");
+		</script>
+	</body>
+</html>
