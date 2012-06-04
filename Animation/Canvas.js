@@ -70,6 +70,13 @@ KJcanvas.prototype.cmd = function()  //动画命令控制器
 					else if(me.cmdQueue[me.front][k] == "END")  //停止动画控制器
 					{
 						clearInterval(me.cmdTimer);
+						break;
+					}
+					else if(me.cmdQueue[me.front][k] == "Other")  //停止动画控制器
+					{
+						var command = me.cmdQueue[me.front][k+1];
+						command();
+						k += 2;
 					}
 					else
 					{

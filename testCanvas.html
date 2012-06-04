@@ -2,17 +2,43 @@
 	<head>
 		<script src="ThirdLibrary/jquery-1.7.2.min.js"></script>
 		<script src="Animation/Canvas.js"></script>
+		<script src="Animation/ShapeObject.js"></script>
+		<script src="Animation/AnimateArguments.js"></script>
 		<script src="Animation/Rectangle.js"></script>
+		<script src="Animation/Label.js"></script>
 		<script src="Animation/Line.js"></script>
-		<script src="Algorithm/Stack(Array).js"></script>
+		<script type="text/javascript">
+		var board;
+		function init()
+		{
+
+			board = new KJcanvas();
+			shape = new Rectangle
+			({
+				Canvas : board
+			});
+			alert("uuu");
+			board.cmd("Setup");
+			board.cmd("Draw",shape);
+			board.cmd("Move",shape,
+			{
+				aim_x : 500,
+				aim_y : 200,
+				moveSpeed : 1
+			});
+			board.cmd("END",shape);
+
+		}
+		</script>
 	</head>
 
-	<body>
+	<body onload="init();">
 		<h3 id="AlgorithmName"></h3>
 		<div id="AlgorithmControlBar"></div>
 		<canvas id="canvas" width="960" height="600" style="border:1px solid #000000;"></canvas>
 	
 		<script type="text/javascript">
+		/*
 			father = function()
 			{
 					this.y = "yyyy";
@@ -138,6 +164,7 @@ ctx.fillText("好好学习",10,20);
 		get : function(){return x}
 	});
 	alert(x);*/
+	
 	</script>
 	
 	</body>

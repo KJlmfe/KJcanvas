@@ -118,13 +118,12 @@ Stack.prototype.create = function()  //初始化堆栈,并绘制该堆栈
 			aim_EndShape : this.top.next.DataShape
 		}
 	);
-//	var waitTime = KJCanvas.cmd("Pause");
-	
-	var me = this; 
-	setTimeout(function()
+	KJCanvas.cmd("Other",function()
 	{
 		$(".controler").removeAttr("disabled");
-	}, 1000);
+	});
+	KJCanvas.cmd("END");  //开始动画动作
+
 }
 Stack.prototype.push = function( value )
 {
@@ -134,7 +133,7 @@ Stack.prototype.push = function( value )
 	this.top.next = new this.stackNode(value);
 	this.top.next.next = tmp_data;
 
-//	KJCanvas.cmd("Setup");
+	KJCanvas.cmd("Setup");
 	KJCanvas.cmd
 	(
 		"FadeIn", this.top.next.DataShape,   //入栈元素淡入
@@ -190,22 +189,20 @@ Stack.prototype.push = function( value )
 		tmp_pointer = tmp_pointer.next;
 	}
 	KJCanvas.cmd("EndParallel");
-//	var waitTime = KJCanvas.cmd("END");
-	
-	var me = this; 
-	setTimeout(function()
+	KJCanvas.cmd("Other",function()
 	{
 		$(".controler").removeAttr("disabled");
-	},1000);
+	});
+	KJCanvas.cmd("END");
 }
 Stack.prototype.pop = function()
 {
-	if(KJCanvas.pauseSignal == false)
+	/*if(KJCanvas.pauseSignal == false)
 	KJCanvas.cmd("Pause");
 	else
 	KJCanvas.cmd("Continue");
-
-	/*
+*/
+	
 	if(this.top.next.next == null)
 		alert(Stack.EMPTY_INFO);
 	else
@@ -254,19 +251,15 @@ Stack.prototype.pop = function()
 			{
 			}
 		);
-	//	KJCanvas.cmd("Delay",Stack.DELAY_TIME);
-	//	KJCanvas.cmd("FadeOut",this.top.next.DataShape,{});//"Delete",this.top.next.PointerShape,{});
-		
-		var waitTime = KJCanvas.cmd("END");	
-		
-		var me = this;	
-		setTimeout(function(){
+		KJCanvas.cmd("Other",function()
+		{
 			$(".controler").removeAttr("disabled");
-		},waitTime);		
+		});
+		waitTime = KJCanvas.cmd("END");	
 		
 		this.top.next = this.top.next.next;
 	}
-	*/
+	
 }
 Stack.prototype.addControls = function(obj)
 {

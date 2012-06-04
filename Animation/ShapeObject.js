@@ -7,8 +7,6 @@ Shape = function() //图形类(所有图形的父类)
 
  	this.x = Shape.X;	 //矩形的中心  圆的圆心  线段的中点
 	this.y = Shape.Y;	
-	this.aim_x = 0;
-	this.aim_y = 0;
 	this.start_x = Shape.START_X;   //线段的起始位置
 	this.start_y = Shape.START_Y;
 	this.end_x = Shape.END_X;      //线段的末尾位置
@@ -105,32 +103,42 @@ Shape.prototype.fade = function(action)  //淡入图形
 		}
 	}, me.Canvas.refreshTime);
 }
-Shape.prototype.move = function() //移动
+Shape.prototype.nextPosition = function(x1,y1,x2,y2,speed)
 {
-	this.startAnimation();
-	var me = this;  //setInterval 里不能直接调用this.draw,所以使用变量作用域解决这个问题
-	
-	//默认沿着两点间的直线路径移动
-	if(this.x != this.aim_x)   //求出直线方程的k与b
+	speed = speed == null ? this.moveSpeed : speed;
+	if(Math.abs(x1 - x2) <= speed && Math.abs(y1 - y2) <= speed)
 	{
-		var k = (this.y - this.aim_y) / (this.x - this.aim_x);  
-		var b = this.y - k * this.x;
-		var factor_y = 0;
-		if(this.x < this.aim_x)
-			var factor_x = 1;
-		else
-			var factor_x = -1;
+		x1 = x2;
+		y1 = y2;
+		var	arrive = true;
 	}
 	else
 	{
-		var k = 0;
-		var b = 0;
-		var factor_x = 0;
-		if(this.y < this.aim_y)
-			var factor_y = 1;
+		if(x1 != x2)   //求出直线方程的k与b
+		{
+			var k = (y1 - y2) / (x1 - x2);  
+			var b = y1 - k * x1;
+			x1 += speed * (x2 - x1) / Math.abs(x2 - x1);
+			y1 = k * x1 + b;
+		}
 		else
-			var factor_y = -1;
-	}	
+		{
+			if(y2 != y1)
+				y1 += speed * (y2 - y1) / Math.abs(y2 - y1);
+		}	
+		var	arrive = false;
+	}
+	return {x : x1, y : y1, arrive : arrive};
+}	
+Shape.prototype.move = function() //移动
+{
+	this.startAnimation();
+	this.aim_x = this.aim_x == null ? this.x : this.aim_x;
+	this.aim_y = this.aim_y == null ? this.y : this.aim_y;
+
+	
+	var me = this;  //setInterval 里不能直接调用this.draw,所以使用变量作用域解决这个问题
+	
 	
 	this.moveTimer = setInterval(function()
 	{
@@ -139,18 +147,15 @@ Shape.prototype.move = function() //移动
 		//把要移动的图形对象从画布上删除
 		me.del();
 		//绘制移动图形
-		me.x += me.moveSpeed * factor_x;
-		me.y = k * me.x + b + me.moveSpeed * factor_y + me.y * Math.abs(factor_y);
-		if(Math.abs(me.x- me.aim_x) <= me.moveSpeed && Math.abs(me.y- me.aim_y) <= me.moveSpeed)
+		var position = me.nextPosition(me.x, me.y, me.aim_x, me.aim_y, me.moveSpeed);
+		me.x = position.x;
+		me.y = position.y;
+		me.draw();
+		if(position.arrive)
 		{
-			me.x = me.aim_x;
-			me.y = me.aim_y;
-			me.draw();
 			me.endAnimation();
 			clearInterval(me.moveTimer);			
 		}
-		else
-			me.dispatcher("Draw");
 	}, me.Canvas.refreshTime);
 }
 Shape.prototype.setArguments = function(cfg)
