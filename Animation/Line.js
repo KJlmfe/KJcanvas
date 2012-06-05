@@ -3,10 +3,8 @@ Line = function(cfg)	//线段类
 	this.setArguments(cfg);
 }
 Line.prototype = new Shape;      //继承图形父类
-Line.prototype.draw = function() //绘画线段的方法
+Line.prototype.updatePosition = function()
 {
-	this.startAnimation();
-	
 	//设置线段的起始位置
 	if(this.StartShape != null)	
 	{
@@ -18,6 +16,11 @@ Line.prototype.draw = function() //绘画线段的方法
 		this.end_x = this.EndShape.x;
 		this.end_y = this.EndShape.y;
 	}
+}
+Line.prototype.draw = function() //绘画线段的方法
+{
+	this.startAnimation();
+	this.updatePosition();	
 
 	this.Canvas.ctx.globalAlpha = this.alpha;
 	this.Canvas.ctx.beginPath();
@@ -32,6 +35,7 @@ Line.prototype.draw = function() //绘画线段的方法
 Line.prototype.move = function() //移动线段
 {
 	this.startAnimation();
+	this.updatePosition();	
 	
 	//设置移动目标线段的起始位置
 	if(this.aimStartShape != null)

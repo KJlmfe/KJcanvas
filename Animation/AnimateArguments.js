@@ -10,7 +10,7 @@ KJcanvas.REFRESH_TIME = 24;        //画面刷新时间
 KJcanvas.CMD_REFRESH_TIME = 200;   //动画命令控制起刷新时间
 
 //大小
-Shape.WIDTH = 50;       //宽度
+Shape.WIDTH = 60;       //宽度
 Shape.HEIGHT = 50;      //高度
 Shape.RADIUS = 50;		//半径
 //位置
@@ -21,13 +21,13 @@ Shape.START_Y = 100;
 Shape.END_X = 200;  	//线段的末尾位置
 Shape.END_Y = 200;
 //颜色
-Shape.BACKCOLOR = "ABC";  	//填充背景色
-Shape.EDGECOLOR = "000";  	//边框颜色
-Shape.TEXTCOLOR = "F00";  	//文本颜色
-Shape.LINECOLOR = "000";   	//线条颜色
+Shape.BACKCOLOR = "FFCAAC";  	//填充背景
+Shape.EDGECOLOR = "D58FFF";  	//边框颜色
+Shape.TEXTCOLOR = "FF2451";		//文本色
+Shape.LINECOLOR = "4DDC12";   	//线条颜色
 //文本
 Shape.TEXT = "(^_^)";    			//文本内容
-Shape.FONT = '10px sans-serif';		//字体
+Shape.FONT = "16px sans-serif";		//字体
 Shape.TEXTALIGN = "center";			
 Shape.TEXTBASELINE = 'middle';
 //宽度
@@ -38,7 +38,7 @@ Shape.ALPHA = 1;		//透明度
 Shape.START_ALPHA = 0;	//淡入的起始透明度/淡出的末尾透明度
 Shape.END_ALPHA = 1;	//淡入的末尾透明度/淡出的起始透明度
 //速度
-Shape.MOVE_SPEED = 5; 		//移动速度
+Shape.MOVE_SPEED = 1; 		//移动速度
 Shape.FADE_SPEED = 0.01;	//淡入淡出速度
 
 var Positive_Integer = /^[0-9]*[1-9][0-9]*$/;

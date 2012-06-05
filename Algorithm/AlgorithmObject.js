@@ -1,7 +1,7 @@
 Algorithm = function(size)
 {
 }
-Algorithm.prototype.addAlgorithmControlBar = function(type,value)
+Algorithm.prototype.addControlBar = function(type,value)
 {
 	var element = document.createElement("input");
 	element.setAttribute("type",type);
@@ -12,4 +12,12 @@ Algorithm.prototype.addAlgorithmControlBar = function(type,value)
 	
 	father.appendChild(element);
 	return element;
+}
+Algorithm.prototype.disableControlBar = function()
+{
+	$(".controler").attr("disabled","disabled");  //禁用所有控制元素
+}
+Algorithm.prototype.enableControlBar = function()
+{
+	$(".controler").removeAttr("disabled");		//启用所有控制元素
 }
