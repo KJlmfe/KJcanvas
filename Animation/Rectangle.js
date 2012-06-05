@@ -1,8 +1,8 @@
-Rectangle = function(cfg)
+Rectangle = function(cfg)	//矩形类
 {
 	this.setArguments(cfg);
 }
-Rectangle.prototype = new Shape;  //继承图形父类
+Rectangle.prototype = new Shape; 	  //继承图形父类
 Rectangle.prototype.draw = function() //绘画矩形的方法
 {
 	this.startAnimation();

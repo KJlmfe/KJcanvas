@@ -1,37 +1,44 @@
-KJcanvas.MAX_ANIMATION_SPEED = 5;  //最大动画速度
-KJcanvas.ANIMATION_SPEED = 1; 
-KJcanvas.WIDTH = 1000;  //默认画板宽度
-KJcanvas.HEIGHT = 550;  //默认画板高度
-KJcanvas.DELAY_TIME = 600; //默认延迟时间
-KJcanvas.REFRESH_TIME = 24; //默认画面刷新时间
-KJcanvas.BORDER = "2px solid #0AF";
-KJcanvas.CMD_REFRESH_TIME = 500;
+KJcanvas.WIDTH = 1000; 			   //画板宽度
+KJcanvas.HEIGHT = 550;             //画板高度
+KJcanvas.BORDER = "2px solid #0AF";//画板边框样式
 
-Shape.BACKCOLOR = "ABC";  //默认图形填充背景色
-Shape.EDGECOLOR = "000";  //默认图形边框颜色
-Shape.TEXTCOLOR = "F00";  //默认图形填充文本颜色
-Shape.TEXT = "shape";    //默认图新填充的文本内容
-Shape.WIDTH = 50;       //默认图形宽度
-Shape.HEIGHT = 50;      //默认图形高度
-Shape.START_X = 0;           //默认图新位置
-Shape.START_Y = 0;
-Shape.AIM_X = 500;      //默认图新移动目标位置
-Shape.AIM_Y = 500;
-Shape.MOVE_SPEED = 5;  //默认图新移动速度
-Shape.MOVE_PATH = "LINE"; //默认图新移动方式(直线)
-Shape.FONT = '10px sans-serif';
-Shape.TEXTALIGN = "center";
+KJcanvas.MAX_ANIMATION_SPEED = 5;  //最大动画速度
+KJcanvas.ANIMATION_SPEED = 1;	   //动画速度  1表示正常
+
+KJcanvas.DELAY_TIME = 600;         //延迟效果时间
+KJcanvas.REFRESH_TIME = 24;        //画面刷新时间
+KJcanvas.CMD_REFRESH_TIME = 200;   //动画命令控制起刷新时间
+
+//大小
+Shape.WIDTH = 50;       //宽度
+Shape.HEIGHT = 50;      //高度
+Shape.RADIUS = 50;		//半径
+//位置
+Shape.X = 300;		//矩形的中心  圆的圆心  线段的中点
+Shape.Y = 300;
+Shape.START_X = 100;    //线段的起始位置
+Shape.START_Y = 100;
+Shape.END_X = 200;  	//线段的末尾位置
+Shape.END_Y = 200;
+//颜色
+Shape.BACKCOLOR = "ABC";  	//填充背景色
+Shape.EDGECOLOR = "000";  	//边框颜色
+Shape.TEXTCOLOR = "F00";  	//文本颜色
+Shape.LINECOLOR = "000";   	//线条颜色
+//文本
+Shape.TEXT = "(^_^)";    			//文本内容
+Shape.FONT = '10px sans-serif';		//字体
+Shape.TEXTALIGN = "center";			
 Shape.TEXTBASELINE = 'middle';
-Shape.LINECOLOR = "000";   //默认线条颜色
-Shape.END_X = 100;  //图形末尾位置
-Shape.END_Y = 100;
-Shape.LINEWIDTH = 2;  //线条宽度
-Shape.RADIUS = 50;
-Shape.X = 100;
-Shape.Y = 100;
-Shape.EDGEWIDTH = 3;
-Shape.ALPHA = 0.5;
-Shape.START_ALPHA = 0;
-Shape.END_ALPHA = 1;
-Shape.FADE_SPEED = 0.01;
+//宽度
+Shape.LINEWIDTH = 2;  	//线条宽度
+Shape.EDGEWIDTH = 3;	//矩形 圆 边框宽度
+//透明度
+Shape.ALPHA = 1;		//透明度	
+Shape.START_ALPHA = 0;	//淡入的起始透明度/淡出的末尾透明度
+Shape.END_ALPHA = 1;	//淡入的末尾透明度/淡出的起始透明度
+//速度
+Shape.MOVE_SPEED = 5; 		//移动速度
+Shape.FADE_SPEED = 0.01;	//淡入淡出速度
+
 var Positive_Integer = /^[0-9]*[1-9][0-9]*$/;

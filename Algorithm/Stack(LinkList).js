@@ -115,14 +115,14 @@ Stack.prototype.create = function()  //初始化堆栈,并绘制该堆栈
 		},	
 		"Move", this.top.PointerShape, //表头指向表尾 
 		{
-			aim_EndShape : this.top.next.DataShape
+			aimEndShape : this.top.next.DataShape
 		}
 	);
 	KJCanvas.cmd("Other",function()
 	{
 		$(".controler").removeAttr("disabled");
 	});
-	KJCanvas.cmd("END");  //开始动画动作
+	KJCanvas.cmd("End");  //开始动画动作
 
 }
 Stack.prototype.push = function( value )
@@ -154,7 +154,7 @@ Stack.prototype.push = function( value )
 	(
 		"Move", this.top.next.PointerShape,  //入栈元素(新栈顶)指向旧栈顶
 		{
-			aim_EndShape : this.top.next.next.DataShape,
+			aimEndShape : this.top.next.next.DataShape,
 		}
 	);
 	KJCanvas.cmd("Delay",Stack.DELAY_TIME);
@@ -162,7 +162,7 @@ Stack.prototype.push = function( value )
 	(
 		"Move", this.top.PointerShape,  //表头指向入栈元素(新栈顶)
 		{
-			aim_EndShape : this.top.next.DataShape,
+			aimEndShape : this.top.next.DataShape,
 		}
 	);
 	KJCanvas.cmd("Delay",Stack.DELAY_TIME);
@@ -193,7 +193,7 @@ Stack.prototype.push = function( value )
 	{
 		$(".controler").removeAttr("disabled");
 	});
-	KJCanvas.cmd("END");
+	KJCanvas.cmd("End");
 }
 Stack.prototype.pop = function()
 {
@@ -238,7 +238,7 @@ Stack.prototype.pop = function()
 			(
 				"Move", this.top.PointerShape,  //表头指向新的栈顶
 				{
-			    	aim_EndShape : this.top.next.next.DataShape
+			    	aimEndShape : this.top.next.next.DataShape
 				}
 			);
 		KJCanvas.cmd("Delay",Stack.DELAY_TIME);
@@ -255,7 +255,7 @@ Stack.prototype.pop = function()
 		{
 			$(".controler").removeAttr("disabled");
 		});
-		waitTime = KJCanvas.cmd("END");	
+		waitTime = KJCanvas.cmd("End");	
 		
 		this.top.next = this.top.next.next;
 	}
