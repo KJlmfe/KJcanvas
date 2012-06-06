@@ -19,7 +19,7 @@ Line.prototype.updatePosition = function()
 }
 Line.prototype.draw = function() //绘画线段的方法
 {
-	this.startAnimation();
+	this.Canvas.ctx.save();		    //保存当前画笔状态
 	this.updatePosition();	
 
 	this.Canvas.ctx.globalAlpha = this.alpha;
@@ -30,14 +30,11 @@ Line.prototype.draw = function() //绘画线段的方法
 	this.Canvas.ctx.strokeStyle = this.lineColor;
 	this.Canvas.ctx.stroke();
 
-	this.endAnimation();
+	this.Canvas.ctx.restore();	//恢复之前画笔状态
+	this.animationStatus["Draw"] = "stop";
 }
-Line.prototype.move = function() //移动线段
-{
-	this.startAnimation();
-	this.updatePosition();	
-	
-	//设置移动目标线段的起始位置
+Line.prototype.setAimPosition = function()    //设置移动目标线段的起始位置
+{	
 	if(this.aimStartShape != null)
 	{
 		this.aimStart_x = this.aimStartShape.x;
@@ -64,27 +61,30 @@ Line.prototype.move = function() //移动线段
 
 	this.StartShape = null;
 	this.EndShape = null;
-
-	var me = this;	
-	this.moveTimer = setInterval(function()
+}
+Line.prototype.move = function() //移动线段
+{
+	if(this.animationStatus["Move"] == "new")
 	{
-		me.Canvas.clear();	//擦干净画布
-		me.del();			//把要移动的图形对象从画布上删除
+		this.updatePosition();	
+		this.setAimPosition();
+		this.animationStatus["Move"] = "run";
+	}
+	else if(this.animationStatus["Move"] == "run")
+	{
 		//设置当前的新位置
-		var start_position = me.nextPosition(me.start_x,me.start_y,me.aimStart_x,me.aimStart_y,me.moveSpeed);
-		var end_position = me.nextPosition(me.end_x,me.end_y,me.aimEnd_x,me.aimEnd_y,me.moveSpeed);
-		me.start_x = start_position.x;
-		me.start_y = start_position.y;
-		me.end_y = end_position.y;
-		me.end_x = end_position.x;
-		me.draw();	//绘制移动图形
+		var start_position = this.nextPosition(this.start_x,this.start_y,this.aimStart_x,this.aimStart_y,this.moveSpeed);
+		var end_position = this.nextPosition(this.end_x,this.end_y,this.aimEnd_x,this.aimEnd_y,this.moveSpeed);
+		this.start_x = start_position.x;
+		this.start_y = start_position.y;
+		this.end_y = end_position.y;
+		this.end_x = end_position.x;
 		if(start_position.arrive && end_position.arrive)  //到达目标位置
 		{
-			me.StartShape = me.aimStartShape;
-			me.EndShape = me.aimEndShape;
-			me.endAnimation();
-			clearInterval(me.moveTimer);			
+			this.StartShape = this.aimStartShape;
+			this.EndShape = this.aimEndShape;
+			this.animationStatus["Move"] = "stop";
 		}
-	}, me.Canvas.refreshTime);
+	}
 }	
 

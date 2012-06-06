@@ -31,27 +31,22 @@ Shape = function()	//图形类(所有图形的父类)
 	this.alpha = Shape.ALPHA;		 		//透明度	
 	this.startAlpha = Shape.START_ALPHA;    //淡入的起始透明度/淡出的末尾透明度
 	this.endAlpha = Shape.END_ALPHA;        //淡入的末尾透明度/淡出的起始透明度
+	
+	this.animationStatus = new Array();		//各个动画的运行状态  new第一次运行 run正在运行 stop结束了
 }
 Shape.prototype.setArguments = function(cfg)  //设置参数
 {
 	for(var x in cfg)
 		this[x] = cfg[x];
 }
-Shape.prototype.startAnimation = function()	//开始动画的准备工作
-{
-	this.Canvas.cmdRunning++;       //正在执行的动画个数++
-	if(!this.Canvas.exist(this))    //每在画板上变换一个图形对象，都要将该对象保存到画板的ShapeOnCanvas叔祖里 	
-		this.Canvas.save(this);
-	this.Canvas.ctx.save();		    //保存当前画笔状态
-}
-Shape.prototype.endAnimation = function() //结束动画的收尾工作
-{
-	this.Canvas.ctx.restore();	//恢复之前画笔状态
-	this.Canvas.cmdRunning--;	//正在执行的动画个数--
-}
 Shape.prototype.dispatcher = function(cmd, cfg)	//动画命令调度器 cmd动画指令 cfg为参数
 {
-	this.setArguments(cfg);		//先设置参数
+	if(this.animationStatus[cmd] == "new")
+	{
+		this.setArguments(cfg);		//先设置参数
+		if(!this.Canvas.exist(this))    //每在画板上变换一个图形对象，都要将该对象保存到画板的ShapeOnCanvas叔祖里 	
+		this.Canvas.save(this);
+	}
 	switch (cmd)
 	{
 		case "Draw":
@@ -80,34 +75,34 @@ Shape.prototype.del = function()  //从画板上删除该图形
 }
 Shape.prototype.fade = function(action)  //淡入/淡出图形
 {	
-	this.startAnimation();
-	if(action == "FadeIn")	//淡入
+	if(this.animationStatus[action] == "new")
 	{
-		var factor = 1;
-		this.alpha = this.startAlpha;
-	}
-	else if(action == "FadeOut")	//淡出
-	{
-		var factor = -1;
-		this.alpha = this.endAlpha;
-	}
-
-	var me = this;
-	this.fadeTimer = setInterval(function()	
-	{
-		me.alpha += me.fadeSpeed * factor;	
-		if(me.alpha >= me.endAlpha)
-			me.alpha = me.endAlpha;
-		if(me.alpha <= me.startAlpha)
-			me.alpha = me.startAlpha;
-		me.del();
-		me.draw();
-		if(me.alpha == me.endAlpha || me.alpha == me.startAlpha)
+		if(action == "FadeIn")	//淡入
 		{
-			me.endAnimation();
-			clearInterval(me.fadeTimer);
+			this.alphaFactor = 1;
+			this.alpha = this.startAlpha;
 		}
-	}, me.Canvas.refreshTime);
+		else if(action == "FadeOut")	//淡出
+		{
+			this.alphaFactor = -1;
+			this.alpha = this.endAlpha;
+		}
+		this.animationStatus[action] = "run";
+	}
+	else if(this.animationStatus[action] == "run")
+	{
+		this.alpha += this.fadeSpeed * this.alphaFactor;	
+		if(this.alpha >= this.endAlpha)
+		{
+			this.alpha = this.endAlpha;
+			this.animationStatus[action] = "stop"
+		}
+		if(this.alpha <= this.startAlpha)
+		{
+			this.alpha = this.startAlpha;
+			this.animationStatus[action] = "stop"
+		}
+	}
 }
 Shape.prototype.nextPosition = function(x1,y1,x2,y2,speed)  //(x1,x2)移动到(默认以两点间直线移动)(x2,y2)且x(或y)每次变化speed的下一为位置
 {
@@ -138,25 +133,22 @@ Shape.prototype.nextPosition = function(x1,y1,x2,y2,speed)  //(x1,x2)移动到(�
 }	
 Shape.prototype.move = function() //移动图形
 {
-	this.startAnimation();
-	this.aim_x = this.aim_x == null ? this.x : this.aim_x;		//设置目标位置
-	this.aim_y = this.aim_y == null ? this.y : this.aim_y;
-
-	var me = this;  //setInterval里不能直接调用this,所以使用变量作用域解决这个问题
-	this.moveTimer = setInterval(function()
+	if(this.animationStatus["Move"] == "new")
 	{
-		me.Canvas.clear();	//擦干净画布
-		me.del();			//把要移动的图形对象从画布上删除
-		var position = me.nextPosition(me.x, me.y, me.aim_x, me.aim_y, me.moveSpeed); 
-		me.x = position.x;	//设置移动图形当前新位置
-		me.y = position.y;
-		me.draw();			//绘制移动图形
+		this.aim_x = this.aim_x == null ? this.x : this.aim_x;		//设置目标位置
+		this.aim_y = this.aim_y == null ? this.y : this.aim_y;
+		this.animationStatus["Move"] = "run";
+	}
+	else if(this.animationStatus["Move"] == "run")
+	{
+		var position = this.nextPosition(this.x,this.y,this.aim_x, this.aim_y, this.moveSpeed); 
+		this.x = position.x;	//设置移动图形当前新位置
+		this.y = position.y;
 		if(position.arrive)	//如果到达目标位置
 		{
-			me.endAnimation();
-			clearInterval(me.moveTimer);			
+			this.animationStatus["Move"] = "stop";
 		}
-	}, me.Canvas.refreshTime);
+	}
 }
 
 /*Shape.prototype.saveArguments = function()*/

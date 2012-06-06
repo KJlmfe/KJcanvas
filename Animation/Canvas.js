@@ -11,6 +11,7 @@ KJcanvas = function(cfg)	//画板类(cfg为参数对象)
 	this.animationSpeed = KJcanvas.ANIMATION_SPEED; 
 	this.maxAnimationSpeed = KJcanvas.MAX_ANIMATION_SPEED;	//最大动画速度倍率
 	this.cmdRefreshTime = KJcanvas.CMD_REFRESH_TIME;	//动画控制器刷新间隔时间
+	this.refreshTime = KJcanvas.REFRESH_TIME;        //画面刷新时间
 
 	this.ShapeOnCanvas = new Array();	//初始化ShapeOnCanvas(用于保存画板上存在的图形对象)
 
@@ -42,7 +43,7 @@ KJcanvas.prototype.cmd = function()		//动画命令控制器
 		this.cmdQueue = new Array();	//初始化cmdQueue(用于保存动画命令的队列)
 		this.rear = 0;			    	//队列首尾指针复位
 		this.front = 0;
-		this.cmdRunning = 0;        	//正在运行的动画命令个数置0
+		this.cmdRun = false;       		 //是否有命令在执行 false表示没有
 		this.pauseSignal = false;       //动画暂停信号 true表示暂停
 		this.parallelSignal = false;    //并行动画信号 true表示开始并行动画
 		
@@ -50,61 +51,22 @@ KJcanvas.prototype.cmd = function()		//动画命令控制器
 		this.cmdTimer = setInterval(function()		//启动动画控制器
 		{
 			//表示之前的动画命令执行结束了并且存在尚未运行的动画命令且无暂停信号
-			if(me.cmdRunning == 0 && me.front < me.rear && me.pauseSignal == false) 
+			if(me.cmdRun == false && me.front < me.rear && me.pauseSignal == false) 
 			{
-				var k = 0;
-				while(me.cmdQueue[me.front][k] != null)
-				{
-					if(me.cmdQueue[me.front][k] == "Delay")		//画面静止
-					{	
-						if(typeof(me.cmdQueue[me.front][k+1]) == "number")
-						{
-							me.delay(me.cmdQueue[me.front][k+1]);
-							k += 2;
-						}
-						else
-						{
-							me.delay();
-							k += 1;
-						}
-					}
-					else if(me.cmdQueue[me.front][k] == "End")		//动画结束
-					{
-						clearInterval(me.cmdTimer);		//停止动画控制器
-						break;
-					}
-					else if(me.cmdQueue[me.front][k] == "Other")	//非动画指令
-					{
-						var command = me.cmdQueue[me.front][k+1];
-						command();
-						k += 2;
-					}
-					else		//动画指令
-					{
-						if(typeof(me.cmdQueue[me.front][k+2]) == "object")	//有参数对象的动画指令
-						{
-							me.cmdQueue[me.front][k+1].dispatcher(me.cmdQueue[me.front][k], me.cmdQueue[me.front][k+2]);
-							k += 3;
-						}
-						else
-						{
-							me.cmdQueue[me.front][k+1].dispatcher(me.cmdQueue[me.front][k]);
-							k += 2;	
-						}
-					}
-				}
+				if(me.cmdQueue[me.front][0] == "Delay")		//画面静止
+					me.delay(me.cmdQueue[me.front][1]);
+				else if(me.cmdQueue[me.front][0] == "End")		//动画结束
+					clearInterval(me.cmdTimer);		//停止动画控制器
+				else 		
+					me.refresh(me.cmdQueue[me.front]);  //根据动画命令刷新画板
 				me.front++;
 			}
 		}, me.cmdRefreshTime);
 	}
 	else if(arguments[0] == "Pause")  //动画暂停
-	{
 		this.pauseSignal = true;
-	}
 	else if(arguments[0] == "Continue")  //动画继续
-	{
 		this.pauseSignal = false;
-	}
 	else if(arguments[0] == "StartParallel")	//开始输入并行动画
 	{
 		this.parallelSignal = true;	
@@ -118,17 +80,67 @@ KJcanvas.prototype.cmd = function()		//动画命令控制器
 			arguments = this.parallelArguments;  //将之前的所有并行动画命令转换为一条串行动画命令
 		}
 		if(this.parallelSignal)		//当前的指令为属于并行动画指令
-		{
 			for(var i=0;i<arguments.length;i++)
-			{
 				this.parallelArguments.push(arguments[i]);   //将并行动画命令暂时存储
+		else		//当前的指令属于串行动画指令
+			this.cmdQueue[this.rear++] = arguments;		//动画命令存入队列
+	}
+}
+KJcanvas.prototype.refresh = function(command)
+{
+	this.cmdRun = true;  	//正在刷新页面 执行动画命令
+	var runStatus = [];		 	//用于存储当前执行的所有动画命令的运行状态
+	for(var i=0; i<command.length; i++)	//初始化所有的动画命令状态为new 表示第一次执行
+		runStatus[i] = "new";
+
+	var me = this;
+	this.refreshTimer = setInterval(function()  //每24ms刷新一次画板
+	{
+		var j = 0;
+		var allStop = true;		//判断是否执行完了当前所有的动画命令
+		while(command[j] != null)
+		{
+			if(command[j] == "Other")	//非动画指令
+			{
+				if(runStatus[j] == "new" || runStatus[j] == "run")
+				{	
+					var functionString = command[j+1];
+					functionString();
+					runStatus[j] = "stop";
+					allStop = false;
+				}
+				j += 2;
+			}
+			else if(typeof(command[j+2]) == "object")	//有参数对象的动画指令
+			{
+				if(runStatus[j] == "new" || runStatus[j] == "run")
+				{
+					command[j+1].animationStatus[command[j]] = runStatus[j];
+					command[j+1].dispatcher(command[j], command[j+2]);
+					runStatus[j] = command[j+1].animationStatus[command[j]];
+					allStop = false;
+				}
+				j += 3;
+			}
+			else	//无参数的动画指令
+			{
+				if(runStatus[j] == "new" || runStatus[j] == "run")
+				{
+					command[j+1].animationStatus[command[j]] = runStatus[j];
+					command[j+1].dispatcher(command[j]);
+					runStatus[j] = command[j+1].animationStatus[command[j]];
+					allStop = false;
+				}
+				j += 2;	
 			}
 		}
-		else		//当前的指令属于串行动画指令
+		me.restore();
+		if(allStop)
 		{
-			this.cmdQueue[this.rear++] = arguments;		//动画命令存入队列
+			me.cmdRun = false;
+			clearInterval(me.refreshTimer);
 		}
-	}
+	}, this.refreshTime);
 }
 KJcanvas.prototype.save = function(obj)		//保存obj图形对象到ShapeOnCanvas数组
 {
@@ -175,12 +187,12 @@ KJcanvas.prototype.init = function()	//新建一个干净的画板
 }
 KJcanvas.prototype.delay = function(delayTime)		//画板禁止delayTime无变化
 {
-	this.cmdRunning++;			
+	this.cmdRun = true;  	//正在刷新页面 执行动画命令
 	delayTime = delayTime == null ? KJcanvas.DELAY_TIME : delayTime;
 	delayTime *= this.delaySpeed;
 	var me = this;
 	setTimeout(function()
 	{
-		me.cmdRunning--;
+		me.cmdRun = false;			
 	}, delayTime);
 }

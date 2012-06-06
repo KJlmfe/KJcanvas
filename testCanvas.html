@@ -8,40 +8,93 @@
 		<script src="Animation/Label.js"></script>
 		<script src="Animation/Line.js"></script>
 		<script type="text/javascript">
-		var board;
-		function init()
-		{
+		/*
 			this.arr = new Array();
 			this.arr.push(4);
 			this.arr = [];
 			alert(this.arr.length);
-/*
-			board = new KJcanvas();
-			shape = new Rectangle
-			({
-				Canvas : board
-			});
-			alert("uuu");
-			board.cmd("Setup");
-			board.cmd("Draw",shape);
-			board.cmd("Move",shape,
+*/
+
+		function randomColor() 
+		{
+    		var rand = Math.floor(Math.random( ) * 0xFFFFFF).toString(16);
+    		if(rand.length == 6)
 			{
-				aim_x : 500,
-				aim_y : 200,
+   		 	    return rand;
+   		 	}
+			else
+			{
+   	    		 return randomColor();
+   			 }
+		}
+
+		function init()
+		{
+		var myCanvas = new KJcanvas();
+		var shape = new Array();
+	
+		myCanvas.cmd("Setup");
+		for(var i=0;i<100;i++)
+		{
+			var x = Math.floor(Math.random()*800); 
+			var y = Math.floor(Math.random()*500);
+			var aim_x = Math.floor(Math.random()*800); 
+			var aim_y = Math.floor(Math.random()*500);
+			var width = Math.floor(Math.random()*100); 
+			var height = Math.floor(Math.random()*100);
+			var backColor = randomColor(); 
+			var edgeColor = randomColor(); 
+			var end_x = Math.floor(Math.random()*800); 
+			var end_y = Math.floor(Math.random()*500);
+			var moveSpeed = Math.floor(Math.random()*5)+1;
+				
+			shape[i] = new Rectangle
+			({
+				Canvas : myCanvas,
+				x : x,
+				y : y,
+				aim_x : aim_x,
+				aim_y : aim_y,
+				width : width,
+				height : height,
+				backColor : backColor,
+				edgeColor : edgeColor,
+				end_x : end_x,
+				end_y : end_y,
 				moveSpeed : 1
 			});
-			board.cmd("END",shape);
-*/
+		}
+		alert("fd");
+		myCanvas.cmd("StartParallel");
+		for(var i=0;i<100;i++)
+		{
+		//	myCanvas.cmd("Draw",shape[i]);
+			myCanvas.cmd("Move",shape[i]);
+		}
+		myCanvas.cmd("EndParallel");
+		myCanvas.cmd("End");
+
 		}
 		</script>
 	</head>
 
 	<body onload="init();">
+	<!--<body>-->
 		<h3 id="AlgorithmName"></h3>
 		<div id="AlgorithmControlBar"></div>
 		<canvas id="canvas" width="960" height="600" style="border:1px solid #000000;"></canvas>
 	
 		<script type="text/javascript">
+	/*	uio = function()
+		{
+			return "r43r";
+		}
+		qwe = function ()
+		{
+			return uio();
+		}
+		hj = qwe();
+		alert(hj);
 		/*
 			father = function()
 			{

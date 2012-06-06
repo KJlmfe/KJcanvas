@@ -38,7 +38,7 @@ Shape.ALPHA = 1;		//透明度
 Shape.START_ALPHA = 0;	//淡入的起始透明度/淡出的末尾透明度
 Shape.END_ALPHA = 1;	//淡入的末尾透明度/淡出的起始透明度
 //速度
-Shape.MOVE_SPEED = 1; 		//移动速度
-Shape.FADE_SPEED = 0.01;	//淡入淡出速度
+Shape.MOVE_SPEED = 5; 		//移动速度
+Shape.FADE_SPEED = 0.1;	//淡入淡出速度
 
 var Positive_Integer = /^[0-9]*[1-9][0-9]*$/;
