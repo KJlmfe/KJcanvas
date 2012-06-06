@@ -138,7 +138,7 @@ KJcanvas.prototype.del = function(obj)		//从ShapeOnCanvas里删除一个图形�
 {
 	if(obj == null)   //如果无参数,默认清空所有对象
 	{
-		this.ShapeOnCanva = new Array();
+		this.ShapeOnCanvas = [];
 	}
 	else
 	{
@@ -171,7 +171,7 @@ KJcanvas.prototype.clear = function()	//clear画板(并没有删除画板上的�
 KJcanvas.prototype.init = function()	//新建一个干净的画板
 {
 	this.del();		//清空之前画板上的所有图形对象
-	this.clear();	//clear画板
+	this.restore();	//clear画板
 }
 KJcanvas.prototype.delay = function(delayTime)		//画板禁止delayTime无变化
 {

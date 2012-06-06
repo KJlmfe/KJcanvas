@@ -1,6 +1,5 @@
 function init()
 {
-	var canvas = document.getElementsByTagName("Canvas")[0]; 	//得到html上canvas元素
 	Canvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(Canvas)
 	
 	DataStructure = new Stack(); 		   //初始化一个数据结构对象
