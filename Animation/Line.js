@@ -35,28 +35,40 @@ Line.prototype.draw = function() //绘画线段的方法
 }
 Line.prototype.setAimPosition = function()    //设置移动目标线段的起始位置
 {	
-	if(this.aimStartShape != null)
+	if(this.aimStartShape != null)   //指定了终点图形
 	{
 		this.aimStart_x = this.aimStartShape.x;
 		this.aimStart_y = this.aimStartShape.y;	
 	}
-	else 
+	else if(this.aimStart_x != null || this.aimStart_y != null)  //指定了终点坐标
 	{
 		this.aimStart_x = this.aimStart_x == null ? this.start_x : this.aimStart_x;
 		this.aimStart_y = this.aimStart_y == null ? this.start_y : this.aimStart_y;
-		this.aimStartShape = this.StartShape;
+		this.aimStartShape = null;   
 	}
-	
-	if(this.aimEndShape != null)
+	else //什么都没有指定,表示该点静止
+	{
+		this.aimStartShape = this.StartShape;  //把两种方式都设置为默认值
+		this.aimStart_x = this.start_x;
+		this.aimStart_y = this.start_y;
+	}
+
+	if(this.aimEndShape != null)   //指定了终点图形
 	{
 		this.aimEnd_x = this.aimEndShape.x;
-		this.aimEnd_y = this.aimEndShape.y;
+		this.aimEnd_y = this.aimEndShape.y;	
 	}
-	else 
+	else if(this.aimEnd_x != null || this.aimEnd_y != null)  //指定了终点坐标
 	{
-		this.aimEnd_x = this.aimEnd_x == null ? this.end_x : this.aimEnd_x;
-		this.aimEnd_y = this.aimEnd_y == null ? this.end_y : this.aimEnd_y;
-		this.aimEndShape = this.EndShape;
+		this.aimEnd_x = this.aimEnd_x == null ? this.start_x : this.aimEnd_x;
+		this.aimEnd_y = this.aimEnd_y == null ? this.start_y : this.aimEnd_y;
+		this.aimEndShape = null;   
+	}
+	else //什么都没有指定,表示该点静止
+	{
+		this.aimEndShape = this.EndShape;  //把两种方式都设置为默认值
+		this.aimEnd_x = this.start_x;
+		this.aimEnd_y = this.start_y;
 	}
 
 	this.StartShape = null;
