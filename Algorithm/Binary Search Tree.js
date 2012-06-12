@@ -187,115 +187,271 @@ BST.prototype.insert = function( value )
 	});
 	Canvas.cmd("End");
 }
-BST.prototype.pop = function( value )
+BST.prototype.delete = function( value )
 {
-	if(this.root == null)
-		alert(BST.EMPTY_INFO);
-	else
-	{
-		this.disableControlBar();
-		
-		var tmp = this.root;
-		var level = 1;
-		while(1)
+	this.disableControlBar();
+
+	Canvas.cmd("Setup");
+	var deleteNode = new this.node( value );
+	Canvas.cmd
+	(
+		"Draw", deleteNode.DataShape,
 		{
-			if(value == tmp.value)
-			{
-				
-			}
-			if(value < tmp.value)
-				if(tmp.left == null)
-				{
-					tmp.left = new this.node( value );
-					Canvas.cmd
-					(
-						"FadeIn", tmp.left.DataShape,   //入栈元素淡入
-						{
-							x : tmp.DataShape.x - 50 + level * 20,
-							y : tmp.DataShape.y + 100,
-						}
-					);		
-					break;
-				}
-				else
-					tmp = tmp.left;
-			else
-				if(tmp.right == null)
-				{
-					tmp.right = new this.node( value );
-					Canvas.cmd
-					(
-						"FadeIn", tmp.right.DataShape,   //入栈元素淡入
-						{
-							x : tmp.DataShape.x + 50 + level * 20,
-							y : tmp.DataShape.y + 100,
-						}
-					);		
-					break;
-				}
-				else
-					tmp = tmp.right;
-			level++;
-		}	
-		Canvas.cmd("Setup");	
-		Canvas.cmd("StartParallel");
-		Canvas.cmd
-		(
-			"Move",	this.top.next.DataShape,  //栈顶出栈
-			{
-				aim_x : BST.DATASHAPE_PUSH_X,
-				aim_y : BST.DATASHAPE_PUSH_Y
-			}
-		);
-		var tmp_pointer = this.top.next;
-		while(tmp_pointer.next !=  null)
+			x : BST.DATASHAPE_INSERT_X,
+			y : BST.DATASHAPE_INSERT_Y,
+		}
+	);
+	var tmp = this.root;
+	var mother = this.root;
+	while(1)
+	{
+		Canvas.cmd("Delay");
+		if(tmp == null)			//没有找到
 		{
 			Canvas.cmd
 			(
-				"Move", tmp_pointer.next.DataShape,
-				{
-					aim_x : tmp_pointer.DataShape.x,
-					aim_y : tmp_pointer.DataShape.y
+				"Other", function(){
+					alert("很抱歉，我们没能在BST里找到 " + value + " 删除失败");
 				}
 			);
-			tmp_pointer = tmp_pointer.next;
+			Canvas.cmd("FadeOut", deleteNode.DataShape);
+			break;
 		}
-		Canvas.cmd("EndParallel");
-		Canvas.cmd("Delay");
+
 		Canvas.cmd
 		(
-			"Move", this.top.PointerShape,  //表头指向新的栈顶
+			"Move", deleteNode.DataShape,
 			{
-		    	aimEndShape : this.top.next.next.DataShape
+				aim_x : tmp.DataShape.x,
+				aim_y : tmp.DataShape.y + BST.DATASHAPE_GAP_Y,
 			}
 		);
+		
+		if(value < tmp.value)
+		{
+			mother = tmp;
+			tmp = tmp.left;
+		}
+		else if(value > tmp.value)
+		{
+			mother = tmp;
+			tmp = tmp.right;
+		}
+		else		//找到了
+		{
+			Canvas.cmd
+			(
+				"Move", deleteNode.DataShape,
+				{
+					aim_x : tmp.DataShape.x,
+					aim_y : tmp.DataShape.y,
+				}
+			);
+			Canvas.cmd("Delete", deleteNode.DataShape);
+			Canvas.cmd("FadeOut", tmp.DataShape);
+
+			if(tmp.left == null && tmp.right == null)  //删除的是叶子节点
+			{
+				if(mother.left == tmp)
+				{
+					Canvas.cmd("FadeOut", mother.LeftPointerShape);
+					mother.left = null;
+				}
+				if(mother.right == tmp)
+				{
+					Canvas.cmd("FadeOut", mother.RightPointerShape);
+					mother.right = null;
+				}
+			}
+			else if(tmp.left == null)   //删除的节点只有右儿子
+			{	
+				Canvas.cmd("StartParallel");
+				if(mother.left == tmp)
+				{
+					Canvas.cmd("Move", mother.LeftPointerShape,
+					{
+						aimEndShape : tmp.right.DataShape,
+					});
+					mother.left = tmp.right;
+				}
+				if(mother.right == tmp)
+				{
+					Canvas.cmd("Move", mother.RightPointerShape,
+					{
+						aimEndShape : tmp.right.DataShape,
+					});
+					mother.right = tmp.right;
+				}
+				Canvas.cmd("FadeOut", tmp.RightPointerShape);
+				Canvas.cmd("EndParallel");
+			}
+			else if(tmp.right == null)	//删除的节点只有左儿子
+			{
+				Canvas.cmd("StartParallel");
+				if(mother.left == tmp)
+				{
+					Canvas.cmd("Move", mother.LeftPointerShape,
+					{
+						aimEndShape : tmp.left.DataShape,
+					});
+					mother.left = tmp.left;
+				}
+				if(mother.right == tmp)
+				{
+					Canvas.cmd("Move", mother.RightPointerShape,
+					{
+						aimEndShape : tmp.left.DataShape,
+					});
+					mother.right = tmp.left;
+				}
+				Canvas.cmd("FadeOut", tmp.LeftPointerShape);
+				Canvas.cmd("EndParallel");
+			}
+			else  //删除的节点有左右两个儿子
+			{
+				leftMaxNode = tmp.left;    //查找删除节点左子树最大的节点
+				leftMaxNodeMother = tmp;
+				while(leftMaxNode.right != null)  
+				{
+					leftMaxNodeMother = leftMaxNode;
+					leftMaxNode = leftMaxNode.right;
+				}
+				//交换删除节点和左子树最大节点的值
+				var swapvalue = tmp.value;
+				tmp.value = leftMaxNode.value;
+				leftMaxNode.value = swapvalue;
+				Canvas.cmd("StartParallel");
+				var tmpValueShape = new Label
+				Canvas.cmd("Move",)
+				//将左子树最大节点的父母指向null
+				if(leftMaxNodeMother.left == leftMaxNode)
+				{
+					Canvas.cmd("FadeOut",leftMaxNodeMother.LeftPointerShape);
+					leftMaxNodeMother.left = null;
+				}
+				else
+				{
+					Canvas.cmd("FadeOut",RightMaxNodeMother.LeftPointerShape);
+					leftMaxNodeMother.Right = null;
+				}
+				//将删除节点的父母指向左子树最大节点
+				if(mother.left == tmp)
+				{
+					Canvas.cmd("Move", mother.LeftPointerShape,
+					{
+						aimEndShape : leftMaxNode.DataShape,
+					});
+					mother.left = leftMaxNode;
+				}
+				else
+				{
+					Canvas.cmd("Move", mother.RightPointerShape,
+					{
+						aimEndShape : leftMaxNode.DataShape,
+					});
+					mother.right = leftMaxNode;
+				}
+				//将左子树最大节点的左右孩子指向删除节点的左右孩子
+				Canvas.cmd("Move",leftMaxNode.LeftPointerShape,{
+					aimEndShape : tmp.left.DataShape,
+				});
+				leftMaxNode.left = tmp.left;
+				Canvas.cmd("Move",leftMaxNode.RightPointerShape,{
+					aimEndShape : tmp.right.DataShape,
+				});
+				leftMaxNode.right = tmp.right;
+				
+				Canvas.cmd("FadeOut",tmp.LeftPointerShape);
+				Canvas.cmd("FadeOut",tmp.RightPointerShape);
+			}
+			break;
+		}
+	}
+	Canvas.cmd("Other",function()
+	{
+		$(".controler").removeAttr("disabled");		//启用所有控制元素
+	});
+	Canvas.cmd("End");
+}
+BST.prototype.find = function( value )
+{
+	this.disableControlBar();
+
+	Canvas.cmd("Setup");
+	var findNode = new this.node( value );
+	Canvas.cmd
+	(
+		"Draw", findNode.DataShape,
+		{
+			x : BST.DATASHAPE_INSERT_X,
+			y : BST.DATASHAPE_INSERT_Y,
+		}
+	);
+	var tmp = this.root;
+	while(1)
+	{
 		Canvas.cmd("Delay");
+		if(tmp == null)			//没有找到
+		{
+			Canvas.cmd
+			(
+				"Other", function(){
+					alert("很抱歉，我们没能在BST里找到 " + value);
+				}
+			);
+			Canvas.cmd("FadeOut", findNode.DataShape);
+			break;
+		}
+
 		Canvas.cmd
 		(
-			"FadeOut", this.top.next.PointerShape,
-			"FadeOut",	this.top.next.DataShape
+			"Move", findNode.DataShape,
+			{
+				aim_x : tmp.DataShape.x,
+				aim_y : tmp.DataShape.y + BST.DATASHAPE_GAP_Y,
+			}
 		);
-		Canvas.cmd("Other",function()
+		
+		if(value < tmp.value)
+			tmp = tmp.left;
+		else if(value > tmp.value)
+			tmp = tmp.right;
+		else		//找到了
 		{
-			$(".controler").removeAttr("disabled");		//启用所有控制元素
-		});
-		Canvas.cmd("End");	
-		this.top.next = this.top.next.next;
+			Canvas.cmd("Other",function(){
+				alert("恭喜你，我们在BST里找到了 " + value);
+			});
+			Canvas.cmd
+			(
+				"Move", findNode.DataShape,
+				{
+					aim_x : tmp.DataShape.x,
+					aim_y : tmp.DataShape.y,
+				}
+			);
+			Canvas.cmd("Delete", findNode.DataShape);
+			break;
+		}
 	}
+	Canvas.cmd("Other",function()
+	{
+		$(".controler").removeAttr("disabled");		//启用所有控制元素
+	});
+	Canvas.cmd("End");
 }
 BST.prototype.addControls = function(obj)
 {
 	$("#AlgorithmName").html(BST.ALGORITHM_NAME);
 	this.TextInput = this.addControlBar("text","");
-	this.CreatBSTButton = this.addControlBar("button","Creat BST");
+	this.CreatBSTButton = this.addControlBar("button","Delete");
 	this.CreatBSTButton.onclick = function(){
 		var value = obj.TextInput.value;
 		value = parseFloat(value);
-		obj.create( value );
+		obj.delete( value );
 		obj.TextInput.value = "";
 	}
 
-	this.PushButton = this.addControlBar("button","Push");
+	this.PushButton = this.addControlBar("button","Insert");
 	this.PushButton.onclick = function(){
 		var value = obj.TextInput.value;
 		value = parseFloat(value);
@@ -303,8 +459,11 @@ BST.prototype.addControls = function(obj)
 		obj.TextInput.value = "";
 	}
 
-	this.PopButton = this.addControlBar("button","Pop");
+	this.PopButton = this.addControlBar("button","Find");
 	this.PopButton.onclick = function(){
-		obj.pop();
+		var value = obj.TextInput.value;
+		value = parseFloat(value);
+		obj.find( value );
+		obj.TextInput.value = "";
 	}
 }

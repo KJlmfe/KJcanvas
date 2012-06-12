@@ -68,10 +68,9 @@ Shape.prototype.dispatcher = function(cmd, cfg)	//动画命令调度器 cmd动�
 }
 Shape.prototype.del = function()  //从画板上删除该图形
 {
-	this.startAnimation();
 	this.Canvas.del(this);
 	this.Canvas.restore();
-	this.endAnimation();
+	this.animationStatus["Delete"] = "stop";
 }
 Shape.prototype.fade = function(action)  //淡入/淡出图形
 {	
