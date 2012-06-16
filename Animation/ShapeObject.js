@@ -106,29 +106,30 @@ Shape.prototype.fade = function(action)  //淡入/淡出图形
 Shape.prototype.nextPosition = function(x1,y1,x2,y2,speed)  //(x1,x2)移动到(默认以两点间直线移动)(x2,y2)且x(或y)每次变化speed的下一为位置
 {
 	speed = speed == null ? this.moveSpeed : speed;
-	if(Math.abs(x1 - x2) <= speed && Math.abs(y1 - y2) <= speed)	//到达目标位置
+	var arrive = false;
+
+	if(x1 != x2)   //求出直线方程的k与b
 	{
-		x1 = x2;
-		y1 = y2;
-		var	arrive = true;
+		var k = (y1 - y2) / (x1 - x2);  
+		var b = y1 - k * x1;
+		x1 += speed * (x2 - x1) / Math.abs(x2 - x1);
+		y1 = k * x1 + b;
+		if(Math.abs(x1 - x2) <= speed)
+			arrive = true;
 	}
-	else	//计算下一个位置
+	else if(y1 != y2)
 	{
-		if(x1 != x2)   //求出直线方程的k与b
-		{
-			var k = (y1 - y2) / (x1 - x2);  
-			var b = y1 - k * x1;
-			x1 += speed * (x2 - x1) / Math.abs(x2 - x1);
-			y1 = k * x1 + b;
-		}
-		else
-		{
-			if(y2 != y1)
-				y1 += speed * (y2 - y1) / Math.abs(y2 - y1);
-		}	
-		var	arrive = false;
+		y1 += speed * (y2 - y1) / Math.abs(y2 - y1);
+		if(Math.abs(y1 - y2) <= speed)
+			arrive = true;
 	}
-	return {x : x1, y : y1, arrive : arrive};	//返回下一个位置和抵达信号
+	else	
+	    arrive = true;
+
+	if(arrive == false)
+		return {x : x1, y : y1, arrive : arrive};	//返回下一个位置和抵达信号
+	else
+		return {x : x2, y : y2, arrive : arrive};
 }	
 Shape.prototype.move = function() //移动图形
 {
