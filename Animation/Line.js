@@ -40,7 +40,7 @@ Line.prototype.setAimPosition = function()    //设置移动目标线段的起�
 		this.aimStart_x = this.aimStartShape.x;
 		this.aimStart_y = this.aimStartShape.y;	
 	}
-	else if(this.aimStart_x != null || this.aimStart_y != null)  //指定了终点坐标
+	else if(this.aimStart_x != null || this.aimStart_y != null)  //指定了起点坐标
 	{
 		this.aimStart_x = this.aimStart_x == null ? this.start_x : this.aimStart_x;
 		this.aimStart_y = this.aimStart_y == null ? this.start_y : this.aimStart_y;
@@ -60,8 +60,8 @@ Line.prototype.setAimPosition = function()    //设置移动目标线段的起�
 	}
 	else if(this.aimEnd_x != null || this.aimEnd_y != null)  //指定了终点坐标
 	{
-		this.aimEnd_x = this.aimEnd_x == null ? this.start_x : this.aimEnd_x;
-		this.aimEnd_y = this.aimEnd_y == null ? this.start_y : this.aimEnd_y;
+		this.aimEnd_x = this.aimEnd_x == null ? this.end_x : this.aimEnd_x;
+		this.aimEnd_y = this.aimEnd_y == null ? this.end_y : this.aimEnd_y;
 		this.aimEndShape = null;   
 	}
 	else //什么都没有指定,表示该点静止

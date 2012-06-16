@@ -1,0 +1,50 @@
+<html>
+	<head>
+		<title>Binary Search Tree</title>
+		
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script src="ThirdLibrary/jquery-1.7.2.min.js"></script>
+		<script src="Animation/Canvas.js"></script>
+		<script src="Animation/ShapeObject.js"></script>
+		<script src="Animation/AnimateArguments.js"></script>
+		<script src="Animation/Rectangle.js"></script>
+		<script src="Animation/Label.js"></script>
+		<script src="Animation/Line.js"></script>
+		<script src="Algorithm/AlgorithmObject.js"></script>
+		
+		<script src="Algorithm/Breadth First Search.js"></script>
+		<script type="text/javascript">
+function mouseMove(ev) 
+{ 
+ev= ev || window.event; 
+var mousePos = mouseCoords(ev); 
+//alert(ev.pageX); 
+document.getElementById("xxx").value = mousePos.x-8; 
+document.getElementById("yyy").value = mousePos.y-99; 
+} 
+
+function mouseCoords(ev) 
+{ 
+if(ev.pageX || ev.pageY){ 
+return {x:ev.pageX, y:ev.pageY}; 
+} 
+return { 
+x:ev.clientX + document.body.scrollLeft - document.body.clientLeft, 
+y:ev.clientY + document.body.scrollTop - document.body.clientTop 
+}; 
+} 
+
+document.onmousemove = mouseMove; 
+</script> 
+		</script>
+	</head>
+
+	<body onload="init();">
+		<h3 id="AlgorithmName"></h3>
+<input id=yyy type=text> 
+<input id=xxx type=text> 
+		<div id="AlgorithmControlBar"></div>
+		<canvas id="canvas"></canvas>
+
+	</body>
+</html>
