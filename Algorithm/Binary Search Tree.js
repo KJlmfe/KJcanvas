@@ -3,13 +3,14 @@ function init()
 	Canvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(Canvas)
 	
 	DataStructure = new BST(); 		   //初始化一个数据结构对象
-	DataStructure.addControls(DataStructure);  //给该数据结构演示动画添加用户界面控制器
-	DataStructure.calcShapeCoord();
-//	DataStructure.create();
 }
 
 BST = function()
-{}
+{
+	this.addControls();  //给该数据结构演示动画添加用户界面控制器
+	this.calcShapeCoord();
+//	this.create();
+}
 
 BST.ALGORITHM_NAME = "二分查找树"; 			//动画名称
 
@@ -401,8 +402,9 @@ BST.prototype.find = function( value )
 	});
 	Canvas.cmd("End");
 }
-BST.prototype.addControls = function(obj)
+BST.prototype.addControls = function()
 {
+	var obj = this;
 	$("#AlgorithmName").html(BST.ALGORITHM_NAME);
 	
 	this.TextInput = this.addControlBar("text","");

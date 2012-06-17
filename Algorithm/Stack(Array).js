@@ -3,11 +3,12 @@ function init()
 	Canvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(Canvas)
 	
 	DataStructure = new Stack(); 		   //初始化一个数据结构对象
-	DataStructure.addControls(DataStructure);  //给该数据结构演示动画添加用户界面控制器
 }
 
 Stack = function(size)
-{}
+{
+	this.addControls();  //给该数据结构演示动画添加用户界面控制器
+}
 
 Stack.ALGORITHM_NAME = "堆栈(数组)"; //算法名	
 Stack.SIZE = 7; //默认堆栈的大小
@@ -208,8 +209,9 @@ Stack.prototype.pop = function()
 		Canvas.cmd("END");	
 	}
 }
-Stack.prototype.addControls = function(obj)
+Stack.prototype.addControls = function()
 {
+	var obj = this;
 	$("#AlgorithmName").html(Stack.ALGORITHM_NAME);
 	this.TextInput = this.addControlBar("text","");
 	this.CreatStackButton = this.addControlBar("button","Creat Stack");

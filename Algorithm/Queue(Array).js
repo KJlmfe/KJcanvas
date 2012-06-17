@@ -1,14 +1,13 @@
 function init()
 {
-	var ArrayQueue = new Queue();  //初始化一个队列对象
-	ArrayQueue.addControls(ArrayQueue);  //添加队列用户控制器
-
-	var Mycanvas = document.getElementsByTagName("canvas")[0]; //初始化canvas对象
-	ArrayQueue.canvas = new Canvas(Mycanvas);  //将该canvas对象绑定到该队列上
+	Canvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(Canvas)
+	
+	DataStructure = new Queue(); 	//初始化一个队列对象
 }
 
-Queue = function(size)
+Queue = function()
 {
+	this.addControls();
 }
 Queue.ALGORITHM_NAME = "队列(数组)"; //算法名	
 Queue.SIZE = 7; //默认队列的大小
@@ -18,7 +17,7 @@ Queue.EMPTY_INFO = "队列里空空如也了,弹不出东西了！";
 Queue.FRAME_WIDTH = 60;
 Queue.FRAME_HEIGHT = 60;
 Queue.FRAME_START_X = 100;
-Queue.FRAME_START_Y = (Canvas.HEIGHT-Queue.FRAME_HEIGHT)/2;
+Queue.FRAME_START_Y = 250;//(Canvas.HEIGHT-Queue.FRAME_HEIGHT)/2;
 Queue.FRAME_TEXT = "";
 Queue.FRAME_BACKCOLOR = "FFF";
 Queue.FRAME_EDGECOLOR = "000";
@@ -37,43 +36,65 @@ Queue.SHAPE_FONT = "10px sans-serif";
 
 Queue.REAR_POINTER_FONT = "20px sans-serif";
 Queue.REAR_POINTER_MOVE_SPEED = 2;
-Queue.REAR_POINTER_START_X = Queue.FRAME_START_X + Queue.FRAME_WIDTH/2;
-Queue.REAR_POINTER_START_Y = Queue.FRAME_START_Y + Queue.FRAME_HEIGHT+100;
+Queue.REAR_POINTER_START_X = Queue.FRAME_START_X;
+Queue.REAR_POINTER_START_Y = Queue.FRAME_START_Y + (Queue.FRAME_HEIGHT+100);
 Queue.REAR_POINTER_COLOR = "000";
 
 Queue.FRONT_POINTER_FONT = "20px sans-serif";
 Queue.FRONT_POINTER_MOVE_SPEED = 2;
-Queue.FRONT_POINTER_START_X = Queue.FRAME_START_X - Queue.FRAME_WIDTH/2;
-Queue.FRONT_POINTER_START_Y = Queue.FRAME_START_Y + Queue.FRAME_HEIGHT+200;
+Queue.FRONT_POINTER_START_X = Queue.FRAME_START_X;
+Queue.FRONT_POINTER_START_Y = Queue.FRAME_START_Y - (Queue.FRAME_HEIGHT+100);
 Queue.FRONT_POINTER_COLOR = "000";
 
 Queue.prototype = new Algorithm();
 Queue.prototype.create = function(queueSize)  //初始化队列大小,并绘制该队列
 {
-	this.queue = new Array();  
-	this.frame = new Array();
-	this.front_pointer = new Label("front = -1",Queue.FRONT_POINTER_COLOR,Queue.FRONT_POINTER_FONT);
-	this.rear_pointer = new Label("rear = 0",Queue.REAR_POINTER_COLOR,Queue.REAR_POINTER_FONT);
-	this.size = Queue.SIZE;
+	this.queue = new Array();  //队列 
 	this.rear = 0;
-	this.front = -1;
+	this.front = 0;
+	this.size = Queue.SIZE;
 	if(Positive_Integer.test(queueSize))
 		this.size = queueSize;
+
+	this.frame = new Array();  //数组框架
+	this.front_pointer = new Label({
+		Canvas : Canvas,
+		text : "front="+this.front,
+		textColor : Queue.FRONT_POINTER_COLOR,
+		font : Queue.FRONT_POINTER_FONT,
+		moveSpeed : Queue.FRONT_POINTER_MOVE_SPEED});
+	this.rear_pointer = new Label({
+		Canvas : Canvas,
+		text : "rear="+this.rear,
+		textColor : Queue.REAR_POINTER_COLOR,
+		font : Queue.REAR_POINTER_FONT,
+		moveSpeed : Queue.REAR_POINTER_MOVE_SPEED});
 	
-	this.canvas.del();
-	this.canvas.clear();
-	this.canvas.cmd("Setup");
-	this.canvas.cmd("Draw",this.front_pointer,Queue.FRONT_POINTER_START_X,Queue.FRONT_POINTER_START_Y);
-	this.canvas.cmd("Draw",this.rear_pointer,Queue.REAR_POINTER_START_X,Queue.REAR_POINTER_START_Y);
+	Canvas.init();
+	Canvas.cmd("Setup");
+	Canvas.cmd("StartParallel");
+	Canvas.cmd("Draw",this.front_pointer,{
+		x : Queue.FRONT_POINTER_START_X,
+		y : Queue.FRONT_POINTER_START_Y});
+	Canvas.cmd("Draw",this.rear_pointer,{
+	    x : Queue.REAR_POINTER_START_X,
+		y : Queue.REAR_POINTER_START_Y});
 	for(i=0; i<this.size; i++)
 	{
-		this.frame[i] = new Rectangle(
-			Queue.FRAME_WIDTH, Queue.FRAME_HEIGHT, 
-			Queue.FRAME_TEXT, 
-			Queue.FRAME_BACKCOLOR, Queue.FRAME_EDGECOLOR
-			); 
-		this.canvas.cmd("Draw",this.frame[i], Queue.FRAME_START_X+i*Queue.FRAME_WIDTH, Queue.FRAME_START_Y);
+		this.frame[i] = new Rectangle({
+			Canvas : Canvas,
+			width : Queue.FRAME_WIDTH, 
+			height : Queue.FRAME_HEIGHT, 
+			text : i, 
+			backColor : Queue.FRAME_BACKCOLOR, 
+			edgeColor : Queue.FRAME_EDGECOLOR
+			}); 
+		Canvas.cmd("Draw",this.frame[i],{
+			x : Queue.FRAME_START_X+i*Queue.FRAME_WIDTH, 
+			y : Queue.FRAME_START_Y});
 	}
+	Canvas.cmd("EndParallel");
+	Canvas.cmd("End");
 }
 Queue.prototype.enqueue = function( value )
 {
@@ -81,75 +102,79 @@ Queue.prototype.enqueue = function( value )
 		alert(Queue.OVERFLOW_INFO);
 	else
 	{
-		$(".controler").attr("disabled","disabled");  //禁用所有控制元素
+		this.disableControlBar();
 	
-		this.queue[this.rear] = new Rectangle(
-			Queue.SHAPE_WIDTH, Queue.SHAPE_HEIGHT,
-			value,
-			Queue.SHAPE_BACKCOLOR, Queue.SHAPE_EDGECOLOR, Queue.SHAPE_TEXTCOLOR,
-			Queue.SHAPE_FONT
-			);
+		this.queue[this.rear] = new Rectangle({
+			Canvas : Canvas,
+			width : Queue.SHAPE_WIDTH, 
+			height : Queue.SHAPE_HEIGHT,
+			text : value,
+			backColor : Queue.SHAPE_BACKCOLOR, 
+			edegeColor : Queue.SHAPE_EDGECOLOR,
+			textColor : Queue.SHAPE_TEXTCOLOR,
+			font : Queue.SHAPE_FONT
+			});
 
-		this.canvas.cmd("Setup");	
-		this.canvas.cmd("Draw",this.queue[this.rear],Queue.SHAPE_START_X,Queue.SHAPE_START_Y);
- 		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
-		this.rear_pointer.text = "rear";
- 		waitTime = this.canvas.cmd(
-			"Move", this.queue[this.rear],
-			this.frame[this.rear].x+(Queue.FRAME_WIDTH-Queue.SHAPE_WIDTH)/2,
-			this.frame[this.rear].y+(Queue.FRAME_HEIGHT-Queue.SHAPE_HEIGHT)/2,
-			Queue.SHAPE_MOVE_SPEED,
+		Canvas.cmd("Setup");	
+		Canvas.cmd("Draw",this.queue[this.rear],{
+			x : Queue.SHAPE_START_X,
+			y : Queue.SHAPE_START_Y});
+ 		Canvas.cmd("Delay",Canvas.DELAY_TIME);
+ 		Canvas.cmd(
+			"Move", this.queue[this.rear],{
+			aim_x : this.frame[this.rear].x,
+			aim_y : this.frame[this.rear].y,
+			moveSpeed : Queue.SHAPE_MOVE_SPEED
+			},
 			
-			"Move",this.rear_pointer,
-			this.frame[this.rear].x+(Queue.FRAME_WIDTH/2),this.frame[this.rear].y+(Queue.FRAME_HEIGHT+100),
-			Queue.REAR_POINTER_MOVE_SPEED
-			);
-		this.rear_pointer.text = "rear = "+this.rear;
-		var me = this; 
-		setTimeout(function(){
-			me.rear++
-			$(".controler").removeAttr("disabled");
-		},waitTime);	
+			"Move",this.rear_pointer,{
+			text : "rear=" + (this.rear+1),
+			aim_x : this.rear_pointer.x + Queue.FRAME_WIDTH,
+			moveSpeed : Queue.REAR_POINTER_MOVE_SPEED
+			});
+		Canvas.cmd("Other",function(){
+			$(".controler").removeAttr("disabled");		//启用所有控制元素
+		});
+		Canvas.cmd("End");
+		this.rear++;
 	}
 }
 Queue.prototype.dequeue = function()
 {
-	if(this.front + 1>= this.rear)
+	if(this.front >= this.rear)
 		alert(Queue.EMPTY_INFO);
 	else
 	{
-		$(".controler").attr("disabled","disabled");
-	
-	 	this.front++;
-
-		this.canvas.cmd("Setup");
-		this.front_pointer.text = "front = "+this.front;
-	   	this.canvas.cmd(
+		this.disableControlBar();
+		Canvas.cmd("Setup");
+	   	Canvas.cmd(
 			"Move",this.queue[this.front],
-			Queue.SHAPE_START_X,Queue.SHAPE_START_Y,
-			Queue.SHAPE_MOVE_SPEED,
-			
+			{
+				aim_x : Queue.SHAPE_START_X,
+				aim_y : Queue.SHAPE_START_Y,
+			},
 			"Move",this.front_pointer,
-			this.frame[this.front].x+(Queue.FRAME_WIDTH/2),this.frame[this.front].y+(Queue.FRAME_HEIGHT+200),
-			Queue.FRONT_POINTER_MOVE_SPEED
+			{
+				text : "front=" + (this.front+1),
+				aim_x : this.frame[this.front].x+Queue.FRAME_WIDTH,
+			}
 		);
-		this.canvas.cmd("Delay",Canvas.DELAY_TIME);
+		Canvas.cmd("Delay",Canvas.DELAY_TIME);
 	
-		waitTime = this.canvas.cmd("Delete",this.queue[this.front]);
-	
-		var me = this;	
-		setTimeout(function(){
-			$(".controler").removeAttr("disabled");
-		/*	if(me.top <= 0)
-				me.DequeueButton.disabled = true;*/
-		},waitTime);		
+		Canvas.cmd("Delete",this.queue[this.front]);
+		Canvas.cmd("Other",function(){
+			$(".controler").removeAttr("disabled");		//启用所有控制元素
+		});
+		Canvas.cmd("End");
+	 	this.front++;
 	}
 }
-Queue.prototype.addControls = function(obj)
+Queue.prototype.addControls = function()
 {
+	var obj = this;
 	$("#AlgorithmName").html(Queue.ALGORITHM_NAME);
-	this.TextInput = this.addAlgorithmControlBar("text","");
-	this.CreatQueueButton = this.addAlgorithmControlBar("button","Creat Queue");
+	this.TextInput = this.addControlBar("text","");
+	this.CreatQueueButton = this.addControlBar("button","Creat Queue");
 	this.CreatQueueButton.onclick = function(){
 		var queueSize = obj.TextInput.value;
 		obj.create(queueSize);
@@ -157,14 +182,14 @@ Queue.prototype.addControls = function(obj)
 		obj.EnqueueButton.disabled = false;
 	}
 
-	this.EnqueueButton = this.addAlgorithmControlBar("button","Enqueue");
+	this.EnqueueButton = this.addControlBar("button","Enqueue");
 	this.EnqueueButton.onclick = function(){
 		var value = obj.TextInput.value;
 		obj.enqueue(value);	
 		obj.TextInput.value = "";
 	}
 
-	this.DequeueButton = this.addAlgorithmControlBar("button","Dequeue");
+	this.DequeueButton = this.addControlBar("button","Dequeue");
 	this.DequeueButton.onclick = function(){
 		obj.dequeue();
 	}

@@ -1,4 +1,4 @@
-Algorithm = function(size)
+Algorithm = function()
 {
 }
 Algorithm.prototype.addControlBar = function(type,value)

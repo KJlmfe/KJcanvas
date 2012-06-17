@@ -3,11 +3,12 @@ function init()
 	Canvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(Canvas)
 	
 	DataStructure = new BFS(); 		   //初始化一个数据结构对象
-	DataStructure.addControls(DataStructure);  //给该数据结构演示动画添加用户界面控制器
 }
 
 BFS = function()
-{}
+{
+	this.addControls();  //给该数据结构演示动画添加用户界面控制器
+}
 
 BFS.ALGORITHM_NAME = "广度优先搜索(邻接矩阵存储)"; 			//动画名称
 
@@ -266,8 +267,9 @@ BFS.prototype.bfs = function( vertex )  //从vertex点开始bfs
 	});
 	Canvas.cmd("End");
 }
-BFS.prototype.addControls = function(obj)
+BFS.prototype.addControls = function()
 {
+	var obj = this;
 	$("#AlgorithmName").html(BFS.ALGORITHM_NAME);
 	this.TextInput = this.addControlBar("text","");
 	this.CreatBFSButton = this.addControlBar("button","Creat BFS");

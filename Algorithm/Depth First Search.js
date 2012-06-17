@@ -3,11 +3,12 @@ function init()
 	Canvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(Canvas)
 	
 	DataStructure = new DFS(); 		   //初始化一个数据结构对象
-	DataStructure.addControls(DataStructure);  //给该数据结构演示动画添加用户界面控制器
 }
 
 DFS = function()
-{}
+{
+	this.addControls(); //给该数据结构演示动画添加用户界面控制器
+}
 
 DFS.ALGORITHM_NAME = "深度优先搜索(邻接矩阵存储)"; 			//动画名称
 
@@ -250,32 +251,28 @@ DFS.prototype.dfs = function( vertex )  //从vertex点开始dfs
 	});
 	Canvas.cmd("End");
 }
-DFS.prototype.addControls = function(obj)
+DFS.prototype.addControls = function()
 {
+	var obj = this;
 	$("#AlgorithmName").html(DFS.ALGORITHM_NAME);
-	this.TextInput = this.addControlBar("text","");
-	this.CreatDFSButton = this.addControlBar("button","Creat DFS");
 	
-	this.CreatDFSButton.onclick = function(){
+	this.TextInput = this.addControlBar("text","");
+	this.CreatNewMapButton = this.addControlBar("button","Creat New Map");
+	this.RunDFSButton = this.addControlBar("button","Run DFS");
+	
+	this.CreatNewMapButton.onclick = function(){
 		var value = obj.TextInput.value;
 		value = parseFloat(value);
 		obj.create(value);
 		obj.TextInput.value = "";
 	}
 
-	this.PushButton = this.addControlBar("button","Push");
-	this.PushButton.onclick = function(){
+	this.RunDFSButton.onclick = function(){
 		var value = obj.TextInput.value;
 		value = parseFloat(value);
 		obj.dfs(value);	
 		obj.TextInput.value = "";
 	}
-
-	this.PopButton = this.addControlBar("button","Pop");
-	this.PopButton.onclick = function(){
-		obj.pop();
-	}
-
-	this.PushButton.disabled = true;
-	this.PopButton.disabled = true;
+	
+	this.RunDFSButton.disabled = true;
 }
