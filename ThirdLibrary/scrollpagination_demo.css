@@ -1,0 +1,92 @@
+body {
+	margin:20px 0px 20px 0px;
+	padding:0px;
+	//background:#493333;
+	color:#e4e4e4;
+	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+a {
+text-decoration: none;
+}
+.about {
+	background:white;
+	color:#303030;
+	font-size:14px;
+	width:600px;
+	margin:25px auto;
+	border-radius:15px;
+	padding:5px 10px;
+}
+
+.about  h1 {
+	font-size:66px;
+	margin:5px;
+	padding:0px;
+	color:#352828;
+}
+.about  h2 {
+	float:left;
+	font-size:47px;
+	margin:5px;
+	padding:0px;
+	color:#352828;
+}
+.about  h3 {
+	margin-top:30px;
+	margin-left:500px;	
+	padding:0px;
+	color:#352828;
+}
+.about  a {
+	color:#352828;	
+}
+
+.about textarea {
+	width:500px;
+	border:0px;
+	border-left:40px solid #493333;
+	background:#c6c6aa;
+	padding:10px 10px 10px 20px;
+	margin:0px auto;
+	display:block;
+	color:#000 !important;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:14px;
+	height:600px;
+	overflow:hidden;
+}
+
+#scrollpaginationdemo {
+	width:600px;
+	margin:0px auto;
+}
+
+#scrollpaginationdemo ul {
+	list-style:none;
+	width:100%;
+	margin:0px auto;
+	padding:0px;
+}
+
+#scrollpaginationdemo ul li {
+	margin:10px 0px;
+	width:100%;
+	background:#66D9FF;
+	padding:5px 10px;
+	border-radius: 15px;
+}
+#scrollpaginationdemo ul li p a{
+	color: white;
+	font-size:29px;
+}
+.loading {
+	background:#c1c39a;
+	color:#303030;
+	font-size:20px;
+	padding:5px 10px;
+	text-align:center;
+	width:450px;
+	margin:0px auto;
+	display:none;
+	border-radius: 5px;
+}

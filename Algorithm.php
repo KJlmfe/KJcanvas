@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Queue(Array)</title>
+		<title><?=$_GET['name']?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="ThirdLibrary/PageStyle.css">
 		
@@ -13,13 +13,19 @@
 		<script src="Animation/Line.js"></script>
 		<script src="Algorithm/AlgorithmObject.js"></script>
 		
-		<script src="Algorithm/Queue(Array).js"></script>
+		<script src="Algorithm/<?=$_GET['name']?>.js"></script>
 	</head>
-
 	<body onload="init();">
 		<div id="wrapper">
 			<div id="header">
 				<h3 id="AlgorithmName"></h3>
+<?php
+	if($_GET['debug']=="true")
+	{
+		echo "<script src='ThirdLibrary/debug.js'></script>";
+		echo "<input id='x-coord' class='debug' type=text><input id='y-coord' class='debug' type=text>"; 
+	}
+?>
 			</div>
 			<div id="body">
 				<div id="AlgorithmControlBar"></div>

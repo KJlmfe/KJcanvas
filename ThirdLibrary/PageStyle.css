@@ -8,7 +8,7 @@ margin : 0 auto;
 }
 #header{
 margin-top : 5px;
-height : 25px;
+height : 27px;
 border-bottom: 1px dashed #D4D4D4;
 position : relative;
 }
@@ -19,9 +19,10 @@ border-top: 1px solid #CCC;
 font: 13px/22px 'Helvetica Neue',Helvetica,Arial,Sans-serif;
 }
 #AlgorithmName{
-font-size: 2em;
-font: 100% Verdana, Arial, Helvetica, sans-serif;
-font-weight: bold;
+font-size : 21px;
+font-family : Verdana, Arial, Helvetica, sans-serif;
+font-weight : bold;
+float : left;
 }
 #AlgorithmControlBar{
 margin-bottom : 10px;
@@ -32,9 +33,15 @@ background-color: #F3F3F3;
 padding : 2px;
 margin : 5px;
 }
+#AlgorithmControlBar input[type="text"]{
+width : 88px;
+}
 #author{
 float : left;
 }
 #copyright{
+float : right;
+}
+.debug{
 float : right;
 }
