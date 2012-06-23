@@ -1,7 +1,6 @@
 function init()
 {
 	Canvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(Canvas)
-	
 	DataStructure = new Queue(); 	//初始化一个队列对象
 }
 
