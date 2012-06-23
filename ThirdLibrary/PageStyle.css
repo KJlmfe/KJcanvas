@@ -1,0 +1,40 @@
+*{
+margin : 0;
+padding : 0;
+}
+#wrapper{
+width : 950px;
+margin : 0 auto;
+}
+#header{
+margin-top : 5px;
+height : 25px;
+border-bottom: 1px dashed #D4D4D4;
+position : relative;
+}
+#footer{
+padding-top : 7px;
+margin-top : 10px;
+border-top: 1px solid #CCC;
+font: 13px/22px 'Helvetica Neue',Helvetica,Arial,Sans-serif;
+}
+#AlgorithmName{
+font-size: 2em;
+font: 100% Verdana, Arial, Helvetica, sans-serif;
+font-weight: bold;
+}
+#AlgorithmControlBar{
+margin-bottom : 10px;
+border-bottom : 1px dashed #D4D4D4;
+background-color: #F3F3F3;
+}
+#AlgorithmControlBar input{
+padding : 2px;
+margin : 5px;
+}
+#author{
+float : left;
+}
+#copyright{
+float : right;
+}

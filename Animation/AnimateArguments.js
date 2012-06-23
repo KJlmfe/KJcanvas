@@ -1,5 +1,5 @@
-KJcanvas.WIDTH = 1000; 			   //画板宽度
-KJcanvas.HEIGHT = 550;             //画板高度
+KJcanvas.WIDTH = 950; 			   //画板宽度
+KJcanvas.HEIGHT = 410;             //画板高度
 KJcanvas.BORDER = "2px solid #0AF";//画板边框样式
 
 KJcanvas.MAX_ANIMATION_SPEED = 5;  //最大动画速度
