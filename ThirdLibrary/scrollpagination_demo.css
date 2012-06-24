@@ -6,7 +6,7 @@ body {
 	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
 }
 a {
-text-decoration: none;
+	text-decoration: none;
 }
 .about {
 	background:white;
@@ -73,11 +73,14 @@ text-decoration: none;
 	width:100%;
 	background:#66D9FF;
 	padding:5px 10px;
+	text-align: center;
 	border-radius: 15px;
 }
 #scrollpaginationdemo ul li p a{
 	color: white;
 	font-size:29px;
+	font-weight: bold;
+
 }
 .loading {
 	background:#c1c39a;
