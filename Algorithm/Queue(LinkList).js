@@ -1,84 +1,106 @@
 function init()
 {
-	Canvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(Canvas)
-	DataStructure = new Queue(); 		   //初始化一个数据结构对象
+	Canvas = new KJcanvas();  
+	DataStructure = new Queue();
 }
 
 Queue = function()
 {
-	this.addControls();  //给该数据结构演示动画添加用户界面控制器
+	Queue.ALGORITHM_NAME = "Queue(LinkList)"; 			
+	Queue.EMPTY_INFO = "Queue is empty,it can't dequeue anymore!";  
+
+	Queue.DATASHAPE_WIDTH = 60;     
+	Queue.DATASHAPE_HEIGHT = 60;   
+	
+	Queue.DATASHAPE_FRONT_X = Canvas.width - Queue.DATASHAPE_WIDTH;  
+	Queue.DATASHAPE_FRONT_Y = Canvas.height/2 - Queue.DATASHAPE_HEIGHT;
+	Queue.DATASHAPE_GAP_X = 100; 
+	
+	Queue.DATASHAPE_WIDTH = 60;    
+	Queue.DATASHAPE_HEIGHT = 60;  
+	Queue.DATASHAPE_BACKCOLOR = "#00FF00";  
+	Queue.DATASHAPE_EDGECOLOR = "#FF4500"; 
+	Queue.DATASHAPE_TEXTCOLOR = "#0044BB";
+	Queue.DATASHAPE_MOVESPEED = 6;
+	Queue.DATASHAPE_FONT = "18px sans-serif";
+	Queue.DATASHAPE_EDGEWIDTH = 1;
+
+	Queue.POINTERNEXTSHAPE_LINECOLOR = "F00";
+	Queue.POINTERNEXTSHAPE_LINEWIDTH = 2;
+	Queue.POINTERNEXTSHAPE_MOVESPEED = 2;
+
+	Queue.POINTERLASTSHAPE_LINECOLOR = "#CC00CC";
+	Queue.POINTERLASTSHAPE_LINEWIDTH = 4;
+	Queue.POINTERLASTSHAPE_MOVESPEED = 2;
+
+	this.addControls();  
+	thisQueue = this;
 }
-
-Queue.ALGORITHM_NAME = "链表(链表实现)"; 			//动画名称
-Queue.EMPTY_INFO = "链表里空空如也了,弹不出东西了！";  
-
-//DATASHAPE ---> 链表元素矩形
-
-Queue.DATASHAPE_WIDTH = 60;     //宽度
-Queue.DATASHAPE_HEIGHT = 60;   //长度
-
-Queue.DATASHAPE_TOP_X = 500;  //表头(栈顶)的位置
-Queue.DATASHAPE_TOP_Y = 100;
-Queue.DATASHAPE_GAP_X = 100;  //彼此之间的横向间隔
-Queue.DATASHAPE_PUSH_X = 450;  //入栈元素的位置
-Queue.DATASHAPE_PUSH_Y = 200;
-
 Queue.prototype = new Algorithm();
-
-Queue.prototype.node = function(value)  //链表节点
+Queue.prototype.node = function(value)  
 {
 	this.data = value;  
 	this.last = null;
-	this.next = null;   //指向下一个链表元素
+	this.next = null;   
 		
-	this.DataShape = new Rectangle		//链表元素图形
+	this.DataShape = new Rectangle	
 	({
 		Canvas : Canvas,
 		text : value,
 		width : Queue.DATASHAPE_WIDTH,
-		height : Queue.DATASHAPE_HEIGHT
+		height : Queue.DATASHAPE_HEIGHT,
+		backColor : Queue.DATASHAPE_BACKCOLOR,
+		edgeColor : Queue.DATASHAPE_EDGECOLOR,
+		textColor : Queue.DATASHAPE_TEXTCOLOR,
+		moveSpeed : Queue.DATASHAPE_MOVESPEED,
+		font : Queue.DATASHAPE_FONT,
+		edgeWidth : Queue.DATASHAPE_EDGEWIDTH
 	});
-
-	this.PointerNextShape = new Line		//指针图形
+	this.PointerNextShape = new Line
 	({
 		Canvas : Canvas,
 		StartShape : this.DataShape,
-		EndShape : this.DataShape
+		EndShape : this.DataShape,
+		lineColor : Queue.POINTERNEXTSHAPE_LINECOLOR,
+		lineWidth : Queue.POINTERNEXTSHAPE_LINEWIDTH,
+		moveSpeed : Queue.POINTERNEXTSHAPE_MOVESPEED 
 	});
-
-	this.PointerLastShape = new Line		//指针图形
+	this.PointerLastShape = new Line
 	({
 		Canvas : Canvas,
 		StartShape : this.DataShape,
-		EndShape : this.DataShape
+		EndShape : this.DataShape,
+		lineColor : Queue.POINTERLASTSHAPE_LINECOLOR,
+		lineWidth : Queue.POINTERLASTSHAPE_LINEWIDTH,
+		moveSpeed : Queue.POINTERLASTSHAPE_MOVESPEED 
 	});
 }
-Queue.prototype.create = function()  //初始化链表,并绘制该链表
+Queue.prototype.create = function() 
 {
 	this.disableControlBar();
-	this.front = new this.node("front");        //表头
-	this.rear = new this.node("rear");  //表尾
+	this.front = new this.node("front");  
+	this.rear = new this.node("rear");  
 	this.front.next = this.rear;
 	this.rear.last = this.front;
 
-	Canvas.init();        //初始化一个洁白的画板
-	Canvas.cmd("Setup");  //开始动画动作
+	Canvas.init();        
+	Canvas.cmd("Setup"); 
 	Canvas.cmd
 	(
-		"FadeIn", this.rear.DataShape,  //表头淡入
+		"FadeIn", this.front.DataShape,
 		{
-			x : Queue.DATASHAPE_TOP_X,
-			y : Queue.DATASHAPE_TOP_Y
+			x : Queue.DATASHAPE_FRONT_X,
+			y : Queue.DATASHAPE_FRONT_Y
 		},	
-		"FadeIn", this.front.DataShape, //表尾淡入
+		"FadeIn", this.rear.DataShape,
 		{
-			x : Queue.DATASHAPE_TOP_X + Queue.DATASHAPE_GAP_X,
-			y :	Queue.DATASHAPE_TOP_Y
+			x : Queue.DATASHAPE_FRONT_X - Queue.DATASHAPE_GAP_X,
+			y :	Queue.DATASHAPE_FRONT_Y
 		}	
 	);
 	Canvas.cmd
 	(
-		"Move", this.front.PointerNextShape, //表头指向表尾 
+		"Move", this.front.PointerNextShape,
 		{
 			aimEndShape : this.front.next.DataShape
 		},
@@ -87,11 +109,11 @@ Queue.prototype.create = function()  //初始化链表,并绘制该链表
 			aimEndShape : this.rear.last.DataShape
 		}
 	);
-	Canvas.cmd("Other",function()
+	Canvas.cmd("Other", function()
 	{
-		$(".controler").removeAttr("disabled");		//启用所有控制元素
+		thisQueue.enableControlBar();
 	});
-	Canvas.cmd("End");  //结束动画
+	Canvas.cmd("End");
 }
 Queue.prototype.enqueue = function( value )
 {
@@ -108,16 +130,16 @@ Queue.prototype.enqueue = function( value )
 	Canvas.cmd("Setup");
 	Canvas.cmd
 	(
-		"FadeIn", this.enqueueNode.DataShape,   //入栈元素淡入
+		"FadeIn", this.enqueueNode.DataShape, 
 		{
-			x : Queue.DATASHAPE_PUSH_X,
-			y : Queue.DATASHAPE_PUSH_Y,
+			x : this.rear.DataShape.x + Queue.DATASHAPE_GAP_X/2,
+			y : this.rear.DataShape.y + Queue.DATASHAPE_HEIGHT*1.5
 		}
 	);
 	Canvas.cmd("Delay");
 	Canvas.cmd
 	(
-		"Move", this.enqueueNode.PointerLastShape,  //入栈元素(新栈顶)指向旧栈顶
+		"Move", this.enqueueNode.PointerLastShape,  
 		{
 			aimEndShape : this.enqueueNode.last.DataShape,
 		},
@@ -133,7 +155,7 @@ Queue.prototype.enqueue = function( value )
 		{
 			aimEndShape : this.rear.DataShape,
 		},
-		"Move", this.rear.PointerLastShape,  //表头指向入栈元素(新栈顶)
+		"Move", this.rear.PointerLastShape,  
 		{
 			aimEndShape : this.enqueueNode.DataShape,
 		}
@@ -163,9 +185,9 @@ Queue.prototype.enqueue = function( value )
 		tmp_pointer = tmp_pointer.next;
 	}
 	Canvas.cmd("EndParallel");
-	Canvas.cmd("Other",function()
+	Canvas.cmd("Other", function()
 	{
-		$(".controler").removeAttr("disabled");		//启用所有控制元素
+		thisQueue.enableControlBar();
 	});
 	Canvas.cmd("End");
 }
@@ -179,18 +201,18 @@ Queue.prototype.dequeue = function()
 		
 		Canvas.cmd("Setup");	
 		Canvas.cmd("StartParallel");
+		this.dequeueNode = this.front.next;
 		Canvas.cmd
 		(
-			"Move",	this.front.next.DataShape,  //栈顶出栈
-			{
-				aim_x : Queue.DATASHAPE_PUSH_X,
-				aim_y : Queue.DATASHAPE_PUSH_Y
+			"Move",	this.dequeueNode.DataShape,
+			{			
+				aim_x : this.front.DataShape.x - Queue.DATASHAPE_GAP_X/2,
+				aim_y : this.front.DataShape.y + Queue.DATASHAPE_HEIGHT*1.5
 			}
 		);
-		this.dequeueNode = this.front.next;
 		this.front.next = this.dequeueNode.next;
 		this.dequeueNode.next.last = this.front;
-
+		
 		var tmp_pointer = this.dequeueNode.next;
 		while(tmp_pointer != null)
 		{
@@ -199,8 +221,6 @@ Queue.prototype.dequeue = function()
 				"Move", tmp_pointer.DataShape,
 				{
 					aim_x : tmp_pointer.DataShape.x + Queue.DATASHAPE_GAP_X,
-					//aim_x : tmp_pointer.last.DataShape.x,
-					//aim_y : tmp_pointer.last.DataShape.y
 				}
 			);
 			tmp_pointer = tmp_pointer.next;
@@ -209,7 +229,7 @@ Queue.prototype.dequeue = function()
 		Canvas.cmd("Delay");
 		Canvas.cmd
 		(
-			"Move", this.front.PointerNextShape,  //表头指向新的栈顶
+			"Move", this.front.PointerNextShape, 
 			{
 		    	aimEndShape : this.front.next.DataShape
 			},
@@ -225,33 +245,36 @@ Queue.prototype.dequeue = function()
 			"FadeOut", this.dequeueNode.PointerLastShape,
 			"FadeOut", this.dequeueNode.PointerNextShape
 		);
-		Canvas.cmd("Other",function()
+		Canvas.cmd("Other", function()
 		{
-			$(".controler").removeAttr("disabled");		//启用所有控制元素
+			thisQueue.enableControlBar();
 		});
-		Canvas.cmd("End");	
+		Canvas.cmd("End");
 	}
 }
 Queue.prototype.addControls = function()
 {
 	var obj = this;
 	$("#AlgorithmName").html(Queue.ALGORITHM_NAME);
+
 	this.TextInput = this.addControlBar("text","");
 	this.CreatQueueButton = this.addControlBar("button","Creat Queue");
-	this.CreatQueueButton.onclick = function(){
+	this.EnqueueButton = this.addControlBar("button","Enqueue");
+	this.DequeueButton = this.addControlBar("button","Dequeue");
+	
+	this.CreatQueueButton.onclick = function()
+	{
 		obj.create();
 		obj.TextInput.value = "";
 	}
-
-	this.EnqueueButton = this.addControlBar("button","Enqueue");
-	this.EnqueueButton.onclick = function(){
+	this.EnqueueButton.onclick = function()
+	{
 		var value = obj.TextInput.value;
 		obj.enqueue(value);	
 		obj.TextInput.value = "";
 	}
-
-	this.DequeueButton = this.addControlBar("button","Dequeue");
-	this.DequeueButton.onclick = function(){
+	this.DequeueButton.onclick = function()
+	{
 		obj.dequeue();
 	}
 
