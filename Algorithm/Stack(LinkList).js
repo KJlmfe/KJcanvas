@@ -1,62 +1,76 @@
 function init()
 {
-	Canvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(Canvas)
-	
-	DataStructure = new Stack(); 		   //初始化一个数据结构对象
+	Canvas = new KJcanvas();  
+	DataStructure = new Stack(); 	
 }
 
 Stack = function()
-{
-	this.addControls();  //给该数据结构演示动画添加用户界面控制器
+{	
+	Stack.ALGORITHM_NAME = "Stack(LinkList)"; 
+	Stack.EMPTY_INFO = "Stack is empty,it can't pop anymore!";  
+	
+	Stack.DATASHAPE_TOP_X = 100; 
+	Stack.DATASHAPE_TOP_Y = 100;
+	Stack.DATASHAPE_GAP_X = 100; 
+	Stack.DATASHAPE_PUSH_X = 150;
+	Stack.DATASHAPE_PUSH_Y = 200;
+
+	Stack.DATASHAPE_WIDTH = 60;    
+	Stack.DATASHAPE_HEIGHT = 60;  
+	Stack.DATASHAPE_BACKCOLOR = "#00FF00";  
+	Stack.DATASHAPE_EDGECOLOR = "#FF4500"; 
+	Stack.DATASHAPE_TEXTCOLOR = "#0044BB";
+	Stack.DATASHAPE_MOVESPEED = 6;
+	Stack.DATASHAPE_FONT = "18px sans-serif";
+	Stack.DATASHAPE_EDGEWIDTH = 1;
+
+	Stack.POINTERSHAPE_LINECOLOR = "F00";
+	Stack.POINTERSHAPE_LINEWIDTH = 2;
+	Stack.POINTERSHAPE_MOVESPEED = 2;
+
+	this.addControls();  
+	thisStack = this;
 }
-
-Stack.ALGORITHM_NAME = "堆栈(链表实现)"; 			//动画名称
-Stack.EMPTY_INFO = "堆栈里空空如也了,弹不出东西了！";  
-
-//DATASHAPE ---> 堆栈元素矩形
-
-Stack.DATASHAPE_WIDTH = 60;     //宽度
-Stack.DATASHAPE_HEIGHT = 60;   //长度
-
-Stack.DATASHAPE_TOP_X = 100;  //表头(栈顶)的位置
-Stack.DATASHAPE_TOP_Y = 100;
-Stack.DATASHAPE_GAP_X = 100;  //彼此之间的横向间隔
-Stack.DATASHAPE_PUSH_X = 150;  //入栈元素的位置
-Stack.DATASHAPE_PUSH_Y = 200;
-
 Stack.prototype = new Algorithm();
-
-Stack.prototype.stackNode = function(value)  //堆栈节点
+Stack.prototype.node = function(value)  
 {
 	this.data = value;  
-	this.next = null;   //指向下一个堆栈元素
+	this.next = null;   
 	
-	this.DataShape = new Rectangle		//堆栈元素图形
+	this.DataShape = new Rectangle	
 	({
 		Canvas : Canvas,
 		text : value,
 		width : Stack.DATASHAPE_WIDTH,
-		height : Stack.DATASHAPE_HEIGHT
+		height : Stack.DATASHAPE_HEIGHT,
+		backColor : Stack.DATASHAPE_BACKCOLOR,
+		edgeColor : Stack.DATASHAPE_EDGECOLOR,
+		textColor : Stack.DATASHAPE_TEXTCOLOR,
+		moveSpeed : Stack.DATASHAPE_MOVESPEED,
+		font : Stack.DATASHAPE_FONT,
+		edgeWidth : Stack.DATASHAPE_EDGEWIDTH
 	});
-
-	this.PointerShape = new Line		//指针图形
+	this.PointerShape = new Line	
 	({
 		Canvas : Canvas,
 		StartShape : this.DataShape,
-		EndShape : this.DataShape
+		EndShape : this.DataShape,
+		lineColor : Stack.POINTERSHAPE_LINECOLOR,
+		lineWidth : Stack.POINTERSHAPE_LINEWIDTH,
+		moveSpeed : Stack.POINTERSHAPE_MOVESPEED 
 	});
 }
-Stack.prototype.create = function()  //初始化堆栈,并绘制该堆栈
+Stack.prototype.create = function()  
 {
 	this.disableControlBar();
-	this.top = new this.stackNode("top");        //表头
-	this.top.next = new this.stackNode("null");  //表尾
+	this.top = new this.node("top"); 
+	this.top.next = new this.node("null"); 
 	
-	Canvas.init();        //初始化一个洁白的画板
-	Canvas.cmd("Setup");  //开始动画动作
+	Canvas.init();      
+	Canvas.cmd("Setup");
 	Canvas.cmd
 	(
-		"FadeIn", this.top.DataShape,  //表头淡入
+		"FadeIn", this.top.DataShape,  
 		{
 			x : Stack.DATASHAPE_TOP_X,
 			y : Stack.DATASHAPE_TOP_Y
@@ -65,34 +79,34 @@ Stack.prototype.create = function()  //初始化堆栈,并绘制该堆栈
 	Canvas.cmd("Delay");
 	Canvas.cmd
 	(
-		"FadeIn", this.top.next.DataShape, //表尾淡入
+		"FadeIn", this.top.next.DataShape, 
 		{
 			x : Stack.DATASHAPE_TOP_X + Stack.DATASHAPE_GAP_X,
 			y :	Stack.DATASHAPE_TOP_Y
 		},	
-		"Move", this.top.PointerShape, //表头指向表尾 
+		"Move", this.top.PointerShape, 
 		{
 			aimEndShape : this.top.next.DataShape
 		}
 	);
-	Canvas.cmd("Other",function()
+	Canvas.cmd("Other", function()
 	{
-		$(".controler").removeAttr("disabled");		//启用所有控制元素
+		thisStack.enableControlBar();
 	});
-	Canvas.cmd("End");  //结束动画
+	Canvas.cmd("End");
 }
-Stack.prototype.push = function( value )
+Stack.prototype.push = function(value)
 {
 	this.disableControlBar();
 
 	var tmp_data = this.top.next;
-	this.top.next = new this.stackNode(value);
+	this.top.next = new this.node(value);
 	this.top.next.next = tmp_data;
 
 	Canvas.cmd("Setup");
 	Canvas.cmd
 	(
-		"FadeIn", this.top.next.DataShape,   //入栈元素淡入
+		"FadeIn", this.top.next.DataShape,
 		{
 			x : Stack.DATASHAPE_PUSH_X,
 			y : Stack.DATASHAPE_PUSH_Y,
@@ -101,7 +115,7 @@ Stack.prototype.push = function( value )
 	Canvas.cmd("Delay");
 	Canvas.cmd
 	(
-		"Move", this.top.next.PointerShape,  //入栈元素(新栈顶)指向旧栈顶
+		"Move", this.top.next.PointerShape, 
 		{
 			aimEndShape : this.top.next.next.DataShape,
 		}
@@ -109,7 +123,7 @@ Stack.prototype.push = function( value )
 	Canvas.cmd("Delay");
 	Canvas.cmd
 	(
-		"Move", this.top.PointerShape,  //表头指向入栈元素(新栈顶)
+		"Move", this.top.PointerShape,  
 		{
 			aimEndShape : this.top.next.DataShape,
 		}
@@ -138,9 +152,9 @@ Stack.prototype.push = function( value )
 		tmp_pointer = tmp_pointer.next;
 	}
 	Canvas.cmd("EndParallel");
-	Canvas.cmd("Other",function()
+	Canvas.cmd("Other", function()
 	{
-		$(".controler").removeAttr("disabled");		//启用所有控制元素
+		thisStack.enableControlBar();
 	});
 	Canvas.cmd("End");
 }
@@ -151,12 +165,11 @@ Stack.prototype.pop = function()
 	else
 	{
 		this.disableControlBar();
-		
 		Canvas.cmd("Setup");	
 		Canvas.cmd("StartParallel");
 		Canvas.cmd
 		(
-			"Move",	this.top.next.DataShape,  //栈顶出栈
+			"Move",	this.top.next.DataShape,  
 			{
 				aim_x : Stack.DATASHAPE_PUSH_X,
 				aim_y : Stack.DATASHAPE_PUSH_Y
@@ -179,7 +192,7 @@ Stack.prototype.pop = function()
 		Canvas.cmd("Delay");
 		Canvas.cmd
 		(
-			"Move", this.top.PointerShape,  //表头指向新的栈顶
+			"Move", this.top.PointerShape,  
 			{
 		    	aimEndShape : this.top.next.next.DataShape
 			}
@@ -190,11 +203,11 @@ Stack.prototype.pop = function()
 			"FadeOut", this.top.next.PointerShape,
 			"FadeOut",	this.top.next.DataShape
 		);
-		Canvas.cmd("Other",function()
+		Canvas.cmd("Other", function()
 		{
-			$(".controler").removeAttr("disabled");		//启用所有控制元素
+			thisStack.enableControlBar();
 		});
-		Canvas.cmd("End");	
+		Canvas.cmd("End");
 		this.top.next = this.top.next.next;
 	}
 }
@@ -202,22 +215,25 @@ Stack.prototype.addControls = function()
 {
 	var obj = this;
 	$("#AlgorithmName").html(Stack.ALGORITHM_NAME);
+
 	this.TextInput = this.addControlBar("text","");
 	this.CreatStackButton = this.addControlBar("button","Creat Stack");
-	this.CreatStackButton.onclick = function(){
+	this.PushButton = this.addControlBar("button","Push");
+	this.PopButton = this.addControlBar("button","Pop");
+	
+	this.CreatStackButton.onclick = function()
+	{
 		obj.create();
 		obj.TextInput.value = "";
 	}
-
-	this.PushButton = this.addControlBar("button","Push");
-	this.PushButton.onclick = function(){
+	this.PushButton.onclick = function()
+	{
 		var value = obj.TextInput.value;
 		obj.push(value);	
 		obj.TextInput.value = "";
 	}
-
-	this.PopButton = this.addControlBar("button","Pop");
-	this.PopButton.onclick = function(){
+	this.PopButton.onclick = function()
+	{
 		obj.pop();
 	}
 

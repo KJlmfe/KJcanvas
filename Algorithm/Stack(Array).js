@@ -42,7 +42,7 @@ Stack = function()
 	Stack.LINE_START_Y = Stack.FRAME_Y;
 	Stack.LINE_END_X = Stack.POINTER_X - 45; 
 	Stack.LINE_END_Y = Stack.FRAME_Y;
-	Stack.LINE_COLOR = "F00";
+	Stack.LINE_LINECOLOR = "F00";
 	Stack.LINE_LINEWIDTH = 2;
 	Stack.LINE_MOVESPEED = 2;
 
@@ -72,7 +72,7 @@ Stack.prototype.create = function(stackSize)
 		start_y : Stack.LINE_START_Y,
 		end_x : Stack.LINE_END_X,
 		end_y : Stack.LINE_END_Y,	
-		lineColor : Stack.LINE_COLOR,
+		lineColor : Stack.LINE_LINECOLOR,
 		lineWidth : Stack.LINE_LINEWIDTH,
 		moveSpeed : Stack.LINE_MOVESPEED
 	});
@@ -223,14 +223,12 @@ Stack.prototype.addControls = function()
 		obj.create(stackSize);
 		obj.TextInput.value = "";
 	}
-
 	this.PushButton.onclick = function()
 	{
 		var value = obj.TextInput.value;
 		obj.push(value);	
 		obj.TextInput.value = "";
 	}
-
 	this.PopButton.onclick = function()
 	{
 		obj.pop();
