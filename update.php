@@ -13,6 +13,7 @@
 	$fp = fopen($dir, "wb");
 	fwrite($fp, $file); 
 	fclose($fp);
+	exec("rm -rf latestKJcanvas");
 	exec("unzip latestKJcanvas.zip -d ".$current_dir."/latestKJcanvas");
 	exec('ls | grep -v "update.php\|latestKJcanvas" | xargs rm -rf');
 	exec("cp -rf latestKJcanvas/*/* ".$current_dir);
