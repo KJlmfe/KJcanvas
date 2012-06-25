@@ -1,6 +1,6 @@
 KJcanvas
 ========
 
-KJcanvas is a animation library for HTML5 canvas
+KJcanvas is a animation library for HTML5 canvas.
 
-This branch is test for new canvas cmd
+And it also contains Live Algorithm(Data structure and algorithm animation).
