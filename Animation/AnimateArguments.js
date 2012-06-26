@@ -41,4 +41,5 @@ Shape.END_ALPHA = 1;	//淡入的末尾透明度/淡出的起始透明度
 Shape.MOVE_SPEED = 5; 		//移动速度
 Shape.FADE_SPEED = 0.1;	//淡入淡出速度
 
-var Positive_Integer = /^[0-9]*[1-9][0-9]*$/;
+var Positive_Integer = /^[0-9]*[1-9][0-9]*$/;  //正整数
+var NonNegative_Integer = /^\d+$/;　　//非负整数（正整数 + 0） 
