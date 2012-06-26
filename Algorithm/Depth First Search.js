@@ -246,7 +246,7 @@ DFS.prototype.dfs = function(vertex)  //从vertex点开始dfs
 	Canvas.cmd("Move", StartVertexShape,
 	{
 		aim_x : this.VisitedShape[vertex].x,
-		aim_y :	this.VisitedShape[vertex].y +  DFS.VISITED_VERTEX_HEIGHT,
+		aim_y :	this.VisitedShape[vertex].y + DFS.VISITED_VERTEX_HEIGHT,
 	});
 	if(this.visited[vertex] == false)
 	{
@@ -262,7 +262,7 @@ DFS.prototype.dfs = function(vertex)  //从vertex点开始dfs
 		Canvas.cmd("Move", this.StackShape[this.top],
 		{
 			aim_x : DFS.STACK_X,
-			aim_y : DFS.STACK_Y - this.top * 20,
+			aim_y : DFS.STACK_Y - this.top * DFS.STACK_GAP,
 		});
 		this.dfsStack[this.top++] = vertex; //入堆
 		Canvas.cmd
