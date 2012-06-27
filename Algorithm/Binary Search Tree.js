@@ -1,33 +1,49 @@
 function init()
 {
 	Canvas = new KJcanvas();  //用上面的canvas初始化一个全局画板对象(Canvas)
-	
 	DataStructure = new BST(); 		   //初始化一个数据结构对象
 }
 
 BST = function()
 {
+	BST.ALGORITHM_NAME = "Binary Search Tree"; 			//动画名称
+
+	BST.DATASHAPE_WIDTH = 28;     //宽度
+	BST.DATASHAPE_HEIGHT = 28;   //长度
+	BST.DATASHAPE_BACKCOLOR = "#00FF00";  
+	BST.DATASHAPE_EDGECOLOR = "#FF4500"; 
+	BST.DATASHAPE_TEXTCOLOR = "#0044BB";
+	BST.DATASHAPE_MOVESPEED = 6;
+	BST.DATASHAPE_FONT = "18px sans-serif";
+	BST.DATASHAPE_EDGEWIDTH = 1;
+
+	BST.DATASHAPE_GAP_Y = 40;  //彼此之间的横向间隔
+	BST.DATASHAPE_INSERT_X = 20;  //入栈元素的位置
+	BST.DATASHAPE_INSERT_Y = 20;
+	BST.DATASHAPE_BROTHER_GAP = 1.2;
+
+	BST.DELETESHAPE_MOVESPEED = 2;
+	BST.DELETESHAPE_BACKCOLOR = "#FF0000";
+
+	BST.FINDSHAPE_FONT = "18px sans-serif";
+	BST.FINDSHAPE_MOVESPEED = 6;
+	BST.FINDSHAPE_TEXTCOLOR = "#242424";
+
+	BST.LEFTPOINTERSHAPE_LINECOLOR = "#FF3030"; 
+	BST.LEFTPOINTERSHAPE_MOVESPEED = 6;
+	BST.LEFTPOINTERSHAPE_EDGEWIDTH = 1;
+
+	BST.RIGHTPOINTERSHAPE_LINECOLOR = "#FFC125"; 
+	BST.RIGHTPOINTERSHAPE_MOVESPEED = 6;
+	BST.RIGHTPOINTERSHAPE_EDGEWIDTH = 1;
+
+	BST.MAXNODESHAPE_BACKCOLOR = "0f0a03";
+
 	this.addControls();  //给该数据结构演示动画添加用户界面控制器
 	this.calcShapeCoord();
-//	this.create();
+	thisBST = this;
 }
-
-BST.ALGORITHM_NAME = "二分查找树"; 			//动画名称
-
-//DATASHAPE ---> 堆栈元素矩形
-
-BST.DATASHAPE_WIDTH = 30;     //宽度
-BST.DATASHAPE_HEIGHT = 30;   //长度
-
-BST.DATASHAPE_ROOT_X = 500;  //表头(栈顶)的位置
-BST.DATASHAPE_ROOT_Y = 20;
-BST.DATASHAPE_GAP_Y = 40;  //彼此之间的横向间隔
-BST.DATASHAPE_INSERT_X = 20;  //入栈元素的位置
-BST.DATASHAPE_INSERT_Y = 20;
-BST.DATASHAPE_BROTHER_GAP = 1.2;
-
 BST.prototype = new Algorithm();
-
 BST.prototype.calcShapeCoord = function()
 {
 	this.coord = new Array();
@@ -77,43 +93,155 @@ BST.prototype.node = function(value)  //堆栈节点
 		Canvas : Canvas,
 		text : value,
 		width : BST.DATASHAPE_WIDTH,
-		height : BST.DATASHAPE_HEIGHT
+		height : BST.DATASHAPE_HEIGHT,
+		x :	Canvas.width/2,
+		y :	BST.DATASHAPE_HEIGHT,
+		backColor : BST.DATASHAPE_BACKCOLOR,  
+		edgeColor : BST.DATASHAPE_EDGECOLOR,
+		textColor : BST.DATASHAPE_TEXTCOLOR,
+		moveSpeed : BST.DATASHAPE_MOVESPEED,
+		font : BST.DATASHAPE_FONT,
+		edgeWidth : BST.DATASHAPE_EDGEWIDTH
 	});
-	
 	this.LeftPointerShape = new Line		//指针图形
 	({
 		Canvas : Canvas,
 		StartShape : this.DataShape,
-		EndShape : this.DataShape
+		EndShape : this.DataShape,
+		lineColor : BST.LEFTPOINTERSHAPE_LINECOLOR,
+		moveSpeed : BST.LEFTPOINTERSHAPE_MOVESPEED,
+		edgeWidth :BST.LEFTPOINTERSHAPE_EDGEWIDTH
 	});
-
 	this.RightPointerShape = new Line		//指针图形
 	({
 		Canvas : Canvas,
 		StartShape : this.DataShape,
-		EndShape : this.DataShape
+		EndShape : this.DataShape,
+		lineColor : BST.RIGHTPOINTERSHAPE_LINECOLOR,
+		moveSpeed : BST.RIGHTPOINTERSHAPE_MOVESPEED,
+		edgeWidth :BST.RIGHTPOINTERSHAPE_EDGEWIDTH
 	});
 }
-BST.prototype.create = function()
+BST.prototype.create = function(size)
 {
-	var me = this;
-	setInterval(function(){
-		me.insert(Math.floor(Math.random()*100));
-	},3000);
+	this.disableControlBar();
+	if(!isNaN(size) && size!="" && size > 0 && size < Math.pow(2,this.n+1)-1)
+		size = size;
+	else
+		size = Math.pow(2,this.n-1)-1;
+	
+	var value = parseInt(Math.random()*100);
+	this.root = new this.node(value);
+	size--;
+	while(size)
+	{
+		var value = parseInt(Math.random()*100);
+		var tmpNode = this.root;
+		var level = 0;
+		while(tmpNode && level < this.n)
+		{
+			if(value < tmpNode.value)
+				if(tmpNode.left == null)
+				{
+					tmpNode.left = new this.node(value);
+					size--;
+					break;
+				}
+				else
+					tmpNode = tmpNode.left;
+			else if(value > tmpNode.value)
+				if(tmpNode.right == null)
+				{
+					tmpNode.right = new this.node(value);
+					size--;
+					break;
+				}
+				else
+					tmpNode = tmpNode.right;
+			level++;
+		}
+	}
+	Canvas.init();
+	Canvas.cmd("Setup");
+	this.print();
+	Canvas.cmd("Other",function(){
+		thisBST.enableControlBar();
+	});
+	Canvas.cmd("End");
 }
-BST.prototype.insert = function( value )
+BST.prototype.print = function()
 {
+	if(this.root == null)
+		return;
+	Canvas.cmd("StartParallel");
+	var front = 0;
+	var rear = 0;
+	var queue = new Array();
+
+	queue[rear++] = 
+	{
+		node : this.root,
+		level_i : 0,
+		level_j : 1
+	};
+	while(front < rear)
+	{
+		var dequeue = queue[front++];
+		if(dequeue.node.left != null)
+		{
+			queue[rear++] =
+			{
+				node : dequeue.node.left,
+				level_i : dequeue.level_i+1,
+				level_j : 2*dequeue.level_j-1
+			};
+			Canvas.cmd("Draw", dequeue.node.LeftPointerShape,
+			{
+				EndShape : dequeue.node.left.DataShape
+			});
+		}
+		if(dequeue.node.right != null)
+		{
+			queue[rear++] =
+			{
+				node : dequeue.node.right,
+				level_i : dequeue.level_i+1,
+				level_j : 2*dequeue.level_j
+			};
+			Canvas.cmd("Draw", dequeue.node.RightPointerShape,
+			{
+				EndShape : dequeue.node.right.DataShape
+			});
+		}
+		Canvas.cmd("Move", dequeue.node.DataShape,
+		{
+			aim_x : this.coord[dequeue.level_i][dequeue.level_j]['x'],
+			aim_y : this.coord[dequeue.level_i][dequeue.level_j]['y']
+		});
+	}
+	Canvas.cmd("EndParallel");
+}
+BST.prototype.insert = function(value)
+{
+	if(isNaN(value) || value=="")
+	{
+		alert("Please enter a valid number.");
+	 	return;
+	}
+	value = parseFloat(value);
 	this.disableControlBar();
 
 	Canvas.cmd("Setup");
-	var insertNode = new this.node( value );
-	Canvas.cmd("Draw", insertNode.DataShape, {
+	var insertNode = new this.node(value);
+	Canvas.cmd("Draw", insertNode.DataShape, 
+	{
 		x : BST.DATASHAPE_INSERT_X,
 		y : BST.DATASHAPE_INSERT_Y,
 	});
 	if(this.root == null)    //BST不存在，插入的点作为根节点
 	{
-		Canvas.cmd("Move", insertNode.DataShape, {
+		Canvas.cmd("Move", insertNode.DataShape, 
+		{
 			aim_x : this.coord[0][1]['x'],
 			aim_y : this.coord[0][1]['y'],
 		});
@@ -121,7 +249,8 @@ BST.prototype.insert = function( value )
 	}
 	else		//插入的是非根节点
 	{
-		Canvas.cmd("Move", insertNode.DataShape, {
+		Canvas.cmd("Move", insertNode.DataShape, 
+		{
 			aim_x : this.root.DataShape.x,
 			aim_y : this.root.DataShape.y + BST.DATASHAPE_GAP_Y,
 		});
@@ -131,7 +260,8 @@ BST.prototype.insert = function( value )
 		while(1)
 		{
 			Canvas.cmd("Delay");
-			Canvas.cmd("Move", insertNode.DataShape, {
+			Canvas.cmd("Move", insertNode.DataShape, 
+			{
 				aim_x : tmp.DataShape.x,
 				aim_y : tmp.DataShape.y + BST.DATASHAPE_GAP_Y,
 			});	
@@ -189,8 +319,9 @@ BST.prototype.insert = function( value )
 			}
 			else
 			{
-				Canvas.cmd("Other", function(){
-					alert(value + " 已经在BST里存在, 插入失败!");
+				Canvas.cmd("Other", function()
+				{
+					alert("Insert Failed, " + value + " is already in the tree.");
 				});
 				Canvas.cmd("FadeOut", insertNode.DataShape);
 				break;
@@ -198,33 +329,136 @@ BST.prototype.insert = function( value )
 			level_i++;
 		}
 	}
-	Canvas.cmd("Other",function(){
-		$(".controler").removeAttr("disabled");		//启用所有控制元素
+	Canvas.cmd("Other",function()
+	{
+		thisBST.enableControlBar();
 	});
 	Canvas.cmd("End");
 }
-BST.prototype.delete = function( value )
+BST.prototype.deleteNode = function(tmpNode,tmpMotherNode)
 {
-	this.disableControlBar();
-	
-	Canvas.cmd("Setup");
-	var deleteValueShape = new Label({Canvas : Canvas, text : value});
-	Canvas.cmd("Draw", deleteValueShape, {
-		x : BST.DATASHAPE_INSERT_X,
-		y : BST.DATASHAPE_INSERT_Y,
+	Canvas.cmd("FadeIn", tmpNode.DataShape, {
+	 	backColor : BST.DELETESHAPE_BACKCOLOR,
+		fadeSpeed : 0.03
 	});
+	Canvas.cmd("Delay");
 
+	if(tmpNode.left == null && tmpNode.right == null)  //删除的节点为叶子节点，直接删除该节点
+		if(tmpMotherNode == null)		//删除的是根结点
+		{
+			this.root = null;
+			Canvas.cmd("FadeOut",tmpNode.DataShape);	
+		}
+		else
+			if(tmpMotherNode.left == tmpNode)
+			{
+				tmpMotherNode.left = null;
+				Canvas.cmd("FadeOut",tmpMotherNode.LeftPointerShape,"FadeOut",tmpNode.DataShape);
+			}
+			else
+			{
+				tmpMotherNode.right = null;
+				Canvas.cmd("FadeOut",tmpMotherNode.RightPointerShape,"FadeOut",tmpNode.DataShape);
+			}
+	else if(tmpNode.right == null)	//删除的节点只有左儿子,删除节点的值用左儿子值替换，然后删除左儿子
+		if(tmpMotherNode == null)
+		{
+			this.root = tmpNode.left;
+			Canvas.cmd("FadeOut",tmpNode.DataShape,"FadeOut",tmpNode.LeftPointerShape);
+		}
+		else
+			if(tmpMotherNode.left == tmpNode)
+			{
+				tmpMotherNode.left = tmpNode.left;
+				Canvas.cmd("Move",tmpMotherNode.LeftPointerShape,{
+					aimEndShape : tmpMotherNode.left.DataShape,
+				},
+				"FadeOut",tmpNode.DataShape,
+				"FadeOut",tmpNode.LeftPointerShape);
+			}
+			else
+			{
+				tmpMotherNode.right = tmpNode.left;
+				Canvas.cmd("Move",tmpMotherNode.RightPointerShape,{
+					aimEndShape : tmpMotherNode.right.DataShape
+				},
+				"FadeOut",tmpNode.DataShape,
+				"FadeOut",tmpNode.LeftPointerShape);
+			}
+	else if(tmpNode.left == null)  //删除的节点只有右儿子，同上理
+		if(tmpMotherNode == null)
+		{
+			this.root = tmpNode.right;
+			Canvas.cmd("FadeOut",tmpNode.DataShape,"FadeOut",tmpNode.RightPointerShape);
+		}
+		else
+			if(tmpMotherNode.left == tmpNode)
+			{
+				tmpMotherNode.left = tmpNode.right;
+				Canvas.cmd("Move",tmpMotherNode.LeftPointerShape,{
+					aimEndShape : tmpMotherNode.left.DataShape,
+				},
+				"FadeOut",tmpNode.DataShape,
+				"FadeOut",tmpNode.RightPointerShape);
+			}
+			else
+			{
+				tmpMotherNode.right = tmpNode.right;
+				Canvas.cmd("Move",tmpMotherNode.RightPointerShape,{
+					aimEndShape : tmpMotherNode.right.DataShape
+				},
+				"FadeOut",tmpNode.DataShape,
+				"FadeOut",tmpNode.RightPointerShape);
+			}
+	else	//删除的节点有左右两个儿子，删除节点的值用左子树最大节点替换，然后删除左子树最大节点
+	{
+		var maxNode = tmpNode.left;  //查找删除节点左子树最大的节点
+		var maxMotherNode = tmpNode;
+		while(maxNode.right != null)
+		{
+			maxMotherNode = maxNode;
+			maxNode = maxNode.right;
+		}
+		tmpNode.value = maxNode.value;
+		var copyMaxNode = new this.node(maxNode.value);	
+		Canvas.cmd("FadeIn",maxNode.DataShape,{
+			backColor : BST.MAXNODESHAPE_BACKCOLOR
+		});
+		Canvas.cmd("Delay");
+		Canvas.cmd("Move",copyMaxNode.DataShape,
+		{
+			x : maxNode.DataShape.x,
+			y : maxNode.DataShape.y,
+			aim_x : tmpNode.DataShape.x,
+			aim_y : tmpNode.DataShape.y,
+			moveSpeed : BST.DELETESHAPE_MOVESPEED
+		});
+		Canvas.cmd("Draw",tmpNode.DataShape,
+		{
+			text : tmpNode.value,
+			backColor : BST.DATASHAPE_BACKCOLOR
+		},
+		"FadeOut",copyMaxNode.DataShape);
+		Canvas.cmd("Delay");
+		this.deleteNode(maxNode,maxMotherNode);
+	}
+}
+BST.prototype.delete = function(value)
+{
+	if(isNaN(value) || value=="")
+	{
+		alert("Please enter a valid number.");
+	 	return;
+	}
+	value = parseFloat(value);
+	this.disableControlBar();
+	Canvas.cmd("Setup");
+	
 	var tmpNode = this.root;
 	var tmpMotherNode = null;
-	var deleteMotherNode = null, deleteNode = null, swapNode = null;
 
 	while(tmpNode != null)   //查找要删除的节点
 	{
-		Canvas.cmd("Delay");
-		Canvas.cmd("Move", deleteValueShape, {
-			aim_x : tmpNode.DataShape.x,
-			aim_y : tmpNode.DataShape.y + BST.DATASHAPE_GAP_Y,
-		});
 		if(value < tmpNode.value)
 		{
 			tmpMotherNode = tmpNode;
@@ -238,126 +472,38 @@ BST.prototype.delete = function( value )
 		else		//找到了要删除的节点
 			break;
 	}
-
 	if(tmpNode == null)  //删除节点不存在
+		alert("Delete failed! Can't find " + value + " in the tree.");
+	else
 	{
-		Canvas.cmd
-		(
-			"Other", function(){
-				alert("很抱歉，我们没能在BST里找到 " + value + " 删除失败");
-			}
-		);
-		Canvas.cmd("FadeOut", deleteValueShape);
+		this.deleteNode(tmpNode,tmpMotherNode);
+		this.print();
 	}
-	else      //删除节点存在
-	{
-		Canvas.cmd("Move", deleteValueShape, {
-		 	aim_x : tmpNode.DataShape.x,
-			aim_y : tmpNode.DataShape.y,
-		});
-		Canvas.cmd("Delete", deleteValueShape);
-
-		if(tmpNode.left == null && tmpNode.right == null)  //删除的节点为叶子节点，直接删除该节点
-		{
-			swapNode = null;
-			deleteNode = tmpNode;
-			deleteMotherNode = tmpMotherNode;
-		}
-		else if(tmpNode.right == null)	//删除的节点只有左儿子,删除节点的值用左儿子值替换，然后删除左儿子
-		{
-			swapNode = tmpNode.left;
-			deleteNode = tmpNode.left;
-			deleteMotherNode = tmpNode;
-		}
-		else if(tmpNode.left == null)  //删除的节点只有右儿子，同上理
-		{
-			swapNode = tmpNode.right;
-			deleteNode = tmpNode.right;
-			deleteMotherNode = tmpNode;
-		}
-		else	//删除的节点有左右两个儿子，删除节点的值用左子树最大节点替换，然后删除左子树最大节点
-		{
-			var maxNode = tmpNode.left;  //查找删除节点左子树最大的节点
-			var maxMotherNode = tmpNode;
-			while(maxNode.right != null)
-			{
-				maxMotherNode = maxNode;
-				maxNode = maxNode.right;
-			}
-		
-			swapNode = maxNode;
-			deleteNode = maxNode;
-			deleteMotherNode = maxMotherNode;
-		}
-		
-		if(swapNode != null)	//删除节点的值用swapNode节点的值替换
-		{
-			tmpNode.value = swapNode.value;
-			var swapValueShape = new Label({Canvas : Canvas, text : swapNode.value});
-			Canvas.cmd("Move", swapValueShape,{
-				x : swapNode.DataShape.x,
-				y : swapNode.DataShape.y,
-				aim_x : tmpNode.DataShape.x,
-				aim_y : tmpNode.DataShape.y,
-			});
-			Canvas.cmd("Draw", tmpNode.DataShape,{text : swapNode.value}, "Delete", swapValueShape);
-		}
-		if(deleteMotherNode != null)	//删除最终需要删除的节点(1.原删除节点2.原删除节点左儿子3.原删除节点右儿子4原删除节点左子树最大节点)
-			if(deleteMotherNode.left == deleteNode)
-				if(deleteNode.left != null)
-				{
-					deleteMotherNode.left = deleteNode.left;
-					Canvas.cmd("Move", deleteMotherNode.LeftPointerShape,{aimEndShape : deleteNode.left.DataShape});
-					Canvas.cmd("FadeOut", deleteNode.DataShape, "FadeOut", deleteNode.LeftPointerShape);
-				}
-				else if(deleteNode.right != null)
-				{
-					deleteMotherNode.left = deleteNode.right;
-					Canvas.cmd("Move", deleteMotherNode.LeftPointerShape,{aimEndShape : deleteNode.right.DataShape});
-					Canvas.cmd("FadeOut", deleteNode.DataShape, "FadeOut", deleteNode.RightPointerShape);
-				}
-				else
-				{
-					deleteMotherNode.left = null;
-					Canvas.cmd("FadeOut", deleteNode.DataShape, "FadeOut", deleteMotherNode.LeftPointerShape);
-				}
-			else
-				if(deleteNode.left != null)
-				{
-					deleteMotherNode.right = deleteNode.left;
-					Canvas.cmd("Move", deleteMotherNode.RightPointerShape,{aimEndShape : deleteNode.left.DataShape});
-					Canvas.cmd("FadeOut", deleteNode.DataShape, "FadeOut", deleteNode.LeftPointerShape);
-				}
-				else if(deleteNode.right != null)
-				{
-					deleteMotherNode.right = deleteNode.right;
-					Canvas.cmd("Move", deleteMotherNode.RightPointerShape,{aimEndShape : deleteNode.right.DataShape});
-					Canvas.cmd("FadeOut", deleteNode.DataShape, "FadeOut", deleteNode.RightPointerShape);
-				}
-				else
-				{
-					deleteMotherNode.right = null;
-					Canvas.cmd("FadeOut", deleteNode.DataShape, "FadeOut", deleteMotherNode.RightPointerShape);
-				}
-		else	//删除的是根节点
-		{
-			this.root = null;
-			Canvas.cmd("FadeOut", deleteNode.DataShape);
-		}
-	}
-
-	Canvas.cmd("Other",function()
-	{
-		$(".controler").removeAttr("disabled");		//启用所有控制元素
+	Canvas.cmd("Other",function(){
+		thisBST.enableControlBar();
 	});
 	Canvas.cmd("End");
 }
 BST.prototype.find = function( value )
 {
+	if(isNaN(value) || value=="")
+	{
+		alert("Please enter a valid number.");
+	 	return;
+	}
+	value = parseFloat(value);
 	this.disableControlBar();
 	Canvas.cmd("Setup");
-	var findValueShape = new Label({Canvas : Canvas, text : value});
-	Canvas.cmd("Draw", findValueShape, {
+	var findValueShape = new Label
+	({
+		Canvas : Canvas, 
+		text : value,
+		font : BST.FINDSHAPE_FONT,
+		moveSpeed :	BST.FINDSHAPE_MOVESPEED,
+		textColor : BST.FINDSHAPE_TEXTCOLOR
+	});
+	Canvas.cmd("Draw", findValueShape, 
+	{
 		x : BST.DATASHAPE_INSERT_X,
 		y : BST.DATASHAPE_INSERT_Y,
 	});
@@ -366,7 +512,8 @@ BST.prototype.find = function( value )
 	while(tmpNode != null)   //查找节点
 	{
 		Canvas.cmd("Delay");
-		Canvas.cmd("Move", findValueShape, {
+		Canvas.cmd("Move", findValueShape, 
+		{
 			aim_x : tmpNode.DataShape.x,
 			aim_y : tmpNode.DataShape.y + BST.DATASHAPE_GAP_Y,
 		});
@@ -374,23 +521,25 @@ BST.prototype.find = function( value )
 			tmpNode = tmpNode.left;
 		else if(value > tmpNode.value)
 			tmpNode = tmpNode.right;
-		else		//找到了节点
+		else		//找到了节点this.InsertButton.onclick = function()
 			break;
 	}
 	
 	if(tmpNode == null)  //查找节点不存在
 	{
-		Canvas.cmd("Other", function() {
-				alert("很抱歉，我们没能在BST里找到 " + value + " 删除失败");
+		Canvas.cmd("Other", function() 
+		{
+			alert("Delete failed，Can't find " + value + " in Tree.");
 		});
 		Canvas.cmd("FadeOut", findValueShape);
 	}
 	else      //查找节点存在
 	{
 		Canvas.cmd("Other",function(){
-			alert("恭喜你，我们在BST里找到了 " + value);
+			alert("Succeeded in finding " + value + " !");
 		});
-		Canvas.cmd("Move", findValueShape, {
+		Canvas.cmd("Move", findValueShape, 
+		{
 		 	aim_x : tmpNode.DataShape.x,
 			aim_y : tmpNode.DataShape.y,
 		});
@@ -398,7 +547,7 @@ BST.prototype.find = function( value )
 	}
 
 	Canvas.cmd("Other",function() {
-		$(".controler").removeAttr("disabled");		//启用所有控制元素
+		thisBST.enableControlBar();	
 	});
 	Canvas.cmd("End");
 }
@@ -411,24 +560,29 @@ BST.prototype.addControls = function()
 	this.InsertButton = this.addControlBar("button","Insert");
 	this.DeleteButton = this.addControlBar("button","Delete");
 	this.FindButton = this.addControlBar("button","Find");
-	
-	this.InsertButton.onclick = function(){
+	this.CreateButton = this.addControlBar("button","Create a Random Tree");
+
+	this.CreateButton.onclick = function()
+	{
 		var value = obj.TextInput.value;
-		value = parseFloat(value);
+		obj.create(value);	
+		obj.TextInput.value = "";
+	}
+	this.InsertButton.onclick = function()
+	{
+		var value = obj.TextInput.value;
 		obj.insert(value);	
 		obj.TextInput.value = "";
 	}
-
-	this.DeleteButton.onclick = function(){
+	this.DeleteButton.onclick = function()
+	{
 		var value = obj.TextInput.value;
-		value = parseFloat(value);
 		obj.delete( value );
 		obj.TextInput.value = "";
 	}
-
-	this.FindButton.onclick = function(){
+	this.FindButton.onclick = function()
+	{
 		var value = obj.TextInput.value;
-		value = parseFloat(value);
 		obj.find( value );
 		obj.TextInput.value = "";
 	}
