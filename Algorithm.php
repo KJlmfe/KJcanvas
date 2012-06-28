@@ -17,16 +17,21 @@
 	</head>
 	<body onload="init();">
 		<div id="wrapper">
-			<div id="header">
-				<h3 id="AlgorithmName"></h3>
 <?php
-	if($_GET['debug']=="true")
+	if(!$_GET['header']=="no")
 	{
-		echo "<script src='ThirdLibrary/debug.js'></script>";
-		echo "<input id='x-coord' class='debug' type=text><input id='y-coord' class='debug' type=text>"; 
+		echo "
+		<div id='header'>
+				<h3 id='AlgorithmName'></h3>";
+		if($_GET['debug']=="true")
+		{
+			echo "<script src='ThirdLibrary/debug.js'></script>";
+			echo "<input id='x-coord' class='debug' type=text><input id='y-coord' class='debug' type=text>"; 
+		}
+		echo "
+			</div>";
 	}
 ?>
-			</div>
 			<div id="body">
 				<div id="AlgorithmControlBar"></div>
 				<canvas></canvas>
