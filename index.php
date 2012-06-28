@@ -9,7 +9,12 @@
 <script type="text/javascript">
 $(function(){
 	$('#content').scrollPagination({
-		'contentPage': 'AlgorithmList.html', // the page where you are searching for results
+<?php 
+	if($_GET['iframe']=='true')
+	echo "'contentPage': 'AlgorithmList(iframe).html', // the page where you are searching for results";
+	else
+	echo "'contentPage': 'AlgorithmList.html', // the page where you are searching for results";
+?>
 		'contentData': {}, // you can pass the children().size() to know where is the pagination
 		'scrollTarget': $(window), // who gonna scroll? in this example, the full window
 		'heightOffset': 10, // how many pixels before reaching end of the page would loading start? positives numbers only please
@@ -41,10 +46,14 @@ $(function(){
 </head>
 <body>
 <div id="scrollpaginationdemo">
-    <div class="about">
-        <h2><a href="index.html">Live Algorithm</a></h1>
- 	<h3>Author:<a href="http://www.freepanda.me">KJlmfe</a><h3>
-    </div>
+<?php
+	if(!$_GET['iframe']=='true')
+		echo "
+    <div class='about'>
+        <h2><a href='index.html'>Live Algorithm</a></h1>
+ 	<h3>Author:<a href='http://www.freepanda.me'>KJlmfe</a><h3>
+    </div>";
+?>
      <div class="about">
     	<h1>Learn algorithm by See Play Think</h1>
     </div>
