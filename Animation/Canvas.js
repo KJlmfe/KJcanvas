@@ -13,15 +13,6 @@ KJcanvas = function(cfg)	//画板类(cfg为参数对象)
 	this.cmdRefreshTime = KJcanvas.CMD_REFRESH_TIME;	//动画控制器刷新间隔时间
 	this.refreshTime = KJcanvas.REFRESH_TIME;        //画面刷新时间
 
-	this.ShapeOnCanvas = new Array();	//初始化ShapeOnCanvas(用于保存画板上存在的图形对象)
-
-	this.setArguments(cfg);
-}
-KJcanvas.prototype.setArguments = function(cfg)		//参数设置(cfg为参数对象)
-{
-	for(var x in cfg)	//设置用户指定的参数
-		this[x] = cfg[x];
-
 	//初始化canvas的2d上下文
 	this.ctx = this.Canvas.getContext("2d"); 
 	
@@ -29,6 +20,32 @@ KJcanvas.prototype.setArguments = function(cfg)		//参数设置(cfg为参数对�
 	this.Canvas.width = this.width;
 	this.Canvas.height = this.height;
 	$(this.Canvas).css("border", this.border);
+
+	this.ShapeOnCanvas = new Array();	//初始化ShapeOnCanvas(用于保存画板上存在的图形对象)
+
+	this.setArguments(cfg);
+	var thisCanvas = this;
+	//添加动画速度控制滑动条
+	jQuery("#SliderSingle").slider({
+		from: 0, 
+		to: 100, 
+		step: 1,
+		round: 2,
+		scale: ["Slow","Normal","Fast"],
+		skin: "plastic",
+		onstatechange: function( value ){
+			if(value >=50 )
+				var speed = (value - 50)/50*(thisCanvas.maxAnimationSpeed-1)+1;
+   			else
+				var speed = (value - 0)/50*(1-0.01)+0.01;	
+			thisCanvas.setArguments({animationSpeed : speed});
+		}
+	});
+}
+KJcanvas.prototype.setArguments = function(cfg)		//参数设置(cfg为参数对象)
+{
+	for(var x in cfg)	//设置用户指定的参数
+		this[x] = cfg[x];
 	
 	//根据动画速度，计算延迟速度(例如:用户设置的是延迟5秒,但动画速度为2(正常速度的两倍),则实际延迟时间为2.5秒)
 	if(this.animationSpeed < 1)  

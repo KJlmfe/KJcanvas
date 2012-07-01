@@ -90,7 +90,7 @@ Shape.prototype.fade = function(action)  //淡入/淡出图形
 	}
 	else if(this.animationStatus[action] == "run")
 	{
-		this.alpha += this.fadeSpeed * this.alphaFactor;	
+		this.alpha += this.fadeSpeed * this.Canvas.animationSpeed * this.alphaFactor;	
 		if(this.alpha >= this.endAlpha)
 		{
 			this.alpha = this.endAlpha;
@@ -106,6 +106,7 @@ Shape.prototype.fade = function(action)  //淡入/淡出图形
 Shape.prototype.nextPosition = function(x1,y1,x2,y2,speed)  //(x1,x2)移动到(默认以两点间直线移动)(x2,y2)且x(或y)每次变化speed的下一为位置
 {
 	speed = speed == null ? this.moveSpeed : speed;
+	speed = speed * this.Canvas.animationSpeed;
 	var arrive = false;
 
 	if(x1 != x2)   //求出直线方程的k与b

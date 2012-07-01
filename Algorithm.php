@@ -3,15 +3,17 @@
 		<title><?=$_GET['name']?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="ThirdLibrary/PageStyle.css">
-		
-		<script src="ThirdLibrary/jquery-1.7.2.min.js"></script>
-		<script src="Animation/Canvas.js"></script>
-		<script src="Animation/ShapeObject.js"></script>
-		<script src="Animation/AnimateArguments.js"></script>
-		<script src="Animation/Rectangle.js"></script>
-		<script src="Animation/Label.js"></script>
-		<script src="Animation/Line.js"></script>
-		<script src="Algorithm/AlgorithmObject.js"></script>
+		<link rel="stylesheet" href="ThirdLibrary/jquery.slider.min.css" type="text/css">
+
+		<script type="text/javascript" src="ThirdLibrary/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="ThirdLibrary/jquery.slider.min.js"></script>
+		<script type="text/javascript" src="Animation/Canvas.js"></script>
+		<script type="text/javascript" src="Animation/ShapeObject.js"></script>
+		<script type="text/javascript" src="Animation/AnimateArguments.js"></script>
+		<script type="text/javascript" src="Animation/Rectangle.js"></script>
+		<script type="text/javascript" src="Animation/Label.js"></script>
+		<script type="text/javascript" src="Animation/Line.js"></script>
+		<script type="text/javascript" src="Algorithm/AlgorithmObject.js"></script>
 		
 		<script src="Algorithm/<?=$_GET['name']?>.js"></script>
 	</head>
@@ -33,7 +35,11 @@
 	}
 ?>
 			<div id="body">
-				<div id="AlgorithmControlBar"></div>
+				<div id="AlgorithmControlBar">
+			 		<div class="layout-slider">
+    		 		 	<input id="SliderSingle" type="slider" name="price" value="50" />
+   				 	</div>
+				</div>
 				<canvas></canvas>
 			</div>
 			<div id="footer">

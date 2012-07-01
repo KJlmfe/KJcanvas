@@ -45,3 +45,14 @@ float : right;
 .debug{
 float : right;
 }
+.layout-slider {
+float : right;
+margin-right: 36px;
+width: 188px; }
+.jslider-label span{
+display : none;
+}
+.jslider-value span{
+display : none;
+}
+
