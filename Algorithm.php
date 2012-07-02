@@ -36,9 +36,9 @@
 ?>
 			<div id="body">
 				<div id="AlgorithmControlBar">
-			 		<div class="layout-slider">
-    		 		 	<input id="SliderSingle" type="slider" name="price" value="50" />
-   				 	</div>
+					<div id="CanvasControlBar">
+			 			<div id="SpeedBar"></div>
+					</div>
 				</div>
 				<canvas></canvas>
 			</div>

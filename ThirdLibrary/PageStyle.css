@@ -45,10 +45,19 @@ float : right;
 .debug{
 float : right;
 }
-.layout-slider {
+#Pause{
+position : relative;
+left : 255px;
+width : 46px;
+}
+#CanvasControlBar{
 float : right;
-margin-right: 36px;
-width: 188px; }
+}
+#SpeedBar{
+float : right;
+margin-right: 70px;
+width: 188px; 
+}
 .jslider-label span{
 display : none;
 }

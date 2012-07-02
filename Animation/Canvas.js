@@ -24,23 +24,7 @@ KJcanvas = function(cfg)	//画板类(cfg为参数对象)
 	this.ShapeOnCanvas = new Array();	//初始化ShapeOnCanvas(用于保存画板上存在的图形对象)
 
 	this.setArguments(cfg);
-	var thisCanvas = this;
-	//添加动画速度控制滑动条
-	jQuery("#SliderSingle").slider({
-		from: 0, 
-		to: 100, 
-		step: 1,
-		round: 2,
-		scale: ["Slow","Normal","Fast"],
-		skin: "plastic",
-		onstatechange: function( value ){
-			if(value >=50 )
-				var speed = (value - 50)/50*(thisCanvas.maxAnimationSpeed-1)+1;
-   			else
-				var speed = (value - 0)/50*(1-0.01)+0.01;	
-			thisCanvas.setArguments({animationSpeed : speed});
-		}
-	});
+	this.addControls();
 }
 KJcanvas.prototype.setArguments = function(cfg)		//参数设置(cfg为参数对象)
 {
@@ -62,18 +46,22 @@ KJcanvas.prototype.cmd = function()		//动画命令控制器
 		this.front = 0;
 		this.cmdRun = false;       		 //是否有命令在执行 false表示没有
 		this.pauseSignal = false;       //动画暂停信号 true表示暂停
+		this.PauseButton.disabled = false;  //启用暂停按钮
 		this.parallelSignal = false;    //并行动画信号 true表示开始并行动画
 		
 		var me = this;
 		this.cmdTimer = setInterval(function()		//启动动画控制器
 		{
 			//表示之前的动画命令执行结束了并且存在尚未运行的动画命令且无暂停信号
-			if(me.cmdRun == false && me.front < me.rear && me.pauseSignal == false) 
+			if(me.cmdRun == false && me.front < me.rear) 
 			{
 				if(me.cmdQueue[me.front][0] == "Delay")		//画面静止
 					me.delay(me.cmdQueue[me.front][1]);
 				else if(me.cmdQueue[me.front][0] == "End")		//动画结束
+				{
+					me.PauseButton.disabled = true;   //禁用暂停按钮
 					clearInterval(me.cmdTimer);		//停止动画控制器
+				}
 				else 		
 					me.refresh(me.cmdQueue[me.front]);  //根据动画命令刷新画板
 				me.front++;
@@ -113,6 +101,8 @@ KJcanvas.prototype.refresh = function(command)
 	var me = this;
 	this.refreshTimer = setInterval(function()  //每24ms刷新一次画板
 	{
+		if(me.pauseSignal == true)
+			return;
 		var j = 0;
 		var allStop = true;		//判断是否执行完了当前所有的动画命令
 		while(command[j] != null)
@@ -212,4 +202,59 @@ KJcanvas.prototype.delay = function(delayTime)		//画板禁止delayTime无变化
 	{
 		me.cmdRun = false;			
 	}, delayTime);
+}
+KJcanvas.prototype.addControlBar = function(type,value,id)
+{
+	var element = document.createElement("input");
+	element.setAttribute("type",type);
+	element.setAttribute("value",value);
+	element.setAttribute("id",id);
+	element.setAttribute("class","CanvasControler");
+
+	var father = document.getElementById("CanvasControlBar");
+	if(type=="slider")
+		var father = document.getElementById("SpeedBar");
+	
+	father.appendChild(element);
+	return element;
+}
+KJcanvas.prototype.addControls = function()
+{
+	var obj = this;
+
+	this.PauseButton = this.addControlBar("button","Pause","Pause");
+	this.SpeedBar = this.addControlBar("slider","50","SliderSingle");
+
+	//添加动画速度控制滑动条
+	jQuery("#SliderSingle").slider({
+		from: 0, 
+		to: 100, 
+		step: 1,
+		round: 2,
+		scale: ["Slow","Normal","Fast"],
+		skin: "plastic",
+		onstatechange: function( value ){
+			if(value >=50 )
+				var speed = (value - 50)/50*(obj.maxAnimationSpeed-1)+1;
+   			else
+				var speed = (value - 0)/50*(1-0.01)+0.01;
+			obj.setArguments({animationSpeed : speed});
+		}
+	});
+
+	this.PauseButton.onclick = function()
+	{
+		if(obj.pauseSignal == true)	
+		{
+			this.value="Pause";
+			obj.cmd("Continue");
+		}
+		else
+		{
+			this.value="Play";
+			obj.cmd("Pause");
+		}
+	}
+	
+	this.PauseButton.disabled = true;
 }
