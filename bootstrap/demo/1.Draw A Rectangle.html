@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Draw A Rectangle</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	</head>
+
+	<body>
+		<h3>Draw A Rectangle</h3>
+		<canvas id="canvas" width="600px" height="400px" style="border:2px solid #0AF"></canvas>
+		<script type="text/javascript">
+			var canvas = document.getElementById("canvas");
+			var ctx = canvas.getContext('2d'); 
+
+			//Set location coordinates
+			var x = 100; 
+			var y = 50;
+
+			//Set size
+			var width = 50;
+			var height = 80;
+			
+			//Set colors
+			var backColor = "Red";
+			var edgeColor = "Black";
+
+			ctx.fillStyle = backColor;  //Set backColor as pen color 
+			ctx.fillRect(x,y,width,height); //Draws a filled rectangle
+			ctx.strokeStyle = edgeColor; //Set edgeColor as pen color
+			ctx.strokeRect(x,y,width,height); //Draws a rectangular outline
+		</script>
+	</body>
+</html>

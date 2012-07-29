@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Create A Rectangle Class</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script type="text/javascript">
+			Rectangle = function(cfg)  //cfg is a object of customize parameters
+			{
+				//Set default parameters
+				this.width = 50;   
+				this.height = 80;		
+ 				this.x = 100;	 
+				this.y = 50;
+				this.backColor = "Red";  
+				this.edgeColor = "Black"; 
+ 
+				//Set customize parameters
+				this.setArguments(cfg);  
+			}
+			Rectangle.prototype.setArguments = function(cfg) //Set customize parameters
+			{
+				for(var x in cfg)
+					this[x] = cfg[x];
+			}
+			Rectangle.prototype.draw = function() //Draw method
+			{
+				ctx.fillStyle = this.backColor;  //Set backColor as pen color 
+				ctx.fillRect(this.x,this.y,this.width,this.height); //Draws a filled rectangle
+				ctx.strokeStyle = this.edgeColor; //Set edgeColor as pen color
+				ctx.strokeRect(this.x,this.y,this.width,this.height); //Draws a rectangular outline
+			}
+		</script>
+	</head>
+
+	<body>
+		<h3>Create A Rectangle Class</h3>
+		<canvas id="canvas" width="600px" height="400px" style="border:2px solid #0AF"></canvas>
+		<script type="text/javascript">
+			var canvas = document.getElementById("canvas");
+			var ctx = canvas.getContext('2d'); 
+
+			var firstShape = new Rectangle();  //Create a rectangle without customize parameters
+			firstShape.draw();
+			
+			var secondShape = new Rectangle   //Create a rectangle with customize parameters
+			({
+				x:300,
+				y:300,
+				height: 50,
+				backColor: "Green"
+			});
+			secondShape.draw();
+		</script>
+	</body>
+</html>

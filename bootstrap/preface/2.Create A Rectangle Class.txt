@@ -1,0 +1,1 @@
+<p>Suppose draw more than one rectangle on canvas and they have self style. You need to write many codes if you go on the previous way. Obviously, they are repeated and redundant. Thers is a better way that creating a rectangle class to avoid these problems. Then new rectangles with the class.</p>

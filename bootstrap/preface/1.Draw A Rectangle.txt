@@ -1,0 +1,2 @@
+<p>Now, let's learn how to draw a rectangle on canvas. We must get the 2d context of object-canvas before we draw something. Then use the methods of ctx(the object of 2d context of canvas) to draw anything you want on canvas. Click the "learn more" button if you want to learn more about drawing shapes on canvas. <a target="_blank" href="https://developer.mozilla.org/en/Canvas_tutorial/Drawing_shapes" class="btn btn-primary btn-small">Learn more &raquo;</a></p>
+

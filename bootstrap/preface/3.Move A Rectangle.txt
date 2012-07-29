@@ -1,0 +1,8 @@
+<p>Think about the theory of movies. You know, one move is made up of many static pictures. When these pictures quickly switch, it becomes moving. So moving a rectangle learn from that.</p>
+<p>The setInterval() method calls a function or evaluates an expression at specified intervals (in milliseconds). Use it to repeat the following steps every 24ms.
+<ol>
+<li>Clear the canvas.</li>
+<li>Set new (x,y) of the rectangle.</li>
+<li>Draw the rectangle.</li>
+</ol>
+</p>

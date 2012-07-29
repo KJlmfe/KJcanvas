@@ -1,0 +1,6 @@
+<p>
+We have achieved parallel animation(move together). The last problem to solve is serial animation(move some when others have arrived).
+</p>
+<p>
+We need two setInterval(), one is used for checking whether previous animation commands have stopped, the other is used for running one animation commands(refresh canvas). They communicate by "cmdRun"(a flag of all previous animation commands have been stopped). It just like a lock.
+</p>

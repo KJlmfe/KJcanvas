@@ -1,0 +1,10 @@
+<p>
+	On "3.Move A Rectangle", when you click the "Move it!" button, the red rectangle disappear. Clearly none of us want to see that happen. 
+</p>
+<p>
+It is very easy to solve this problem with a stack. Add the following into codes.
+<ul>
+<li>Push shapes into the stack after drawing them on canvas.</li>
+<li>Draw all shapes in the stack when refresh canvas.</li>
+</ul>
+</p>

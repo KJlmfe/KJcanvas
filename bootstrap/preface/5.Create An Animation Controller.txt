@@ -1,0 +1,22 @@
+<p>
+Suppose move more than one rectangle on canvas and they have self move parameters. We will fall into complex codes if go on previous way. 
+So create a simple and convenient interface for animation.</p>
+<p>
+Here is the interface and conventions.
+
+<dl>
+<dt>cmd
+({
+	a1,b1,c1,
+	a2,b2,c2,
+	a3,b3,c3,
+	...
+});
+</dt>
+<ul>
+<li>a* is a string such as "Move","Draw"</li>
+<li>b* is an object of shape</li>
+<li>c* is an object of animation parameters such as {aim_x:10,aim_y:10,moveSpeed:2}</li>
+</ul>
+</dl>
+</p>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Create An Animation Controller</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script type="text/javascript">
+			Rectangle = function(cfg)  //cfg is a object of customize parameters
+			{
+				//Record the animation running state
+				//I use array not a single variable for shapes have "Move","Draw","FadeIn","FadeOut" and so on
+				this.animationStatus = new Array();
+
+				//Set default parameters
+				this.width = 50;   
+				this.height = 80;		
+ 				this.x = 100;	 
+				this.y = 50;
+				this.backColor = "Red";  
+				this.edgeColor = "Black"; 
+ 
+				//Set customize parameters
+				this.setArguments(cfg);  
+			}
+			Rectangle.prototype.setArguments = function(cfg) //Set customize parameters
+			{
+				for(var x in cfg)
+					this[x] = cfg[x];
+			}
+			Rectangle.prototype.draw = function() //Draw method
+			{
+				ctx.fillStyle = this.backColor;  //Set backColor as pen color 
+				ctx.fillRect(this.x,this.y,this.width,this.height); //Draws a filled rectangle
+				ctx.strokeStyle = this.edgeColor; //Set edgeColor as pen color
+				ctx.strokeRect(this.x,this.y,this.width,this.height); //Draws a rectangular outline
+				this.animationStatus["Draw"] = "Stop";			
+			}
+			Rectangle.prototype.nextPosition = function()  
+			{
+				var x1 = this.x;
+				var y1 = this.y;
+				var x2 = this.aim_x;
+				var y2 = this.aim_y;
+				
+				//Calculate the next location coordinates from (x1,y1) to (x2,y2) step by moveSpeed
+				if(x1 != x2)   
+				{
+					var k = (y1-y2) / (x1-x2);  
+					var b = y1 - k*x1;
+					x1 += this.moveSpeed * (x2-x1) / Math.abs(x2-x1);
+					y1 = k*x1 + b;
+				}
+				else if(y1 != y2)
+					y1 += this.moveSpeed * (y2-y1) / Math.abs(y2-y1);
+
+				//Determine whether arrives and set the new location coordinates
+				if(Math.abs(x1-x2)<this.moveSpeed && Math.abs(y1-y2)<this.moveSpeed)
+				{
+					this.x = x2;
+					this.y = y2;
+					this.animationStatus["Move"] = "Stop";
+				}
+				else
+				{
+					this.x = x1;
+					this.y = y1;
+				}
+			}
+			var ShapeOnCanvas = new Array();  //A stack to save shapes that on canvas
+			cmd = function()
+			{
+				command = arguments;  //"command" is a long array that save animation commands
+				//"command[i]" is a string such as "Move","Draw"
+				//"command[i+1]" is an object of shape
+				//"command[i+2]" is an object of animation parameters such as {aim_x:10,aim_y:10,moveSpeed:2} 
+				for(var i=0; i<command.length; i+=3)  //Do the preparation before start animation(refresh canvas)
+				{
+					command[i+1].animationStatus[command[i]] = "new";  //init all animation status as "new"
+					command[i+1].setArguments(command[i+2]);  //Set animation parameters
+					ShapeOnCanvas.push(command[i+1]);  //Push it into the stack
+				}
+	
+				timer = setInterval(function()   //Run once every 24ms
+				{
+					var j = 0;
+					var allStop = true;  //"allStop" is the flag of all animations have been stopped
+					for(var j=0; j<command.length; j+=3)
+						if(command[j+1].animationStatus[command[j]] == "new")
+						{
+							switch(command[j])
+							{
+								case "Draw":
+									command[j+1].draw();
+									break;
+								case "Move":
+									command[j+1].nextPosition();
+									break;
+							}	
+							allStop = false;
+						}
+					ctx.clearRect(0,0,600,400);  //Clear the canvas
+					for(var i=0;i<ShapeOnCanvas.length;i++)
+						ShapeOnCanvas[i].draw();  //Draw all shapes that on canvas
+					if(allStop)
+						clearInterval(timer);  //Stop setInterval() when all animations have been stopped
+				}, 24);
+			}	
+		</script>
+	</head>
+
+	<body>
+		<h3>Create An Animation Controller <button onclick="move();">Click Me!</button></h3>
+		<canvas id="canvas" width="600px" height="400px" style="border:2px solid #0AF"></canvas>
+		<script type="text/javascript">
+			var canvas = document.getElementById("canvas");
+			var ctx = canvas.getContext('2d'); 
+			
+			var staticShape = new Rectangle();
+			var moveShape = new Rectangle
+			({
+				x:10,
+				y:10,
+				height:40,
+				backColor: "Yellow",
+			});
+			var fastMoveShape = new Rectangle
+			({
+				x:400,
+				y:10,
+				height:50,
+				backColor: "Green",				
+			});
+
+			function move()
+			{
+				cmd
+				(
+					"Draw",staticShape,{},
+					"Move",moveShape,{aim_x:400,aim_y:300,moveSpeed:3},
+					"Move",fastMoveShape,{aim_x:100,aim_y:300,moveSpeed:6}
+				);
+			}
+		</script>
+	</body>
+</html>
