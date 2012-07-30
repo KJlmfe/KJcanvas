@@ -3,9 +3,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Live Algorithm</title>
-<script type="text/javascript" src="ThirdLibrary/jquery-1.7.2.min.js"></script>
-<script type="text/javascript" src="ThirdLibrary/scrollpagination.js"></script>
-<link href="ThirdLibrary/scrollpagination_demo.css" rel="stylesheet" media="screen" />
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="js/scrollpagination.js"></script>
+<link href="css/scrollpagination_demo.css" rel="stylesheet" media="screen" />
 <script type="text/javascript">
 $(function(){
 	$('#content').scrollPagination({

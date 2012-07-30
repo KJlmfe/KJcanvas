@@ -1,0 +1,43 @@
+#WarmBed
+{
+width:955px;
+margin : auto;
+}
+#AlgorithmControlBar{
+width : 954px;
+margin-bottom : 10px;
+border-bottom : 1px dashed #D4D4D4;
+background-color: #F3F3F3;
+margin-right : 0;
+float : left;
+}
+#AlgorithmControlBar input{
+padding : 2px;
+margin : 5px;
+}
+#AlgorithmControlBar input[type="text"]{
+width : 88px;
+}
+.debug{
+float : right;
+}
+#Pause{
+position : relative;
+left : 255px;
+width : 46px;
+}
+#CanvasControlBar{
+float : right;
+}
+#SpeedBar{
+float : right;
+margin-right: 70px;
+width: 188px; 
+}
+.jslider-label span{
+display : none;
+}
+.jslider-value span{
+display : none;
+}
+
