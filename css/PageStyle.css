@@ -1,19 +1,19 @@
 #WarmBed
 {
-width:955px;
 margin : auto;
 }
 #AlgorithmControlBar{
-width : 954px;
+width : 100%;
 margin-bottom : 10px;
 border-bottom : 1px dashed #D4D4D4;
 background-color: #F3F3F3;
 margin-right : 0;
 float : left;
 }
-#AlgorithmControlBar input{
+.controler{
 padding : 2px;
-margin : 5px;
+margin : 4px;
+margin-top : 9px;
 }
 #AlgorithmControlBar input[type="text"]{
 width : 88px;
@@ -23,8 +23,10 @@ float : right;
 }
 #Pause{
 position : relative;
-left : 255px;
+left : 205px;
 width : 46px;
+padding : 2px;
+margin-bottom : 10px;
 }
 #CanvasControlBar{
 float : right;

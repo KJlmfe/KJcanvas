@@ -118,6 +118,18 @@ KJcanvas.prototype.refresh = function(command)
 				}
 				j += 2;
 			}
+			else if(command[j] == "Light")	//高亮指定代码行
+			{
+				if(runStatus[j] == "new" || runStatus[j] == "run")
+				{	
+					$(".line").removeClass("highlighted");  //取消所有高亮
+					for(var k in command[j+1])
+						$(".line.number"+command[j+1][k]).addClass("highlighted");  //设置指定行的高亮
+					runStatus[j] = "stop";
+					allStop = false;
+				}
+				j += 2;
+			}
 			else if(typeof(command[j+2]) == "object")	//有参数对象的动画指令
 			{
 				if(runStatus[j] == "new" || runStatus[j] == "run")

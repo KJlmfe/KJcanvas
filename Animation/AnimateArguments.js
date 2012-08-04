@@ -1,4 +1,4 @@
-KJcanvas.WIDTH = 950; 			   //画板宽度
+KJcanvas.WIDTH = 666; 			   //画板宽度
 KJcanvas.HEIGHT = 410;             //画板高度
 KJcanvas.BORDER = "2px solid #0AF";//画板边框样式
 

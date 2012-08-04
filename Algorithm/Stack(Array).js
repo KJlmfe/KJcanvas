@@ -137,7 +137,7 @@ Stack.prototype.push = function(value)
 			edgeWidth : Stack.SHAPE_EDGEWIDTH
 		});
 		Canvas.cmd("Setup");
-		Canvas.cmd("FadeIn", this.stack[this.top]);
+		Canvas.cmd("FadeIn", this.stack[this.top], "Light",[3]);
 		Canvas.cmd("Delay");
 		Canvas.cmd
 		(
@@ -147,6 +147,7 @@ Stack.prototype.push = function(value)
 				aim_y : this.frame[this.top].y,
 			}
 		);
+		Canvas.cmd("Delay");
 		Canvas.cmd
 		(
 			"Move", this.pointer,
@@ -158,12 +159,15 @@ Stack.prototype.push = function(value)
 			{
 				aimStart_y : this.line.start_y - Stack.FRAME_HEIGHT, 
 				aimEnd_y : this.line.end_y - Stack.FRAME_HEIGHT, 
-			}
+			},
+			"Light", [4]
 		);
+		Canvas.cmd("Delay");
 		Canvas.cmd("Other", function()
 		{
 			thisStack.enableControlBar();
 		});
+		Canvas.cmd("Light", []);
 	    Canvas.cmd("End");
 		this.top++;
 	}
@@ -188,18 +192,21 @@ Stack.prototype.pop = function()
 			{
 				aimStart_y : this.line.start_y + Stack.FRAME_HEIGHT, 
 				aimEnd_y : this.line.end_y + Stack.FRAME_HEIGHT, 
-			}
+			},
+			"Light", [9]
 		);
+		Canvas.cmd("Delay");
 	   	Canvas.cmd
 		(
 			"Move", this.stack[this.top],
 			{
 				aim_x : Stack.SHAPE_X,
 				aim_y : Stack.SHAPE_Y,
-			}
+			},
+			"Light", [10]
 		);
 		Canvas.cmd("Delay");
-		Canvas.cmd("FadeOut", this.stack[this.top]);
+		Canvas.cmd("FadeOut", this.stack[this.top], "Light", []);
 		Canvas.cmd("Other", function()
 		{
 			$(".controler").removeAttr("disabled");		

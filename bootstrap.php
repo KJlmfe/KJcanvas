@@ -16,6 +16,7 @@
       }
     </style>
     <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link type="text/css" rel="stylesheet"  href="css/shCoreDefault.css"/>
 		
 	<link rel="stylesheet" href="css/PageStyle.css">
 
@@ -55,26 +56,36 @@
     </div>
 
     <div class="container">
-
 		<div class='row'>
 			<div class='span12'>
-				<div id="WarmBed">
 				<h2><?=$_GET['name']?></h2>
-	<?php
+<?php
 		if($_GET['debug']=="true")
 		{
 			echo "<script src='js/debug.js'></script>";
 			echo "<input id='x-coord' class='debug' type=text><input id='y-coord' class='debug' type=text>"; 
 		}
 ?>
-					<div id="AlgorithmControlBar">
-						<div id="CanvasControlBar">
-			 				<div id="SpeedBar"></div>
-						</div>
+				<div id="AlgorithmControlBar">
+					<div id="CanvasControlBar">
+			 			<div id="SpeedBar"></div>
 					</div>
+				</div>
+			</div>
+		</div>
+		<div class='row'>
+			<div class='span7-fluid'>
+				<div id="WarmBed">
 					<canvas></canvas>
 				</div>
-
+			</div>
+			<div class="span5">
+				<pre class="brush: c; toolbar: false">
+<?php
+$sourceCode = file_get_contents("src/".$_GET['name'].".c");
+echo $sourceCode;
+?>
+				</pre>
 			</div>
 		</div>
       
@@ -89,10 +100,12 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-	<script src="js/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="js/jquery.slider.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-	
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/shCore.js"></script>
+	<script type="text/javascript" src="js/shBrushCpp.js"></script>
+	<script type="text/javascript">SyntaxHighlighter.all();</script>
 	<script type="text/javascript" src="Animation/Canvas.js"></script>
 	<script type="text/javascript" src="Animation/ShapeObject.js"></script>
 	<script type="text/javascript" src="Animation/AnimateArguments.js"></script>
