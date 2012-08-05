@@ -254,6 +254,16 @@ KJcanvas.prototype.addControls = function()
 		}
 	});
 
+	//Add shotcut key
+	$("body").keydown(function(e){
+		if(window.event) // IE8 and earlier
+			keynum = e.keyCode;
+		else if(e.which) // IE9/Firefox/Chrome/Opera/Safari
+			keynum = e.which;
+		if(keynum==13 && $("#Pause").attr("disabled")==undefined )  //"enter" play or pause 
+			$("#Pause").click();
+	});
+
 	this.PauseButton.onclick = function()
 	{
 		if(obj.pauseSignal == true)	
